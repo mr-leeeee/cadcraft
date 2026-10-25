@@ -54,6 +54,11 @@ pub fn specs() -> Vec<CommandSpec> {
             .alias(&["printpdf", "pdfb"])
             .params("{path?: \"DIR/NAME^NAME2.pdf\" (default: the drawing's file; a `^` splits the name into one book name per row of frames; else returns base64 `data` per book), names?: [book names], frameHeight?: mm (default 297), unit?: mm per drawing unit (default 1)} → {books: [{name, pages, bytes, path? | data}], skipped}: closed polylines of the frame height in model space are sheet frames; each row (same lower edge, bottom to top) is one PDF, its frames left to right one page each on the paper (ISO A-series, either orientation) they match")
             .noundo(),
+        CommandSpec::new("multiplot", "Multi-Plot...", run_multiplot)
+            .menu(&["File", "Multi-Plot..."])
+            .alias(&["mp"])
+            .params("{frameHeight?: mm (default 297), unit?: mm per drawing unit (default 1)} → opens dialog for batch plotting multiple sheets")
+            .noundo(),
         CommandSpec::new("attach", "Attach", |_, _| {
             Err(EngineError::Other("ATTACH is not available yet: raster images and PDF/DWF/DGN underlays can't be shown yet".into()))
         })
@@ -430,14 +435,15 @@ const FRAME_TOL_MM: f64 = 0.5;
 const MAX_FRAMES: usize = 100_000;
 
 /// A sheet frame found in model space.
-struct Frame {
-    window: Bounds2,
-    paper: &'static str,
-    landscape: bool,
+#[derive(Clone)]
+pub struct Frame {
+    pub window: Bounds2,
+    pub paper: &'static str,
+    pub landscape: bool,
 }
 
 /// The ISO/ANSI paper a frame of `w` x `h` mm fits (either orientation), and whether it is landscape.
-fn paper_for(w: f64, h: f64) -> Option<(&'static str, bool)> {
+pub fn paper_for(w: f64, h: f64) -> Option<(&'static str, bool)> {
     cadcraft_render::PAPER_SIZES.iter().find_map(|p| {
         let (pw, ph) = (p.width_mm, p.height_mm);
         if (pw - w).abs() <= FRAME_TOL_MM && (ph - h).abs() <= FRAME_TOL_MM {
@@ -450,8 +456,56 @@ fn paper_for(w: f64, h: f64) -> Option<(&'static str, bool)> {
     })
 }
 
+/// Options for flexible frame detection.
+#[derive(Clone, Default)]
+pub struct FrameFindOptions {
+    /// Frame height to match (mm). If None, match any size.
+    pub frame_height: Option<f64>,
+    /// Tolerance for frame height match (mm).
+    pub height_tolerance: f64,
+    /// Minimum frame size (mm) - frames smaller than this are skipped.
+    pub min_size_mm: f64,
+    /// Maximum frame size (mm) - frames larger than this are skipped.
+    pub max_size_mm: f64,
+    /// If true, skip paper size matching and return all closed rectangles.
+    pub find_all_rectangles: bool,
+    /// Aspect ratio tolerance (0.0 = exact, 1.0 = any). For paper matching.
+    pub aspect_tolerance: f64,
+    /// Drawing unit per mm (for coordinate conversion).
+    pub unit: f64,
+}
+
+impl FrameFindOptions {
+    pub fn exact(frame_height: f64, unit: f64) -> Self {
+        Self { frame_height: Some(frame_height), height_tolerance: 0.0005, unit, ..Default::default() }
+    }
+    pub fn flexible(unit: f64) -> Self {
+        Self { frame_height: None, height_tolerance: 10.0, unit, min_size_mm: 50.0, max_size_mm: 2000.0, find_all_rectangles: true, aspect_tolerance: 0.3, ..Default::default() }
+    }
+}
+
+#[derive(Clone, Default)]
+pub struct FrameFindOptionsInternal {
+    pub frame_height: Option<f64>,
+    pub height_tolerance: f64,
+    pub min_size_mm: f64,
+    pub max_size_mm: f64,
+    pub find_all_rectangles: bool,
+    pub aspect_tolerance: f64,
+    pub unit: f64,
+}
+
 /// Sheet frames grouped into books: rows of equal lower edge, bottom to top, each left to right.
-fn frame_books(d: &Drawing, frame_height: f64, unit: f64) -> (Vec<Vec<Frame>>, usize) {
+pub fn frame_books(d: &Drawing, frame_height: f64, unit: f64) -> (Vec<Vec<Frame>>, usize) {
+    frame_books_with_options(d, FrameFindOptionsInternal {
+        frame_height: Some(frame_height),
+        height_tolerance: 0.0005,
+        unit,
+        ..Default::default()
+    })
+}
+
+pub fn frame_books_with_options(d: &Drawing, opts: FrameFindOptionsInternal) -> (Vec<Vec<Frame>>, usize) {
     let mut found: Vec<(i64, f64, Frame)> = Vec::new();
     let mut skipped = 0;
     for e in d.model.iter().take(MAX_FRAMES) {
@@ -463,18 +517,56 @@ fn frame_books(d: &Drawing, frame_height: f64, unit: f64) -> (Vec<Vec<Frame>>, u
         if b.is_empty() || !b.width().is_finite() || !b.height().is_finite() {
             continue;
         }
-        let (w, h) = (b.width() * unit, b.height() * unit);
-        if (h - frame_height).abs() > 0.0005 {
+        let (w, h) = (b.width() * opts.unit, b.height() * opts.unit);
+        
+        // Size filtering
+        if w < opts.min_size_mm || h < opts.min_size_mm || w > opts.max_size_mm || h > opts.max_size_mm {
+            skipped += 1;
             continue;
         }
-        match paper_for(w, h) {
-            Some((paper, landscape)) => {
-                let row = (b.min.y * 1000.0).round();
-                if row.is_finite() && row.abs() < 9e15 {
-                    found.push((row as i64, b.min.x, Frame { window: b, paper, landscape }));
+        
+        // Height matching (if frame_height specified)
+        if let Some(fh) = opts.frame_height {
+            if (h - fh).abs() > opts.height_tolerance && (w - fh).abs() > opts.height_tolerance {
+                skipped += 1;
+                continue;
+            }
+        }
+        
+        // Paper matching (unless find_all_rectangles)
+        let (paper, landscape) = if opts.find_all_rectangles {
+            // Find best matching paper with aspect tolerance
+            match paper_for(w, h) {
+                Some(p) => p,
+                None if opts.aspect_tolerance > 0.0 => {
+                    // Find paper with similar aspect ratio
+                    let target_aspect = w / h;
+                    cadcraft_render::PAPER_SIZES.iter().find_map(|p| {
+                        let pa = p.width_mm / p.height_mm;
+                        if (pa - target_aspect).abs() <= opts.aspect_tolerance * target_aspect {
+                            Some((p.name, false))
+                        } else if (1.0/pa - target_aspect).abs() <= opts.aspect_tolerance * target_aspect {
+                            Some((p.name, true))
+                        } else {
+                            None
+                        }
+                    }).unwrap_or(("Unknown", false))
+                }
+                None => ("Custom", false),
+            }
+        } else {
+            match paper_for(w, h) {
+                Some(p) => p,
+                None => {
+                    skipped += 1;
+                    continue;
                 }
             }
-            None => skipped += 1,
+        };
+        
+        let row = (b.min.y * 1000.0).round();
+        if row.is_finite() && row.abs() < 9e15 {
+            found.push((row as i64, b.min.x, Frame { window: b, paper, landscape }));
         }
     }
     found.sort_by(|a, b| a.0.cmp(&b.0).then(a.1.total_cmp(&b.1)));
@@ -536,6 +628,12 @@ fn run_pdfbook(s: &mut Session, p: &Value) -> Result<Value> {
     }
     let message = format!("Plotted {} book(s), {} sheet(s)", out.len(), books.iter().map(Vec::len).sum::<usize>());
     Ok(json!({ "books": out, "skipped": skipped, "message": message }))
+}
+
+
+/// MULTIPLOT command: opens the multi-plot dialog (UI only, no-op in JSON mode).
+fn run_multiplot(_s: &mut Session, _p: &Value) -> Result<Value> {
+    Ok(json!({ "message": "Use the Multi-Plot dialog (menu File ▸ Multi-Plot... or type MULTIPLOT)" }))
 }
 
 #[cfg(test)]

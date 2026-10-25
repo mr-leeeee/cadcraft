@@ -76,6 +76,10 @@ pub fn specs() -> Vec<CommandSpec> {
             .params(
                 "{layout?: current, device?: plotter name (PLOTTERMANAGER) | \"None\", paper?: the device's paper | \"A4\"|\"A3\"|\"Letter\"|\"ANSI B\"|…, width?, height? (mm), landscape?, margins?: [l,b,r,t] mm, lineweights?, plotArea?, scale?, scaleToFit?, center?, plotStyleTable?: \"monochrome.ctb\"|\"grayscale.ctb\"|\"default.ctb\"|\"None\"|…, displayPlotStyles?: bool, plotTransparency?: bool}",
             ),
+        CommandSpec::new("modelpagesetup", "Model Page Setup", run_modelpagesetup)
+            .params(
+                "{device?: plotter name (PLOTTERMANAGER) | \"None\", paper?: the device's paper | \"A4\"|\"A3\"|\"Letter\"|\"ANSI B\"|…, width?, height? (mm), landscape?, margins?: [l,b,r,t] mm, lineweights?, plotArea?, scale?, scaleToFit?, center?, plotStyleTable?, displayPlotStyles?, plotTransparency?}",
+            ),
         CommandSpec::new("plot", "Print...", |s, p| run_plot(s, &super::plotters::plot_options(s, p, "plot")?, "plot"))
             .menu(&["File", "Print..."])
             .key("Cmd+P")
@@ -728,6 +732,97 @@ fn run_pagesetup(s: &mut Session, p: &Value) -> Result<Value> {
         s.touch();
     }
     Ok(json!({ "layout": name, "page": serde_json::to_value(&page).unwrap_or(Value::Null) }))
+}
+
+/// Model space page setup (for PLOT dialog "Apply to Model").
+fn run_modelpagesetup(s: &mut Session, p: &Value) -> Result<Value> {
+    let cmd = "modelpagesetup";
+    let keys = [
+        "device",
+        "paper",
+        "width",
+        "height",
+        "landscape",
+        "margins",
+        "lineweights",
+        "plotArea",
+        "scale",
+        "scaleToFit",
+        "center",
+        "plotStyleTable",
+        "displayPlotStyles",
+        "plotTransparency",
+    ];
+    let changes = keys.iter().any(|k| p.get(k).is_some());
+    let mut page = s.doc()?.model_page_setup.clone().unwrap_or_else(|| {
+        cadcraft_doc::PageSetup { plot_area: "extents".into(), scale_to_fit: true, ..Default::default() }
+    });
+    // A plotter's own papers (with their printable areas) come first.
+    let device_paper = super::plotters::page_device(cmd, p, &mut page)?;
+    if let Some(paper) = p.get("paper").filter(|_| !device_paper) {
+        let n = paper.as_str().ok_or_else(|| bad(cmd, "`paper` must be a paper name"))?;
+        let ps = cadcraft_render::paper_size(n).ok_or_else(|| {
+            let known: Vec<&str> = cadcraft_render::PAPER_SIZES.iter().filter_map(|p| p.aliases.first().copied()).collect();
+            bad(cmd, format!("unknown paper size `{n}` (known: {})", known.join(", ")))
+        })?;
+        page.paper = ps.name.into();
+        page.width_mm = ps.width_mm;
+        page.height_mm = ps.height_mm;
+    }
+    let mm = |k: &str| p.get(k).and_then(Value::as_f64).filter(|v| v.is_finite() && *v > 0.0 && *v <= 5080.0);
+    match (mm("width"), mm("height")) {
+        (Some(w), Some(h)) => {
+            page.paper = format!("User ({w:.2} x {h:.2} MM)");
+            page.width_mm = w.min(h);
+            page.height_mm = w.max(h);
+        }
+        (None, None) if p.get("width").is_none() && p.get("height").is_none() => {}
+        _ => return Err(bad(cmd, "`width` and `height` (mm, 0-5080) are both required for a custom size")),
+    }
+    if let Some(l) = p.get("landscape").and_then(Value::as_bool) {
+        page.landscape = l;
+    }
+    if let Some(m) = p.get("margins") {
+        let a: Vec<f64> = m.as_array().map(|a| a.iter().filter_map(Value::as_f64).collect()).unwrap_or_default();
+        match a[..] {
+            [l, b, r, t] if a.iter().all(|v| v.is_finite() && (0.0..=1000.0).contains(v)) => page.margins_mm = [l, b, r, t],
+            _ => return Err(bad(cmd, "`margins` must be [left, bottom, right, top] in mm")),
+        }
+    }
+    if let Some(v) = p.get("lineweights").and_then(Value::as_bool) {
+        page.lineweights = v;
+    }
+    if let Some(v) = p.get("scaleToFit").and_then(Value::as_bool) {
+        page.scale_to_fit = v;
+    }
+    if let Some(v) = p.get("center").and_then(Value::as_bool) {
+        page.center = v;
+    }
+    if let Some(v) = p.get("scale") {
+        page.scale = parse_scale(v).ok_or_else(|| bad(cmd, "`scale` must be positive"))?;
+    }
+    if let Some(v) = str_param(p, "plotArea") {
+        let v = v.to_ascii_lowercase();
+        if !["layout", "extents", "display", "window", "limits"].contains(&v.as_str()) {
+            return Err(bad(cmd, "`plotArea` must be layout, extents, display, window or limits"));
+        }
+        // Model space: store the plot area for DXF round trips.
+        page.plot_area = v;
+    }
+    if let Some(v) = str_param(p, "plotStyleTable") {
+        page.plot_style_table = v.chars().take(260).collect();
+    }
+    if let Some(v) = p.get("displayPlotStyles").and_then(Value::as_bool) {
+        page.show_plot_styles = v;
+    }
+    if let Some(v) = p.get("plotTransparency").and_then(Value::as_bool) {
+        page.plot_transparency = v;
+    }
+    if changes {
+        s.doc_mut()?.model_page_setup = Some(page.clone());
+        s.touch();
+    }
+    Ok(json!({ "layout": "Model", "page": serde_json::to_value(&page).unwrap_or(Value::Null) }))
 }
 
 // ---------- plotting ----------

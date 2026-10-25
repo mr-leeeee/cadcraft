@@ -1170,42 +1170,40 @@ fn parse_entities(recs: &[(String, Vec<Tag>)], d: &mut Drawing, rx: &mut Rx, ski
                 };
                 kindent = Some((c, k));
             }
-            "INSERT" => {
-                if t.i(66) == Some(1) {
-                    let mut attribs = Vec::new();
-                    let ins_layer = kindent.as_ref().map(|(c, _)| c.layer.clone()).unwrap_or_default();
-                    while let Some((k2, t2)) = recs.get(i) {
-                        if k2 == "ATTRIB" {
-                            let tt = T(t2);
-                            // A multiline attribute has its text as embedded MTEXT after its own groups.
-                            let (own, embedded) = split_embedded(t2);
-                            let multiline = multiline_attrib(embedded, &common(&tt));
-                            let own = T(own);
-                            let mut text = text_from(&own);
-                            if let Some(m) = &multiline {
-                                text.value.clone_from(&m.read_as);
-                            }
-                            attribs.push(Attrib {
-                                tag: own.s(2).unwrap_or_default(),
-                                text,
-                                invisible: own.i(70).unwrap_or(0) & 1 != 0,
-                                constant: false,
-                                prompt: String::new(),
-                                props: attrib_props(&tt, &ins_layer),
-                                multiline,
-                                modes: attrib_modes(own.0),
-                            });
-                            i += 1;
-                        } else {
-                            if k2 == "SEQEND" {
-                                i += 1;
-                            }
-                            break;
+            "INSERT" if t.i(66) == Some(1) => {
+                let mut attribs = Vec::new();
+                let ins_layer = kindent.as_ref().map(|(c, _)| c.layer.clone()).unwrap_or_default();
+                while let Some((k2, t2)) = recs.get(i) {
+                    if k2 == "ATTRIB" {
+                        let tt = T(t2);
+                        // A multiline attribute has its text as embedded MTEXT after its own groups.
+                        let (own, embedded) = split_embedded(t2);
+                        let multiline = multiline_attrib(embedded, &common(&tt));
+                        let own = T(own);
+                        let mut text = text_from(&own);
+                        if let Some(m) = &multiline {
+                            text.value.clone_from(&m.read_as);
                         }
+                        attribs.push(Attrib {
+                            tag: own.s(2).unwrap_or_default(),
+                            text,
+                            invisible: own.i(70).unwrap_or(0) & 1 != 0,
+                            constant: false,
+                            prompt: String::new(),
+                            props: attrib_props(&tt, &ins_layer),
+                            multiline,
+                            modes: attrib_modes(own.0),
+                        });
+                        i += 1;
+                    } else {
+                        if k2 == "SEQEND" {
+                            i += 1;
+                        }
+                        break;
                     }
-                    if let Some((_, EntityKind::Insert(ins))) = kindent.as_mut() {
-                        ins.attribs = attribs;
-                    }
+                }
+                if let Some((_, EntityKind::Insert(ins))) = kindent.as_mut() {
+                    ins.attribs = attribs;
                 }
             }
             // A VERTEX or ATTRIB with no POLYLINE or INSERT before it; a stray SEQEND holds nothing.
@@ -1745,6 +1743,10 @@ pub fn read(bytes: &[u8]) -> Result<Drawing> {
     layout_objs.sort_by_key(|l| l.1);
     for (name, order, br, page) in &layout_objs {
         if name.eq_ignore_ascii_case("Model") {
+            d.model_page_setup = Some(page.clone());
+            if let Some(bname) = rx.brs.get(br) {
+                paper_block_for.insert(bname.to_ascii_uppercase(), name.clone());
+            }
             continue;
         }
         d.layouts.push(Layout { page: page.clone(), ..Layout::new(name, *order) });

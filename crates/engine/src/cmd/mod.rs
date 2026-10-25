@@ -12,7 +12,7 @@ mod draw;
 mod draw2;
 mod draworder;
 mod edit;
-mod exchange;
+pub mod exchange;
 pub mod file;
 mod gripcmds;
 mod griphot;
@@ -37,6 +37,7 @@ mod selecttools;
 mod settings;
 mod spline_opts;
 mod table;
+mod thread;
 mod tolerance;
 mod trimextend;
 mod utility;
@@ -46,6 +47,9 @@ pub mod curves;
 pub mod helpers;
 pub mod machines;
 pub mod options;
+
+// Re-export for multi-plot dialog
+pub use exchange::{frame_books, frame_books_with_options, Frame, paper_for, FrameFindOptionsInternal, FrameFindOptions};
 
 use cadcraft_doc::Handle;
 use cadcraft_geom::Vec2;
@@ -199,6 +203,7 @@ pub fn command_specs() -> &'static [CommandSpec] {
         v.extend(options::specs());
         v.extend(utility::specs());
         v.extend(table::specs());
+        v.extend(thread::specs());
         v.extend(tolerance::specs());
         v.extend(constraints::specs());
         v.extend(lisp::specs());
