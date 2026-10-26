@@ -1844,6 +1844,7 @@ fn setup_layouts(d: &mut Drawing, layout_objs: &mut [LayoutDef], rx: &Rx) -> (Ha
     layout_objs.sort_by_key(|l| l.1);
     for (name, order, br, page) in layout_objs.iter() {
         if name.eq_ignore_ascii_case("Model") {
+            d.model_page_setup = Some(page.clone());
             continue;
         }
         d.layouts.push(Layout { page: page.clone(), ..Layout::new(name, *order) });

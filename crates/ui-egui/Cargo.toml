@@ -26,6 +26,7 @@ serde_json = { workspace = true }
 log = { workspace = true }
 chrono = { workspace = true }
 image = { workspace = true }
+uuid = { version = "1", features = ["v4"] }
 web-time = { workspace = true }
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
