@@ -98,7 +98,7 @@ pub struct Drawing {
     pub blocks: BTreeMap<String, std::sync::Arc<Block>>,
     pub model: EntityStore,
     pub layouts: Vec<Layout>,
-/// Model space page setup (for PLOT dialog "Apply to Model").
+    /// Model space page setup (for PLOT dialog "Apply to Model").
     pub model_page_setup: Option<PageSetup>,
     /// The layout a file marks active (its block is `*Paper_Space`, the others `*Paper_SpaceN`),
     /// written active again. `None`, or a layout that no longer exists: the first by tab order.
@@ -176,7 +176,7 @@ impl Drawing {
             blocks: BTreeMap::new(),
             model: EntityStore::new(),
             layouts: vec![Layout::new("Layout1", 1), Layout::new("Layout2", 2)],
-model_page_setup: None,
+            model_page_setup: None,
             active_layout: None,
             views: Vec::new(),
             vports: Vec::new(),

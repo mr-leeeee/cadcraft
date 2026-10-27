@@ -53,7 +53,7 @@ pub mod machines;
 pub mod options;
 
 // Re-export for multi-plot dialog
-pub use exchange::{frame_books, frame_books_with_options, Frame, paper_for, FrameFindOptionsInternal, FrameFindOptions};
+pub use exchange::{Frame, FrameFindOptions, FrameFindOptionsInternal, frame_books, frame_books_with_options, paper_for};
 
 use cadcraft_doc::Handle;
 use cadcraft_geom::Vec2;

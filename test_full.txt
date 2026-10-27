@@ -1,0 +1,3081 @@
+warning: patch `egui_demo_lib v0.37.0 (https://github.com/storytold/egui.git?rev=6d518fc799681571963842f95b55a6b68431b15a#6d518fc7)` was not used in the crate graph
+warning: patch `egui_extras v0.37.0 (https://github.com/storytold/egui.git?rev=6d518fc799681571963842f95b55a6b68431b15a#6d518fc7)` was not used in the crate graph
+warning: patch `egui_inspection v0.37.0 (https://github.com/storytold/egui.git?rev=6d518fc799681571963842f95b55a6b68431b15a#6d518fc7)` was not used in the crate graph
+warning: patch `egui_system_font_provider v0.37.0 (https://github.com/storytold/egui.git?rev=6d518fc799681571963842f95b55a6b68431b15a#6d518fc7)` was not used in the crate graph
+help: Check that the patched package version and available features are compatible
+      with the dependency requirements. If the patch has a different version from
+      what is locked in the Cargo.lock file, run `cargo update` to use the new
+      version. This may also occur with an optional dependency that is not enabled.
+    Finished `test` profile [optimized + debuginfo] target(s) in 47.18s
+     Running unittests src\main.rs (target\debug\deps\cadcraft-d344e1c39b1e2310.exe)
+
+running 52 tests
+test control_server::tests::a_failed_accept_waits_before_the_next ... ok
+test control_server::tests::a_request_with_the_token_is_dispatched ... ok
+test control_server::tests::a_full_queue_answers_busy ... ok
+test control_server::tests::an_http_request_closes_the_connection_before_its_body_is_dispatched ... ok
+test control_server::tests::a_request_without_the_token_is_unauthorized ... ok
+test control_server::tests::an_idle_connection_is_closed ... ok
+test control_server::tests::an_overlong_line_is_refused_without_reading_the_rest ... ok
+test control_server::tests::lines_are_read_up_to_the_limit ... ok
+test control_server::tests::a_line_that_is_not_a_request_closes_the_connection ... ok
+test control_server::tests::extra_connections_are_refused ... ok
+test desktop_theme::tests::a_watcher_without_a_thread_is_inert ... ok
+test desktop_theme::tests::the_last_answer_stands_until_a_new_one ... ok
+test control_server::tests::requests_are_answered_with_their_ids ... ok
+test graphics::tests::explicit_backend_override_is_preserved ... ok
+test graphics::tests::explicit_compiler_and_backend_overrides_are_preserved ... ok
+test graphics::tests::windows_default_initializes_only_dx12 ... ok
+test graphics::tests::windows_default_uses_fxc_instead_of_searching_for_dxc ... ok
+test logging::tests::a_line_carries_time_level_thread_target_and_message ... ok
+test logging::tests::a_poisoned_lock_does_not_stop_logging ... ok
+test logging::tests::directives_follow_env_logger_and_the_most_specific_one_wins ... ok
+test logging::tests::attaching_to_an_unusable_directory_reports_an_error_and_keeps_logging ... ok
+test logging::tests::hostile_specs_never_panic_and_fall_back_sensibly ... ok
+test logging::tests::exactly_max_pending_lines_drop_nothing ... ok
+test logging::tests::lines_logged_before_the_file_exists_are_written_when_it_is_attached ... ok
+test logging::tests::rotation_into_an_unusable_directory_is_an_error_not_a_panic ... ok
+test logging::tests::stderr_only_stops_keeping_records_for_a_file ... ok
+test logging::tests::rotation_keeps_the_previous_logs_and_starts_an_empty_file ... ok
+test logging::tests::records_from_many_threads_are_whole_lines ... ok
+test logging::tests::the_default_filter_shows_cadcraft_info_and_other_crates_warnings ... ok
+test logging::tests::the_file_stops_at_its_size_cap_with_one_note ... ok
+test logging::tests::the_logger_filters_records_and_writes_them_to_the_attached_file ... ok
+test logging::tests::timestamps_are_utc_with_milliseconds ... ok
+test spacemouse::motion::tests::axes_deflect_and_expire ... ok
+test spacemouse::motion::tests::decode_reports ... ok
+test logging::tests::the_pending_buffer_is_bounded_and_says_how_much_it_dropped ... ok
+test spacemouse::motion::tests::drift_tracks_rest_after_two_idle_seconds ... ok
+test tests::control_port_values_that_are_not_ports_are_ignored ... ok
+test tests::control_without_a_port_keeps_the_environment_port ... ok
+test tests::save_dialog_offers_dwg_with_the_drawing_format_first ... ok
+test system_animations::tests::the_os_is_asked_on_the_first_frame_and_its_answer_kept ... ok
+test tests::the_desktop_answers_for_the_system_theme ... ok
+test tests::the_override_variable_wins_and_empty_values_are_unset ... ok
+test tests::windows_uses_appdata ... ok
+test workspace::tests::dock_columns_floating_and_hidden_panels_survive_native_workspace_file_reload ... ok
+test workspace::tests::failed_write_keeps_warning_and_retries_once_on_exit ... ok
+test workspace::tests::invalid_update_cannot_replace_last_good_workspace ... ok
+test workspace::tests::profile_override_isolated_or_explicitly_disabled ... ok
+test workspace::tests::split_frame_layout_file_loads_as_the_dock_default_with_its_other_settings ... ok
+test workspace::tests::rapid_changes_are_written_once_per_interval_with_the_newest_state ... ok
+test workspace::tests::unsupported_docking_preserves_other_workspace_preferences ... ok
+test workspace::tests::malformed_oversized_and_newer_state_are_reported_and_preserved ... ok
+test workspace::tests::workspace_survives_new_store_without_transient_or_document_state ... ok
+
+test result: ok. 52 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 8.79s
+
+     Running unittests src\main.rs (target\debug\deps\cadcraft_cli-0abc079db1b0c7e6.exe)
+
+running 17 tests
+test mcp_args_tests::mcp_connect_without_address_is_an_error_not_headless ... ok
+test mcp_args_tests::mcp_rejects_unknown_and_repeated_arguments ... ok
+test mcp_args_tests::mcp_without_connect_is_headless ... ok
+test mcp_args_tests::mcp_connect_with_address_selects_remote ... ok
+test tests::hostile_window_is_an_error ... ok
+test tests::framing_options ... ok
+test tests::last_placeholder_takes_the_previous_handle ... ok
+test tests::default_framing_is_extents ... ok
+test tests::unknown_options_are_rejected_before_side_effects ... ok
+test tests::validators_accept_only_the_documented_options ... ok
+test tests::returned_handle_reads_only_real_handles ... ok
+test tests::window_parses ... ok
+test tests::write_atomic_replaces_file_and_leaves_no_staging_files ... ok
+test tests::write_atomic_failure_keeps_destination_and_cleans_up ... ok
+test tests::zoom_window_frames_export ... ok
+test tests::zoom_object_frames_the_selection ... ok
+test tests::run_export_honours_zoom ... ok
+
+test result: ok. 17 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.13s
+
+     Running tests\handle_chaining.rs (target\debug\deps\handle_chaining-b7f93e76e9e698f0.exe)
+
+running 9 tests
+test last_is_cleared_when_document_switch_changes_drawings ... ok
+test last_is_cleared_by_a_script_that_changes_drawings ... ok
+test a_handle_returned_after_a_switch_is_last ... ok
+test a_group_name_that_looks_like_a_handle_is_not_last ... ok
+test last_is_cleared_when_new_switches_drawings ... ok
+test last_without_an_earlier_handle_is_an_error ... ok
+test ordinary_values_are_not_placeholders ... ok
+test viewport_set_after_mview_uses_the_returned_handle ... ok
+test last_is_cleared_when_open_switches_drawings ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.18s
+
+     Running tests\it\main.rs (target\debug\deps\it-a06560685ef5c46d.exe)
+
+running 12 tests
+test drafting_spacing::drafting_settings_spacing_roundtrips_without_persisting_osmode ... ok
+test drafting_spacing::quarter_unit_spacing_survives_save_and_reopen ... ok
+test cli::closed_stdout_still_runs_the_commands_and_saves ... ok
+test help::bare_invocation_still_reports_on_stderr ... ok
+test cli::closed_stdout_ends_quietly ... ok
+test mcp_connect::connect_with_address_routes_to_that_endpoint ... ok
+test help::help_flags_print_usage_to_stdout_and_exit_zero ... ok
+test mcp_connect::no_connect_still_serves_headless ... ok
+test mcp_connect::connect_without_address_fails_before_serving ... ok
+test mcp_connect::connect_to_closed_port_fails ... ok
+test skipped_records::info_counts_and_convert_warns_about_skipped_records ... ok
+test undrawn_entities::convert_to_an_image_warns_about_entities_it_cannot_draw ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.42s
+
+     Running unittests src\lib.rs (target\debug\deps\cadcraft_color-2062d870f7afe049.exe)
+
+running 6 tests
+test tests::palette_known_entries ... ok
+test tests::aci_roundtrip_and_parse ... ok
+test tests::parse_hex_rejects_non_hex_digits ... ok
+test tests::parse_hex_rejects_repeated_hash ... ok
+test tests::parse_rejects_plus_sign ... ok
+test tests::white_flips_on_light_background ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running unittests src\lib.rs (target\debug\deps\cadcraft_constraints-9e1ae986a1188094.exe)
+
+running 32 tests
+test curves::tests::ellipse_residuals ... ok
+test curves::tests::spline_end_derivatives_match_sampling ... ok
+test expr::tests::arithmetic ... ok
+test dof::budget_tests::endpoint_analysis_rejects_cubic_fit_work_before_differentiation ... ok
+test expr::tests::errors ... ok
+test expr::tests::names_valid ... ok
+test expr::tests::env_and_cycles ... ok
+test expr::tests::expression_and_parameter_depth_share_a_limit_on_a_small_stack ... ok
+test expr::tests::rename_replaces_whole_names_only ... ok
+test lm::tests::dense_and_rank ... ok
+test lm::tests::inconsistent_does_not_converge ... ok
+test lm::tests::minimum_norm_step ... ok
+test lm::tests::null_space_spans_free_motion ... ok
+test model::budget_tests::rigid_sampling_budget_is_shared_between_models ... ok
+test model::budget_tests::write_back_keeps_partial_rational_weights ... ok
+test tests::arc_solved_with_a_negative_radius_keeps_its_points ... ok
+test tests::coincident_points_and_point_on_curve ... ok
+test tests::collinear_concentric_equal ... ok
+test tests::autoconstrain_rectangle_of_lines ... ok
+test tests::conflicts_are_reported_and_nothing_moves ... ok
+test tests::dimensional_constraints ... ok
+test tests::glyphs_and_residuals ... ok
+test tests::horizontal_vertical_parallel_perpendicular ... ok
+test tests::hostile_geometry_never_panics ... ok
+test tests::invalid_references_and_purge ... ok
+test tests::keep_option_moves_the_other_entity ... ok
+test tests::polyline_rectangle ... ok
+test tests::set_parameter_rejects_out_of_domain_dimension ... ok
+test tests::symmetric_fix ... ok
+test tests::tangent_and_smooth ... ok
+test tests::rectangle_chain_with_parameters ... ok
+test tests::two_line_angle_over_180_is_rejected ... ok
+
+test result: ok. 32 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+     Running tests\dof.rs (target\debug\deps\dof-5bf869362c872df4.exe)
+
+running 16 tests
+test block_reference_moves_rigidly ... ok
+test circle_tangent_to_ellipse_and_elliptical_arc_ends ... ok
+test ellipse_constraints ... ok
+test elliptical_arc_start_that_swaps_its_axes_is_kept ... ok
+test minor_axis_end_pulled_past_the_major_axis_is_refused ... ok
+test hostile_new_geometry_never_panics ... ok
+test minor_axis_end_pulled_through_the_centre_is_refused ... ok
+test over_constrained_drawing_is_reported ... ok
+test point_on_curve_that_swaps_a_round_ellipse_axes_is_kept ... ok
+test redundant_hint_names_the_duplicated_constraints ... ok
+test spline_points_tangent_and_smooth_g2 ... ok
+test rectangle_dof_counts_down_to_fully_constrained ... ok
+test spline_tangent_to_circle_and_fit_spline_smooth ... ok
+test tangent_circle_that_swaps_a_round_ellipse_axes_is_kept ... ok
+test tangent_that_swaps_a_round_ellipse_axes_is_kept ... ok
+test vertex_constraints_on_large_fit_spline_do_not_charge_reconstruction ... ok
+
+test result: ok. 16 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.16s
+
+     Running unittests src\lib.rs (target\debug\deps\cadcraft_doc-966afdbc9dfdd70d.exe)
+
+running 59 tests
+test array::tests::hostile_params_are_invalid ... ok
+test array::tests::polar_rows_go_outwards ... ok
+test array::tests::rect_items_go_column_row_level ... ok
+test dynblock::apply::tests::element_tags_are_read_from_the_entitys_own_xdata ... ok
+test entity::grip_tests::handle_parse_hex_accepts_only_hex_digits ... ok
+test entity::grip_tests::polyline_grips_are_vertices_and_midpoints ... ok
+test extents::tests::centered_and_top_left_text_follow_placement ... ok
+test extents::tests::multileader_text_is_inside_its_bounds ... ok
+test extents::tests::right_justified_attdef_is_left_of_alignment_point ... ok
+test extents::tests::right_justified_text_is_left_of_alignment_point ... ok
+test gdt::tests::compose_then_parse ... ok
+test gdt::tests::hostile_strings_do_not_panic ... ok
+test gdt::tests::layout_boxes_each_compartment ... ok
+test gdt::tests::parses_symbols_compartments_and_lines ... ok
+test library::tests::metric_drawings_draw_iso_scaled_patterns ... ok
+test plotstyle::tests::builtins_are_complete_color_dependent_tables ... ok
+test dynblock::tests::hostile_counts_with_missing_groups_stay_linear ... ok
+test plotstyle::tests::colour_transforms ... ok
+test plotstyle::tests::drawing_tables_shadow_builtins ... ok
+test plotstyle::tests::json_round_trip_with_defaults ... ok
+test plotstyle::tests::file_format_round_trip ... ok
+test plotstyle::tests::named_builtins_and_sanitizing ... ok
+test plotter::tests::round_trip_and_hostile_values ... ok
+test store::tests::draw_order_moves ... ok
+test store::tests::move_next_to_and_sort ... ok
+test store::tests::move_next_to_splits_big_chunks ... ok
+test store::tests::push_get_remove ... ok
+test store::tests::snapshots_are_independent ... ok
+test tables::cellstyle::tests::hostile_values_are_sanitized ... ok
+test tables::cellstyle::tests::implied_styles_follow_the_table_style ... ok
+test tables::cellstyle::tests::numbers_format ... ok
+test tables::cellstyle::tests::storing_an_implied_style_keeps_the_style_plain ... ok
+test tables::tablebreak::tests::breaks_repeat_labels_and_go_right ... ok
+test tables::tablebreak::tests::down_without_repeats_and_manual_heights ... ok
+test tables::tablebreak::tests::hostile_break_settings ... ok
+test tables::tablebreak::tests::unbroken_is_one_part ... ok
+test tests::add_and_extents ... ok
+test tests::attdef_in_block_is_ignored_in_insert_extents ... ok
+test tests::blank_text_and_mtext_have_no_bounds ... ok
+test tests::block_entity_on_layer_zero_counts_even_if_layer_zero_is_off_or_missing ... ok
+test tests::block_entity_on_off_or_frozen_layer_is_ignored ... ok
+test tests::block_entity_on_undefined_layer_counts ... ok
+test tests::block_entity_with_invisible_flag_is_ignored_in_insert_extents ... ok
+test tests::entity_serde_roundtrip ... ok
+test tests::hidden_layers_excluded_from_extents ... ok
+test tests::deep_block_visit_does_not_hide_a_shallow_reference ... ok
+test tests::inserts_of_missing_or_empty_blocks_do_not_stretch_extents ... ok
+test tests::insert_bounds_with_cyclic_block_terminate ... ok
+test tests::invisible_dimblock_entity_is_ignored_in_dimension_extents ... ok
+test tests::new_drawing_has_standard_tables ... ok
+test tests::new_metric_drawing_has_metric_multileader_and_table_styles ... ok
+test tests::non_blank_text_and_mtext_have_bounds ... ok
+test tests::paper_space_entities ... ok
+test tests::rays_and_xlines_do_not_stretch_extents ... ok
+test tests::space_names_its_tab ... ok
+test tests::transform_arc_mirror_keeps_shape ... ok
+test tests::visible_attributes_of_a_missing_block_still_count ... ok
+test tests::wide_arc_segment_extents_reach_the_outer_edge ... ok
+test tests::wide_polyline_extents_follow_the_band ... ok
+
+test result: ok. 59 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.24s
+
+     Running tests\it\main.rs (target\debug\deps\it-6a1d3b5ba97e4eee.exe)
+
+running 9 tests
+test lin_pat_parse::broken_linetypes_are_skipped_with_warnings ... ok
+test lin_pat_parse::broken_patterns_are_skipped_with_warnings ... ok
+test lin_pat_parse::hatch_patterns_are_read ... ok
+test lin_pat_parse::lowercase_pattern_names_are_upper_cased ... ok
+test lin_pat_parse::simple_and_text_linetypes_are_read ... ok
+test lin_pat_parse::text_rotation_units_and_absolute_angles ... ok
+test sub_segment_alias::short_segment_name_matches_the_documented_forms ... ok
+test lin_pat_parse::hostile_linetype_files_never_panic_and_stay_capped ... ok
+test lin_pat_parse::hostile_pattern_files_never_panic_and_stay_capped ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.15s
+
+     Running unittests src\lib.rs (target\debug\deps\cadcraft_dwg-693b9da2fb389c80.exe)
+
+running 6 tests
+test tests::detects_magic ... ok
+test tests::dxf_to_dwg_rejects_garbage_without_crashing ... ok
+test tests::current_text_style_reaches_the_dwg ... ok
+test tests::garbage_is_an_error_not_a_crash ... ok
+test tests::dimension_text_position_flags_reach_the_dwg_as_autocad_reads_them ... ok
+test tests::orphaned_dgn_line_style_components_are_left_out ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.07s
+
+     Running unittests src\lib.rs (target\debug\deps\cadcraft_dxf-bfecabb550af391f.exe)
+
+running 15 tests
+test codepage::tests::code_page_names ... ok
+test codepage::tests::invalid_sequences_become_replacement_characters ... ok
+test codepage::tests::header_scan ... ok
+test codepage::tests::mif_escapes ... ok
+test tests::ascii_roundtrip ... ok
+test tests::binary_parse ... ok
+test tests::binary_strings_unescape ... ok
+test tests::hostile_escapes_stay_literal ... ok
+test tests::literal_escape_text_roundtrips ... ok
+test tests::malformed_inputs ... ok
+test tests::unicode_escapes_and_latin1 ... ok
+test tests::surrogate_pair_escapes ... ok
+test tests::writes_non_ascii_as_escapes ... ok
+test version::tests::file_versions_map_to_the_nearest_writable_one ... ok
+test version::tests::parses_years_and_codes ... ok
+
+test result: ok. 15 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.18s
+
+     Running tests\binary_write.rs (target\debug\deps\binary_write-db9462e3e930552e.exe)
+
+running 4 tests
+test binary_converts_values_to_their_codes_kind ... ok
+test binary_roundtrips_every_value_kind ... ok
+test hostile_binary_input_never_panics ... ok
+test utf8_ascii_keeps_text_and_drops_line_breaks ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.17s
+
+     Running unittests src\lib.rs (target\debug\deps\cadcraft_engine-0797c2517f7a54e7.exe)
+
+running 381 tests
+test atomic_write::tests::replaces_contents_atomically ... ok
+test cmd::annotate::tests::angular_between_lines_follows_rotation ... ok
+test cmd::annotate::tests::dimassoc_zero_makes_plain_dimensions ... ok
+test capped_read::tests::reads_within_limit_and_rejects_oversize ... ok
+test cmd::annotate::tests::dimension_override_text_with_variables ... ok
+test cmd::annotate::tests::dimension_overrides ... ok
+test cmd::annotate::tests::dimspace_prompts_for_its_inputs ... ok
+test cmd::annotate::tests::dimstyle_commands ... ok
+test cmd::annotate::tests::dimstyle_rename_updates_block_dimensions ... ok
+test cmd::annotate::tests::erase_disassociate_and_reassociate ... ok
+test cmd::annotate::tests::dimtedit_and_dimspace ... ok
+test cmd::annotate::tests::hostile_annotation_params_never_panic ... ok
+test cmd::annotate::tests::interactive_angular_picks_circle ... ok
+test cmd::annotate::tests::interactive_angular_picks_polyline_segments ... ok
+test cmd::annotate::tests::interactive_dimlinear_select_object_is_associative ... ok
+test cmd::annotate::tests::linear_dimension_follows_line_endpoint ... ok
+test cmd::annotate::tests::linetype_rename_updates_references ... ok
+test cmd::annotate::tests::moving_the_line_keeps_a_free_continued_origin ... ok
+test cmd::annotate::tests::moving_the_object_carries_the_dimension ... ok
+test cmd::annotate::tests::moving_the_object_keeps_the_ordinate_datum ... ok
+test cmd::annotate::tests::mtext_rejects_nonpositive_height ... ok
+test cmd::annotate::tests::radius_and_diameter_follow_circle ... ok
+test cmd::annotate::tests::table_create_edit_merge ... ok
+test cmd::annotate::tests::setvar_dim_variables_apply_to_new_dimensions ... ok
+test cmd::annotate::tests::table_interactive ... ok
+test cmd::annotate::tests::text_style_rename_follows_block_definition_text ... ok
+test cmd::array::tests::polar_angles ... ok
+test cmd::blocks::attedit::tests::replacement_is_bounded_and_specs_take_lists ... ok
+test cmd::blocks::attribs::tests::attdisp_keywords_map_to_attmode ... ok
+test cmd::blocks::extract::tests::csv_quotes_separators_quotes_and_line_breaks ... ok
+test cmd::blocks::insert_file::tests::file_names_become_block_names ... ok
+test cmd::blocks::insert_file::tests::inserted_file_brings_its_mline_styles ... ok
+test cmd::blocks::xref::bind::tests::bound_names ... ok
+test cmd::blocks::xref::load::tests::imported_array_blocks_keep_their_parameters ... ok
+test cmd::blocks::xref::load::tests::paths_resolve_against_the_host_folder_then_by_name ... ok
+test cmd::blocks::xref::load::tests::prefixes_ignore_case ... ok
+test cmd::constraints::tests::dcangular_constrains_the_drawn_angle_whichever_way_the_lines_run ... ok
+test cmd::constraints::tests::bars_settings_and_autoconstrain_json ... ok
+test cmd::constraints::tests::auto_types_spellings_are_stored_canonically ... ok
+test cmd::annotate::tests::text_style_commands ... ok
+test cmd::constraints::tests::delconstraint_rejects_referenced_dimension ... ok
+test cmd::constraints::tests::edits_are_resolved_and_erase_purges ... ok
+test cmd::constraints::tests::interactive_prompts ... ok
+test cmd::constraints::tests::hostile_constraint_params_never_panic ... ok
+test cmd::constraints::tests::renaming_a_parameter_rewrites_the_expressions_that_use_it ... ok
+test cmd::constraints::tests::settings_bars_checkbox_clears_exceptions ... ok
+test cmd::constraints::tests::settings_dims_checkbox_clears_exceptions ... ok
+test cmd::constraints::tests::json_geometric_and_dimensional_constraints ... ok
+test cmd::curves::tests::arc_builders ... ok
+test cmd::curves::tests::reverse_polyline_vertices ... ok
+test cmd::curves::tests::spline_split_and_reverse ... ok
+test cmd::curves::tests::tangent_circles ... ok
+test cmd::draw2::tests::arc_command_options ... ok
+test cmd::draw2::tests::arc_continue_from_last_line ... ok
+test cmd::draw2::tests::arc_continue_from_last_picked_end_of_three_point_arc ... ok
+test cmd::draw2::tests::arc_variants_command_line ... ok
+test cmd::draw2::tests::arc_variants_json ... ok
+test cmd::draw2::tests::breakline_block_symbol_runs_between_its_defpoints ... ok
+test cmd::draw2::tests::breakline_command_line_prompts_options_and_undo ... ok
+test cmd::draw2::tests::breakline_json_symbol_size_extension_and_location ... ok
+test cmd::draw2::tests::centermark_and_centerline ... ok
+test cmd::draw2::tests::circle_ttr_json_and_command_line ... ok
+test cmd::draw2::tests::circle_ttt_json_and_command_line ... ok
+test cmd::draw2::tests::circle_variants_json_and_command_line ... ok
+test cmd::draw2::tests::divide_and_measure_command_line ... ok
+test cmd::draw2::tests::ellipse_arc_typed_angles_are_true_angles ... ok
+test cmd::draw2::tests::divide_and_measure_json ... ok
+test cmd::draw2::tests::ellipse_axis_and_arc ... ok
+test cmd::draw2::tests::helix_json_and_command_line ... ok
+test cmd::draw2::tests::mline_json_and_command_line ... ok
+test cmd::draw2::tests::poly3d_json_and_command_line ... ok
+test cmd::draw2::tests::new_draw_commands_survive_garbage_input ... ok
+test cmd::draw2::tests::rectang_center_mode_command_line ... ok
+test cmd::draw2::tests::rectang_center_mode_honours_options ... ok
+test cmd::draw2::tests::rectang_center_mode_json ... ok
+test cmd::draw2::tests::rectang_options_command_line ... ok
+test cmd::draw2::tests::rectang_options_json ... ok
+test cmd::draw2::tests::revcloud_command_line ... ok
+test cmd::draw2::tests::spline_cv_json_and_command_line ... ok
+test cmd::draw2::tests::revcloud_json ... ok
+test cmd::draw2::tests::wipeout_json_and_command_line ... ok
+test cmd::draw2::tests::xline_options_command_line ... ok
+test cmd::draw2::tests::xline_options_json ... ok
+test cmd::exchange::tests::attach_share_and_orbit_say_they_are_not_available_yet ... ok
+test cmd::exchange::tests::import_brings_objects_with_their_layers_and_blocks ... ok
+test cmd::exchange::tests::export_writes_the_chosen_format_and_is_not_save_as ... ok
+test cmd::exchange::tests::preview_applies_an_explicit_layout_scale ... ok
+test cmd::exchange::tests::pdfbook_collects_frames_into_one_pdf_per_row ... ok
+test cmd::exchange::tests::web_export_delivers_a_download_instead_of_writing_a_path ... ok
+test cmd::file::pr193_tests::failed_store_keeps_unsaved_changes_and_delivered_save_clears_them ... ok
+test cmd::exchange::tests::publish_plots_every_sheet ... ok
+test cmd::file::tests::closing_earlier_inactive_drawing_keeps_active_drawing ... ok
+test cmd::file::tests::a_script_cannot_start_a_script ... ok
+test cmd::file::tests::closing_later_inactive_drawing_keeps_active_drawing ... ok
+test cmd::file::tests::script_command_reports_a_missing_file ... ok
+test cmd::file::tests::script_command_runs_a_scr_file ... ok
+test cmd::hatch::tests::hatchedit_pattern_replaces_gradient ... ok
+test cmd::hatch::tests::hatchedit_solid_replaces_gradient ... ok
+test cmd::hatch::tests::json_hatch_refuses_an_undefined_pattern ... ok
+test cmd::exchange::tests::preview_draws_the_sheet_as_it_plots ... ok
+test cmd::file::tests::typed_script_prompts_for_the_file_then_runs_or_reports_it ... ok
+test cmd::hatch::tests::pattern_choices_list_the_library_with_its_lines ... ok
+test cmd::hatch::tests::the_pattern_picker_is_offered_and_its_choice_sets_the_pattern ... ok
+test cmd::hatch::tests::repeated_picks_and_handles_in_one_region_do_not_produce_duplicate_loops ... ok
+test cmd::hatch::tests::unknown_pattern_error_and_catalog_name_the_pat_file_route ... ok
+test cmd::inquiry::tests::implausible_allows_rounding_but_not_a_real_excess ... ok
+test cmd::inquiry::usage::tests::a_cut_scan_reports_the_objects_it_omitted ... ok
+test cmd::inquiry::usage::tests::a_drawing_at_the_limit_is_complete ... ok
+test cmd::layer::tests::layer_states_save_list_restore_delete ... ok
+test cmd::layer::tests::delete_and_purge_keep_layers_used_by_block_definitions ... ok
+test cmd::layer::tests::rejected_layer_set_changes_nothing ... ok
+test cmd::layer::tests::rename_repoints_paper_space_and_block_entities ... ok
+test cmd::layout::tests::hostile_layout_params ... ok
+test cmd::layout::tests::mspace_edits_model_through_viewport ... ok
+test cmd::layout::tests::mview_arrangements_and_interactive ... ok
+test cmd::layout::tests::new_layout_from_the_menu_asks_for_a_name ... ok
+test cmd::layout::tests::new_layout_gets_viewport_zoomed_to_extents ... ok
+test cmd::layout::tests::rename_copy_delete ... ok
+test cmd::layout::tests::pagesetup_paper_table ... ok
+test cmd::layout::tests::rename_keeps_the_active_layout_whatever_its_case ... ok
+test cmd::layout::tests::viewport_scale_lock_and_layers ... ok
+test cmd::machines::tests::pick_box_at_object_selection_prompts ... ok
+test cmd::layout::tests::plot_goes_through_the_hook ... ok
+test cmd::machines::tests::prompts_remember_last_options ... ok
+test cmd::machines::tests::selection_commands_pickfirst_and_json_unchanged ... ok
+test cmd::machines::tests::selection_commands_prompt_without_pickfirst ... ok
+test cmd::mleader_edit::tests::align_distribute_parallel_and_spacing ... ok
+test cmd::mleader_edit::tests::collect_blocks_into_one_multileader ... ok
+test cmd::mleader_edit::tests::edit_adds_and_removes_leaders ... ok
+test cmd::mleader_edit::tests::hostile_mleader_edit_params_never_panic ... ok
+test cmd::mleader_edit::tests::units::directional_projects_landings_and_supports_spacing ... ok
+test cmd::mleader_edit::tests::units::distribute_orders_landings_along_the_line ... ok
+test cmd::mleader_edit::tests::units::parallel_requires_a_reference_and_skips_leaders ... ok
+test cmd::modify2::tests::align_json_and_command_line ... ok
+test cmd::modify2::tests::chspace_json_and_command_line ... ok
+test cmd::modify2::tests::blend_json_and_command_line ... ok
+test cmd::modify2::tests::arraypath_json_and_command_line ... ok
+test cmd::modify2::tests::explode_polyline3d_keeps_elevations ... ok
+test cmd::modify2::tests::editing_commands_leave_locked_layer_objects_alone ... ok
+test cmd::modify2::tests::fillet_command_line_line_and_arc ... ok
+test cmd::modify2::tests::fillet_line_arc_and_arcs ... ok
+test cmd::modify2::tests::fillet_polyline_json_and_command_line ... ok
+test cmd::modify2::tests::flatten_json_and_command_line ... ok
+test cmd::modify2::tests::join_keeps_selected_objects_outside_the_chain ... ok
+test cmd::modify2::tests::lengthen_command_line ... ok
+test cmd::modify2::tests::lengthen_keeps_elevation ... ok
+test cmd::modify2::tests::lengthen_json ... ok
+test cmd::modify2::tests::ncopy_json_and_command_line ... ok
+test cmd::modify2::tests::offset_elliptical_arc_follows_picked_side ... ok
+test cmd::modify2::tests::offset_polyline_arc_bulge_follows_joined_endpoints ... ok
+test cmd::modify2::tests::pedit_command_line ... ok
+test cmd::modify2::tests::new_modify_commands_survive_garbage_input ... ok
+test cmd::modify2::tests::pedit_json_options ... ok
+test cmd::modify2::tests::pedit_preselected_line_asks_to_convert ... ok
+test cmd::modify2::tests::reverse_json_and_command_line ... ok
+test cmd::modify2::tests::splinedit_json_and_command_line ... ok
+test cmd::modify2::tests::textedit_json_and_command_line ... ok
+test cmd::options::tests::every_profile_var_round_trips_through_restore ... ok
+test cmd::modify2::tests::trim_and_extend_ellipse_and_spline ... ok
+test cmd::props::tests::properties_set_rejects_unloaded_linetype ... ok
+test cmd::qselect::tests::modes_append_exclude_and_scope ... ok
+test cmd::qselect::tests::hostile_params_are_errors_not_panics ... ok
+test cmd::qselect::tests::type_and_property_filters ... ok
+test cmd::qselect::tests::wildcards ... ok
+test cmd::table::breaks::tests::csv_parsing ... ok
+test cmd::table::formula::tests::names ... ok
+test cmd::table::formula::tests::syntax ... ok
+test cmd::table::formula::tests::shifting_references ... ok
+test cmd::thread::tests::run_thread_json ... ok
+test cmd::thread::tests::thread_json_refuses_sizes_it_cannot_draw ... ok
+test cmd::thread::tests::thread_m_prompts_for_diameter_pitch_spacing_and_centre ... ok
+test cmd::thread::tests::thread_m_refuses_sizes_it_cannot_draw ... ok
+test cmd::thread::tests::thread_previews_the_pair_before_the_pick ... ok
+test cmd::txt2mtxt::tests::combined_lines_keep_their_own_heights ... ok
+test cmd::txt2mtxt::tests::combines_texts_top_down_into_one_mtext_with_the_first_ones_properties ... ok
+test cmd::txt2mtxt::tests::command_line_settings_and_locked_layers ... ok
+test cmd::txt2mtxt::tests::selection_order_wrap_and_one_mtext_per_text ... ok
+test cmd::utility::calc::tests::number_text ... ok
+test cmd::utility::calc::tests::deep_unary_chain_does_not_overflow_the_stack ... ok
+test cmd::utility::calc::tests::parenthesis_nesting_just_under_the_limit_still_parses ... ok
+test cmd::table::breaks::tests::link_strips_utf8_bom ... ok
+test cmd::utility::calc::tests::points_and_vectors ... ok
+test cmd::utility::tests::calculator ... ok
+test cmd::utility::tests::find_and_replace ... ok
+test doc_path::tests::relative_paths_resolve_beside_the_drawing_and_other_computers_are_refused ... ok
+test finite::tests::finds_nan_and_infinity_anywhere ... ok
+test grip_dims::tests::a_line_end_measures_from_the_other_end ... ok
+test grip_dims::tests::locks_hold_and_pin_the_grip ... ok
+test grips::tests::arc_and_ellipse_grips ... ok
+test grips::tests::grip_modes ... ok
+test grips::tests::grips_on_locked_layers_and_hostile_values ... ok
+test grips::tests::line_and_circle_grips ... ok
+test grips::tests::other_entity_grips ... ok
+test grips::tests::polyline_grips ... ok
+test grips::tests::spline_text_insert_and_dimension_grips ... ok
+test guard::tests::panics_in_a_command_machine_end_the_command_not_the_app ... ok
+test lisp::block_tests::a_block_being_edited_in_place_is_not_redefined ... ok
+test lisp::block_tests::a_block_of_the_same_name_is_redefined ... ok
+test lisp::block_tests::a_definition_that_isnt_added_leaves_no_layer ... ok
+test lisp::block_tests::a_failed_routine_drops_its_open_definition ... ok
+test lisp::block_tests::an_anonymous_block_is_always_named_with_a_star ... ok
+test lisp::block_tests::an_anonymous_block_that_inserts_itself_is_refused ... ok
+test lisp::block_tests::anonymous_blocks_get_a_name ... ok
+test lisp::block_tests::a_saved_drawing_keeps_the_block ... ok
+test lisp::block_tests::the_entities_base_point_and_description_are_kept ... ok
+test lisp::block_tests::the_issues_routine_defines_the_block ... ok
+test lisp::block_tests::what_cant_be_defined_is_refused ... ok
+test lisp::builtins::wildcard_budget_tests::all_native_scans_consume_fuel ... ok
+test lisp::read::tests::reads_forms_atoms_and_comments ... ok
+test lisp::read::tests::malformed_and_hostile_input_is_an_error_not_a_crash ... ok
+test lisp::tests::a_callback_must_fit_within_a_partial_slice ... ok
+test lisp::tests::a_leading_newline_ends_the_command_line_instead_of_adding_an_empty_one ... ok
+test lisp::tests::a_waiting_routine_is_a_prompt_with_a_rubber_band ... ok
+test lisp::tests::a_zero_callback_budget_does_not_run_the_callback ... ok
+test lisp::tests::an_entsel_prompt_picks_objects_whatever_its_message_says ... ok
+test lisp::tests::angtof_reads_the_string_in_the_given_units ... ok
+test lisp::tests::appload_and_load ... ok
+test lisp::tests::arithmetic_follows_autolisp ... ok
+test lisp::tests::appload_keeps_the_whitespace_of_a_relative_path ... ok
+test lisp::tests::command_draws_and_one_routine_is_one_undo_step ... ok
+test lisp::tests::appload_reads_a_lsp_path_and_reports_its_commands ... ok
+test lisp::tests::entity_lists_hold_angles_in_radians ... ok
+test lisp::tests::entity_lists_round_trip ... ok
+test lisp::tests::equality_compares_symbols_as_autolisp_does ... ok
+test lisp::tests::errors_unwind_bindings_and_reach_the_handler ... ok
+test lisp::tests::functions_scope_and_control ... ok
+test lisp::tests::geometry ... ok
+test lisp::tests::a_panic_inside_a_routine_ends_it_with_an_error ... ok
+test lisp::tests::getangle_is_relative_to_angbase ... ok
+test lisp::tests::getvar_cecolor_is_a_string ... ok
+test lisp::tests::getvar_drawing_and_session_variables ... ok
+test lisp::tests::hostile_lisp_never_panics ... ok
+test lisp::tests::input_functions_take_supplied_answers ... ok
+test lisp::tests::interactive_routine_waits_for_the_user ... ok
+test lisp::tests::printing ... ok
+test lisp::tests::lists_and_strings ... ok
+test lisp::tests::real_print_subnormal_and_rounding ... ok
+test lisp::tests::reaching_a_callback_slice_boundary_does_not_grant_another_slice ... ok
+test lisp::tests::selection_sets_and_filters ... ok
+test lisp::tests::startup_files_load_from_the_support_folder ... ok
+test lisp::tests::deeply_nested_lists_drop_without_overflowing_the_stack ... ok
+test lisp::tests::synchronous_callback_loop_is_an_error_not_a_hang ... ok
+test lisp::tests::tables_and_variables ... ok
+test lisp::tests::setvar_rejects_an_oversized_shared_structure ... ok
+test lisp::tests::strings_are_capped ... ok
+test lisp::tests::too_many_list_cells_stop_the_routine ... ok
+test lisp::value::tests::printing_and_equality ... ok
+test lisp::value::tests::reals_print_with_six_significant_digits ... ok
+test mtext_edit::tests::hostile_input_never_panics ... ok
+test mtext_edit::tests::round_trips_formats_and_atoms ... ok
+test mtext_edit::tests::ruler_and_lists ... ok
+test mtext_edit::tests::toggles_and_typing_keep_formats ... ok
+test pointmod::tests::filters ... ok
+test pointmod::tests::snap_words ... ok
+test prompt::tests::keywords ... ok
+test prompt::tests::points ... ok
+test select::hatch_pattern_pick_tests::pattern_hatch_is_picked_on_a_visible_stroke ... ok
+test select::hatch_pattern_pick_tests::pattern_hatch_island_stays_empty ... ok
+test select::hatch_pattern_pick_tests::solid_hatch_is_picked_inside_its_fill_not_its_bounding_rectangle ... ok
+test select::hatch_pattern_pick_tests::solid_hatch_island_follows_the_island_style ... ok
+test lisp::value::tests::a_long_list_drops_without_overflowing_the_stack ... ok
+test select::solid_interior_tests::crossing_window_in_triangular_bbox_but_outside_fill_does_not_select ... ok
+test select::solid_interior_tests::crossing_window_inside_solid_and_trace_selects_fill ... ok
+test select::tests::fence_selects_crossed_xline_and_ray ... ok
+test select::solid_interior_tests::pick_in_triangular_bbox_but_outside_fill_does_not_select ... ok
+test snap::curves::tests::ellipse_mid_halves_the_length ... ok
+test snap::curves::tests::ellipse_perpendiculars_are_normals ... ok
+test snap::curves::tests::ellipse_tangents_touch_and_stay_on_the_arc ... ok
+test snap::curves::tests::spline_snaps ... ok
+test snap::iso::tests::grid_lines_bounded ... ok
+test snap::iso::tests::lattice_points_are_spacing_apart_along_each_axis ... ok
+test snap::tests::arc_deferred_tangent_keeps_its_sweep ... ok
+test snap::tests::arc_perpendicular_clamps_to_the_arc ... ok
+test snap::tests::arc_tangent_only_on_the_arc_not_its_circle ... ok
+test snap::tests::center_quadrant_tangent ... ok
+test snap::tests::deferred_tangent_pairs_with_arcs ... ok
+test snap::tests::endpoint_and_mid ... ok
+test snap::tests::deferred_tangent_without_base ... ok
+test snap::tests::intersection ... ok
+test snap::tests::off_bit_disables ... ok
+test snap::tests::ortho_and_polar ... ok
+test snap::tests::perpendicular_from_base ... ok
+test snap::tests::resolve_belt_tangent_between_circles ... ok
+test snap::tests::resolve_degenerate_input_is_none_not_panic ... ok
+test snap::tests::resolve_perpendicular_cases ... ok
+test snap::tests::resolve_tangent_to_free_point ... ok
+test spatial::tests::cached_index_follows_edits ... ok
+test spatial::tests::index_follows_layer_visibility_inside_blocks ... ok
+test spatial::tests::hostile_queries_match_scan ... ok
+test spatial::tests::osnap_parity_with_scan ... ok
+test spatial::tests::small_spaces_are_scanned ... ok
+test spatial::tests::pick_parity_with_scan ... ok
+test spatial::tests::incremental_index_matches_fresh_build ... ok
+test spatial::tests::window_and_fence_parity_with_scan ... ok
+test sysvars::table::tests::table_names_are_upper_case_and_unique ... ok
+test tests::bare_variable_name_runs_setvar ... ok
+test tests::arc_refuses_zero_radius ... ok
+test tests::area_of_hatch_excludes_island ... ok
+test tests::block_insert_with_attributes ... ok
+test tests::block_rotation_property_turns_attribute_text ... ok
+test tests::boundary_pick_point_keeps_island_of_separate_lines ... ok
+test tests::cancel_keeps_partial_line_as_one_undo ... ok
+test tests::circle_variants ... ok
+test tests::boundary_point_batch_is_capped ... ok
+test tests::copy_and_rotate_drag_as_a_transform_of_the_selection ... ok
+test tests::copy_rotate_scale_mirror ... ok
+test tests::count_from_the_menu_shows_its_result ... ok
+test tests::deferred_pick_elsewhere_is_a_plain_point ... ok
+test tests::dim_auto_vertical_and_radius ... ok
+test tests::dimlinear_interactive_and_continue ... ok
+test tests::dynamic_input_pointer_settings ... ok
+test tests::edits_while_a_command_runs_redraw ... ok
+test tests::enter_repeats_last_command ... ok
+test tests::erase_all_and_selection_keywords ... ok
+test tests::extend_line_to_boundary ... ok
+test tests::every_interactive_command_starts_and_cancels ... ok
+test tests::fillet_two_lines ... ok
+test tests::every_variable_name_starts_setvar_unless_it_is_a_command ... ok
+test tests::format_thickness_asks_for_the_thickness ... ok
+test tests::gradient_pick_point_keeps_island_of_separate_lines ... ok
+test tests::hatch_by_pick_point_with_island ... ok
+test tests::hatch_from_overlapping_lines ... ok
+test tests::hatch_pick_point_keeps_island_of_separate_lines ... ok
+test tests::hostile_params_never_panic ... ok
+test tests::json_execute_and_errors ... ok
+test tests::layers_and_properties ... ok
+test tests::hostile_variable_like_input_never_panics ... ok
+test tests::line_belt_tangent_to_tangent ... ok
+test tests::line_deferred_tangent_with_typed_polar ... ok
+test tests::line_deferred_tangent_without_solution_reprompts ... ok
+test tests::line_first_point_deferred_tangent ... ok
+test tests::line_undo_option_and_aliases ... ok
+test tests::line_via_command_line ... ok
+test tests::mleader_and_qdim ... ok
+test tests::move_with_pickfirst_and_window_selection ... ok
+test tests::new_objects_take_the_current_thickness ... ok
+test tests::offset_circle_and_polyline ... ok
+test tests::osnap_toggle ... ok
+test tests::pickadd_controls_idle_picks ... ok
+test tests::pline_halfwidth_is_centre_to_edge ... ok
+test tests::pline_width_answers_taper_the_next_segment ... ok
+test tests::polar_and_direct_distance ... ok
+test tests::press_and_drag_selection_window ... ok
+test tests::programmatic_undo_during_a_command_ends_it_first ... ok
+test tests::properties_palette_current_property_commands ... ok
+test tests::properties_set_circle_size_and_dim_style ... ok
+test tests::properties_set_thickness ... ok
+test tests::properties_set_transparency ... ok
+test tests::rectangle_polygon_and_pline ... ok
+test tests::sample_drawing_builds ... ok
+test tests::scale_reference_typed_and_picked ... ok
+test tests::script_runs_commands ... ok
+test tests::script_splits_line_at_keyword_prompt ... ok
+test tests::setvar_at_command_line ... ok
+test tests::setvar_clayer_keeps_numeric_layer_name ... ok
+test tests::setvar_keeps_header_types ... ok
+test tests::setvar_point_variables_take_point_objects ... ok
+test tests::sysvars_roundtrip ... ok
+test tests::trim_line_between_edges ... ok
+test tests::typed_ltscale_asks_for_the_scale ... ok
+test tests::undo_during_a_command_without_undo_keyword_ends_it_and_undoes ... ok
+test tests::undo_during_line_removes_the_last_segment_and_keeps_line_running ... ok
+test tests::zoom_extents_fits_drawing ... ok
+test units::tests::angle_radians_low_precision_not_wrapped ... ok
+test units::tests::angles ... ok
+test units::tests::decimal_and_arch ... ok
+test units::tests::directions_show_from_angbase_in_the_angdir_sense ... ok
+test units::tests::dms_display_precision ... ok
+test units::tests::dms_rounding_carries ... ok
+test units::tests::dms_minutes_and_seconds_must_be_within_0_to_60 ... ok
+test units::tests::engineering_huge_distance_falls_back_to_decimal ... ok
+test units::tests::engineering_rounding_carries_to_feet ... ok
+test units::tests::huge_architectural_and_fractional_distances_do_not_saturate ... ok
+test units::tests::mixed_distance_needs_a_positive_fraction_after_the_whole_number ... ok
+test units::tests::parse_distance_needs_a_number ... ok
+test units::tests::parse_distance_rejects_doubled_minus ... ok
+test units::tests::parse_distances ... ok
+test units::tests::rounding_to_a_full_turn_wraps_to_zero ... ok
+test units::tests::scientific_exponent_is_signed_and_padded ... ok
+test units::tests::surveyor_display_is_degrees_minutes_seconds ... ok
+test lisp::tests::runaway_routines_are_errors_not_crashes ... ok
+
+test result: ok. 381 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 9.92s
+
+     Running tests\aliases.rs (target\debug\deps\aliases-6af35f4be3457fee.exe)
+
+running 3 tests
+test hostile_alias_files_never_panic ... ok
+test an_alias_file_adds_and_overrides_aliases ... ok
+test reinit_reads_the_alias_file_again ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.61s
+
+     Running tests\audit.rs (target\debug\deps\audit-ab8a1817af7568d8.exe)
+
+running 7 tests
+test a_clean_drawing_is_left_alone ... ok
+test audit_at_the_command_line_asks_before_fixing ... ok
+test audit_reports_without_changing_and_fixes_when_asked ... ok
+test missing_standard_entries_and_layer_zero_are_recreated ... ok
+test auditctl_generates_adt_report_file ... ok
+test recover_opens_the_file_with_the_fixes_applied ... ok
+test a_long_block_cycle_is_broken_without_deep_recursion ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.93s
+
+     Running tests\autosave.rs (target\debug\deps\autosave-29147d5650077805.exe)
+
+running 9 tests
+test a_block_editor_that_cannot_be_composed_is_not_autosaved_as_the_old_host ... ok
+test a_changed_drawing_is_written_savetime_minutes_after_the_change ... ok
+test closing_deletes_and_savetime_zero_or_no_folder_writes_nothing ... ok
+test file_names_round_trip ... ok
+test files_of_other_programs_in_the_autosave_folder_are_never_deleted ... ok
+test recover_as_copy_opens_an_unsaved_untitled_drawing ... ok
+test autosave_files_are_written_in_the_background_and_removed_on_exit ... ok
+test recovery_offers_files_of_apps_that_stopped ... ok
+test a_failed_autosave_is_tried_again_without_another_change ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.79s
+
+     Running tests\block_editor.rs (target\debug\deps\block_editor-ca6dc4406a927084.exe)
+
+running 12 tests
+test a_dynamic_block_from_another_program_says_its_parameters_are_kept ... ok
+test a_dynamic_reference_with_its_own_values_opens_its_dynamic_block ... ok
+test a_selected_reference_opens_its_block_and_bclose_asks_to_save ... ok
+test bedit_can_start_a_new_block ... ok
+test bsaveas_makes_a_new_block_and_keeps_the_old_one ... ok
+test a_file_save_writes_the_drawing_outside_the_editor ... ok
+test closing_without_saving_leaves_the_drawing_as_it_was ... ok
+test hostile_params_never_panic ... ok
+test saving_the_block_updates_every_reference ... ok
+test the_current_drawing_opens_in_the_block_editor ... ok
+test unchanged_objects_keep_their_exact_coordinates ... ok
+test what_the_block_editor_refuses ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+
+     Running tests\clipboard.rs (target\debug\deps\clipboard-439f70b78df54281.exe)
+
+running 8 tests
+test cutbase_and_copybase_need_a_base_point_and_take_each_object_once ... ok
+test cutbase_asks_for_the_base_point_then_the_objects ... ok
+test clipboard_travels_as_text ... ok
+test cutbase_cuts_with_the_given_base_point ... ok
+test cutting_only_locked_objects_keeps_the_clipboard ... ok
+test paste_into_another_drawing_brings_layers_and_blocks ... ok
+test pasteblock_makes_a_block_of_the_clipboard ... ok
+test pasteorig_pastes_only_into_another_drawing ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests\compare.rs (target\debug\deps\compare-9984fc096664a513.exe)
+
+running 7 tests
+test finds_added_removed_and_changed_objects ... ok
+test hostile_inputs_are_errors ... ok
+test derived_dimension_fields_are_not_differences ... ok
+test compares_a_file_read_through_the_io_hooks ... ok
+test matches_objects_by_geometry_when_handles_differ ... ok
+test navigates_areas_and_closes ... ok
+test relative_xref_paths_of_a_compared_file_take_that_files_folder ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests\dim_diameter_sign.rs (target\debug\deps\dim_diameter_sign-81e1f94d73ac10a5.exe)
+
+running 2 tests
+test exploding_keeps_the_sign_as_a_code ... ok
+test the_dimension_block_writes_the_sign_as_a_code ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests\dimassoc_saved.rs (target\debug\deps\dimassoc_saved-6856b2761445decf.exe)
+
+running 1 test
+test the_issue_repro_saves_every_associated_dimension_with_dimassoc ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests\drawing_recovery_command.rs (target\debug\deps\drawing_recovery_command-f4bbef1808ed4ca3.exe)
+
+running 1 test
+test lists_and_discards_only_recoverable_autosave_files ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests\insert_file.rs (target\debug\deps\insert_file-8980b1d87af83efa.exe)
+
+running 3 tests
+test exploded_json_insert_is_one_undo_step ... ok
+test star_name_inserts_the_blocks_objects_with_one_scale_factor ... ok
+test a_drawing_file_becomes_a_block_with_its_insbase_and_tables ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests\it\main.rs (target\debug\deps\it-e5bf36c68feed5fd.exe)
+
+running 697 tests
+test angle_prompts::dimension_line_and_text_angles_are_directions ... ok
+test angle_prompts::hatch_angle_is_a_rotation_in_aunits ... ok
+test angle_prompts::chamfer_and_mleader_angles_are_amounts_in_aunits ... ok
+test angle_prompts::rotate_angle_is_a_rotation_in_aunits ... ok
+test angle_settings::bare_numbers_are_in_aunits_and_suffixes_override ... ok
+test angle_settings::json_and_default_parsing_keep_degrees_from_east ... ok
+test angle_settings::polar_angles_measure_from_angbase_in_angdir ... ok
+test angle_settings::rotate_reference_angles_follow_angbase_and_angdir ... ok
+test annotate_options::dimangular_quadrant_locks_the_measured_angle ... ok
+test annotate_options::dimlinear_angle_rotates_the_text_and_text_replaces_it ... ok
+test annotate_options::dimlinear_vertical_forces_the_orientation ... ok
+test annotate_options::dimordinate_datum_and_text_options ... ok
+test annotate_options::dimradius_text_options ... ok
+test annotate_options::mleader_landing_first_and_content_first ... ok
+test annotate_options::mleader_options_take_effect ... ok
+test annotative::add_and_delete_current_scale_keep_one_scale ... ok
+test annotative::annoautoscale_adds_the_new_scale ... ok
+test annotative::annotative_dimension_scales_its_text_and_arrows ... ok
+test annotative::annotative_mtext_columns_follow_the_scale ... ok
+test annotative::annotative_multileader_and_hatch ... ok
+test annotative::annotative_text_draws_at_paper_height_times_the_scale ... ok
+test annotative::annoupdate_and_properties_follow_the_style ... ok
+test annotative::hostile_parameters_are_refused ... ok
+test annotative::explode_gives_plain_objects_at_the_current_scale ... ok
+test annotative::objectscale_at_the_command_line ... ok
+test annotative::scalelistedit_at_the_command_line ... ok
+test annotative::text_of_an_annotative_style_supports_the_current_scale ... ok
+test annotative::scale_list_add_delete_reset ... ok
+test arc_ctrl_direction::continue_ctrl_flips_the_arc_through_the_same_endpoints ... ok
+test annotative::unsupported_scale_hides_unless_annoallvisible ... ok
+test arc_ctrl_direction::cse_ctrl_reverses_by_swapping_the_endpoint_angles ... ok
+test arc_ctrl_direction::no_ctrl_is_the_old_behavior ... ok
+test array_commands::array_asks_for_the_type_and_continues_as_that_array ... ok
+test array_commands::arraypolar_asks_for_the_center_then_edits_items_and_angles ... ok
+test array_commands::arrayrect_edits_the_array_in_a_loop_until_exit ... ok
+test assoc_array::arrayedit_base_replace_and_reset ... ok
+test assoc_array::arrayedit_changes_parameters_of_one_array ... ok
+test assoc_array::arrayedit_source_then_arrayclose ... ok
+test array_commands::arrays_over_maxarray_are_refused_not_shrunk ... ok
+test assoc_array::arrays_of_arrays_and_limits ... ok
+test assoc_array::explode_gives_plain_objects_and_edits_move_the_array ... ok
+test assoc_array::json_arrays_follow_arrayassociativity ... ok
+test assoc_array::json_arrays_are_associative_by_default ... ok
+test assoc_array::pasted_arrays_get_their_own_blocks ... ok
+test assoc_array::typed_arrayedit ... ok
+test assoc_array::typed_levels_and_polar_rows ... ok
+test attdisp_attsync::attdisp_runs_transparently_inside_another_command ... ok
+test attdisp_attsync::attdisp_sets_attmode_and_the_display_follows_it ... ok
+test attdisp_attsync::attsync_brings_references_in_line_with_the_definitions ... ok
+test attdisp_attsync::view_attribute_display_menu_sets_attmode ... ok
+test attedit_prompts::attedit_asks_for_a_block_then_each_value ... ok
+test attedit_prompts::attribute_tags_match_in_any_case_and_unknown_tags_are_reported ... ok
+test attedit_prompts::dash_attedit_global_replaces_a_string_in_matching_attributes ... ok
+test attedit_prompts::dash_attedit_one_at_a_time_edits_the_selected_attributes ... ok
+test attrib_modes::references_take_lock_position_from_the_definition ... ok
+test attrib_props::dash_attedit_sets_layer_and_colour_of_one_attribute ... ok
+test attrib_props::hostile_answers_do_not_panic ... ok
+test attribute_tools::battman_at_the_command_line_edits_removes_and_moves ... ok
+test attribute_tools::battman_constant_definitions_leave_references ... ok
+test attribute_tools::battman_edit_renames_a_tag_and_references_keep_their_values ... ok
+test attribute_tools::battman_lists_definitions_and_references ... ok
+test attribute_tools::battman_removes_and_reorders_definitions ... ok
+test attribute_tools::battman_starts_from_a_selected_reference ... ok
+test attribute_tools::battman_without_sync_leaves_references_alone ... ok
+test block_keep::a_value_that_is_not_documented_is_an_error_and_changes_nothing ... ok
+test block_keep::the_documented_values_work_in_any_case ... ok
+test block_redefine::a_block_cannot_be_redefined_to_reference_itself ... ok
+test block_redefine::redefining_with_a_different_case_replaces_the_block ... ok
+test blockreplace::blockreplace_asks_for_both_blocks_and_whether_to_purge ... ok
+test blockreplace::blockreplace_keeps_a_definition_an_unused_block_still_names ... ok
+test blockreplace::blockreplace_no_keeps_the_replaced_definition ... ok
+test blockreplace::blockreplace_purges_the_replaced_definition_on_request ... ok
+test blockreplace::blockreplace_references_follow_the_replacement_blocks_annotative_setting ... ok
+test blockreplace::blockreplace_refuses_a_block_as_soon_as_its_name_is_given ... ok
+test blockreplace::blockreplace_refuses_what_it_cannot_replace ... ok
+test break_closed_polyline::break_json_on_a_closed_polyline_follows_the_order_of_the_points ... ok
+test blockreplace::blockreplace_replaces_every_reference_and_keeps_its_placement ... ok
+test break_closed_polyline::break_opens_a_closed_polyline_at_the_command_line ... ok
+test break_join_locked_layers::break_and_breakatpoint_refuse_a_locked_line ... ok
+test attribute_tools::battman_refuses_bad_edits_without_changing_anything ... ok
+test break_join_locked_layers::break_refuses_a_locked_arc_and_circle ... ok
+test break_join_locked_layers::interactive_break_and_join_refuse_locked_lines ... ok
+test break_join_locked_layers::join_keeps_a_locked_original_in_a_mixed_layer_pair ... ok
+test break_join_locked_layers::join_refuses_when_any_line_is_locked ... ok
+test break_keeps_z::break_keeps_arc_centre_z ... ok
+test break_keeps_z::break_keeps_line_z ... ok
+test break_keeps_z::break_keeps_polyline_elevation ... ok
+test break_keeps_z::breakatpoint_keeps_line_z ... ok
+test burst::burst_at_the_command_line_selects_then_bursts ... ok
+test burst::burst_is_one_undo_step_and_leaves_other_objects_alone ... ok
+test burst::burst_places_the_geometry_as_explode_does_for_a_non_uniformly_scaled_reference ... ok
+test burst::burst_text_keeps_the_attribute_colour_and_explode_does_not ... ok
+test burst::burst_turns_visible_attribute_values_into_text ... ok
+test annotate_options::dimarc_partial_measures_part_of_the_arc ... ok
+test compare_export::a_dimension_whose_block_is_past_the_nesting_limit_is_drawn_again ... ok
+test compare_export::a_named_block_whose_dimension_block_has_another_generated_name_keeps_this_drawings_definition ... ok
+test compare_export::a_dimension_block_copy_keeps_its_geometry_when_the_snapshot_is_saved ... ok
+test compare_export::a_named_block_defined_differently_in_the_other_drawing_shows_the_other_definition ... ok
+test compare_export::a_named_block_whose_dimension_draws_another_block_shows_the_other_definition ... ok
+test compare_export::a_named_block_whose_line_is_hidden_or_thicker_in_the_other_drawing_shows_the_other_definition ... ok
+test compare_export::anonymous_blocks_of_the_other_drawing_keep_their_own_definition ... ok
+test compare_export::a_named_block_with_the_same_relative_image_path_from_another_folder_shows_the_other_definition ... ok
+test compare_export::block_contents_take_the_comparison_color ... ok
+test compare_export::colors_carried_apart_from_the_object_color_are_replaced ... ok
+test compare_export::copies_drop_associations_to_the_source_objects ... ok
+test compare_export::edits_after_compare_count_and_objects_keep_their_layers ... ok
+test compare_export::exports_both_drawings_as_colored_groups_in_a_new_drawing ... ok
+test compare_export::inline_colors_of_multiline_attributes_are_replaced ... ok
+test compare_export::relative_xref_paths_become_paths_from_the_source_folder ... ok
+test compare_export::needs_a_comparison_of_the_current_drawing ... ok
+test compare_export::takes_the_other_drawings_layers_and_blocks_it_needs ... ok
+test constraint_geometry::block_reference_insertion_and_rigid_points ... ok
+test constraint_geometry::ellipse_points_and_tangent_line_from_json ... ok
+test constraint_geometry::dof_of_unconstrained_selection_and_hostile_params ... ok
+test constraint_geometry::spline_smooth_to_arc_is_g2_and_reports_dof ... ok
+test constraint_infer::editing_with_snaps_infers_and_constraint_commands_do_not ... ok
+test constraint_infer::line_segments_join_and_ortho_directions_are_kept ... ok
+test constraint_infer::off_by_default_and_settable_by_setvar ... ok
+test constraint_infer::snapped_points_become_coincident_and_tangent ... ok
+test count::count_at_the_command_line ... ok
+test count::counts_layouts_and_all_spaces ... ok
+test count::counts_minsert_copies_and_selections ... ok
+test count::counts_nested_references_in_the_current_space ... ok
+test count::counts_objects_like_a_picked_one_and_highlights_them ... ok
+test count::counttable_inserts_a_table ... ok
+test count::hostile_nesting_is_bounded ... ok
+test count::self_check_says_what_count_covered ... ok
+test dash_block::block_and_the_json_forms_keep_their_defaults ... ok
+test dash_block::dash_block_erases_the_selection_and_asks_before_redefining ... ok
+test data_extraction::constant_attributes_come_from_the_definition ... ok
+test data_extraction::dataextraction_at_the_command_line_inserts_a_table ... ok
+test data_extraction::inserts_a_table_with_a_header_row ... ok
+test data_extraction::rows_are_counted_by_block_and_values ... ok
+test data_extraction::eattext_at_the_command_line_writes_a_file ... ok
+test data_extraction::uncombined_rows_list_each_reference ... ok
+test data_extraction::writes_csv_and_tab_separated_files ... ok
+test dim_baseline_spacing::baseline_spacing_follows_overrides_and_dimscale ... ok
+test dim_chain::chains_attach_like_dimreassociate_and_long_chains_are_capped ... ok
+test dim_commands::breaks ... ok
+test dim_commands::dimedit_modes ... ok
+test dim_commands::dimedit_prompts ... ok
+test dim_commands::inspection_dimensions ... ok
+test dim_commands::jogged_linear ... ok
+test dim_commands::jogged_radius ... ok
+test dim_commands::marks_follow_move_and_rotate_and_hostile_values_do_not_panic ... ok
+test dim_explode_text::exploded_dimension_text_matches_the_drawn_text ... ok
+test dim_properties::bad_values_change_nothing ... ok
+test dim_properties::properties_override_one_dimensions_text_height_arrows_scale_and_precision ... ok
+test dim_radial_inside::radial_text_goes_inside_when_the_location_is_inside ... ok
+test dim_radial_outside::radial_text_goes_to_a_location_outside_the_circle ... ok
+test dim_vars::dimstyle_and_dimoverride_refuse_negative_whole_numbers ... ok
+test dim_vars::fit_moves_text_or_arrows_outside ... ok
+test dim_vars::leaders_use_the_leader_arrow ... ok
+test dim_vars::linetypes_and_lineweights_of_dimension_and_extension_lines ... ok
+test dim_vars::new_variables_are_style_overrides_and_read_back ... ok
+test dim_vars::setvar_negative_whole_numbers_do_not_reach_new_dimensions ... ok
+test dim_vars::setvar_refuses_the_values_the_style_refuses ... ok
+test dim_vars::suppressed_halves_fixed_extension_lines_and_vertical_position ... ok
+test dim_vars::text_fill_variables_are_style_overrides ... ok
+test dim_vars::text_move_settings ... ok
+test dim_vars::tolerance_justification_angular_zeros_and_arc_symbol ... ok
+test dimtedit_prompts::align_text_angle_menu_entry_asks_for_the_angle ... ok
+test dimtedit_prompts::dimtedit_moves_justifies_rotates_and_homes_typed_text ... ok
+test drafting_spacing::drafting_settings_edits_are_drawing_changes_with_undo_and_redo ... ok
+test drafting_spacing::invalid_spacing_is_refused_without_changing_the_drawing ... ok
+test drafting_spacing::loaded_spacing_is_used_by_getvar_settings_snapshots_and_grid_snap ... ok
+test drafting_spacing::spacing_stays_with_each_drawing_and_new_drawings_use_defaults ... ok
+test draw_prompts::circle_center_prompt_rejects_garbage ... ok
+test draw_prompts::circle_radius_point_on_the_centre_is_refused ... ok
+test draw_prompts::polygon_edge_endpoints_must_differ ... ok
+test draw_prompts::polygon_radius_must_be_positive ... ok
+test draw_prompts::polygon_typed_radius_has_a_horizontal_bottom_edge ... ok
+test draw_prompts::spline_close_makes_a_smooth_periodic_curve ... ok
+test draw_prompts::spline_rejects_text_and_switches_method ... ok
+test draworder::draworder_json_keeps_relative_order ... ok
+test draworder::draworder_typed_options_and_undo ... ok
+test draworder::texttofront_and_hatchtoback ... ok
+test dyn_input::an_option_picked_at_the_cursor_answers_the_prompt ... ok
+test dyn_input::dynprompt_is_a_setting_on_by_default ... ok
+test dynamic_block_data::a_reference_to_a_dynamic_block_reports_its_custom_properties ... ok
+test dynamic_block_data::a_visibility_state_is_changed_in_one_undo_step ... ok
+test dynamic_block_data::blocks_without_dynamic_data_and_bad_names ... ok
+test dynamic_block_data::dynamic_block_data_is_reported ... ok
+test data_extraction::too_many_rows_for_a_table_are_refused_before_anything_changes ... ok
+test dynamic_grips::a_grip_drag_previews_the_reference_and_takes_a_point_or_a_distance ... ok
+test dynamic_grips::a_grip_drag_previews_the_reference_in_its_own_colours ... ok
+test dynamic_grips::a_state_that_lists_a_parameter_shows_its_grips ... ok
+test dynamic_grips::an_end_no_action_follows_has_no_grip ... ok
+test dynamic_grips::grips_are_listed_and_dragged_in_one_undo_step ... ok
+test fillet_chamfer::chamfer_angle_and_method ... ok
+test fillet_chamfer::chamfer_no_trim_and_multiple ... ok
+test fillet_chamfer::chamfer_polyline ... ok
+test fillet_chamfer::fillet_multiple_and_undo ... ok
+test fillet_chamfer::fillet_no_trim_keeps_the_lines ... ok
+test fillet_chamfer::json_chamfer_angle_and_trim ... ok
+test fix_holds_grips::a_fixed_midpoint_stays_in_place_when_an_end_grip_is_dragged ... ok
+test fix_holds_grips::dragging_an_end_of_one_of_two_parallel_lines_leaves_its_other_end_in_place ... ok
+test fix_holds_grips::dragging_the_grip_of_a_fixed_end_leaves_it_in_place ... ok
+test fix_holds_grips::moving_an_arc_with_a_fixed_end_leaves_it_whole_and_in_place ... ok
+test followups_626::isometric_snap_gives_way_to_polarsnap ... ok
+test followups_626::mview_restore_ignores_unusable_tiles_from_files ... ok
+test followups_626::mview_restore_puts_a_saved_configuration_on_a_layout ... ok
+test grip_dim_input::circle_radius_and_polyline_segments ... ok
+test grip_dim_input::dyndigrip_and_dyndivis_are_checked_settings ... ok
+test grip_dim_input::only_a_single_stretched_grip_has_dimensions ... ok
+test grip_dim_input::typed_length_and_angle_place_a_line_end ... ok
+test grip_options::bad_grips_are_errors_not_panics ... ok
+test grip_options::base_point_copy_and_undo_make_one_undo_step ... ok
+test grip_options::enter_cycles_the_modes_and_typed_values_apply ... ok
+test grip_options::grip_option_json_form ... ok
+test grip_options::line_and_arc_lengthen_and_radius ... ok
+test grip_options::move_with_base_point_and_copy_on_the_selection ... ok
+test grip_options::polyline_segment_converts_to_arc_and_back ... ok
+test grip_options::polyline_vertex_options ... ok
+test grip_options::reference_rotate_and_scale ... ok
+test grip_options::several_hot_grips_stretch_together ... ok
+test grip_selection::grip_edits_act_on_the_selection ... ok
+test group_selection::clicks_pick_whole_selectable_groups ... ok
+test group_selection::dash_group_json ... ok
+test group_selection::dash_group_options_typed ... ok
+test group_selection::select_objects_prompts_pick_groups ... ok
+test groups::erased_members_leave_groups ... ok
+test groups::group_json_named_and_unnamed ... ok
+test groups::group_typed_name_description_and_undo ... ok
+test groups::groupedit_add_remove_rename ... ok
+test groups::ungroup_by_pick_name_and_json ... ok
+test hatch_assoc::erased_island_is_filled_erased_boundary_ends_the_link ... ok
+test hatch_assoc::hatch_of_selected_polyline_follows_move_and_scale ... ok
+test hatch_assoc::hostile_sources_never_panic ... ok
+test hatch_assoc::interactive_stretch_at_the_command_line_refills ... ok
+test hatch_assoc::moving_hatch_with_its_boundary_keeps_the_link ... ok
+test hatch_assoc::moving_or_copying_the_hatch_alone_ends_the_link ... ok
+test hatch_assoc::non_associative_hatch_keeps_no_sources ... ok
+test hatch_assoc::opening_the_boundary_ends_the_link ... ok
+test hatch_assoc::pick_point_hatch_follows_stretched_lines ... ok
+test hatch_dialog_helpers::gradient_takes_a_name_and_centred ... ok
+test hatch_dialog_helpers::hatchedit_refuses_a_bad_gradient_and_changes_nothing ... ok
+test hatch_dialog_helpers::hatch_takes_points_and_objects_in_one_call ... ok
+test hatch_dialog_helpers::hatchedit_turns_a_pattern_into_a_gradient_and_back ... ok
+test hatch_dialog_helpers::hatchpick_json_form_validates_like_the_prompts ... ok
+test hatch_dialog_helpers::hatchpick_keeps_closed_objects_only ... ok
+test hatch_dialog_helpers::hatchpick_keeps_points_inside_boundaries_and_changes_nothing ... ok
+test hatch_dialog_helpers::hatchpick_origin_and_hatch_modes ... ok
+test hatch_dialog_helpers::hatchpick_typed_mode_and_escape_keeps_nothing ... ok
+test hatch_dialog_helpers::hpdlgmode_defaults_to_1_and_takes_0_or_1 ... ok
+test hatch_numeric_validation::bad_scale_or_angle_is_refused_and_changes_nothing ... ok
+test hatch_numeric_validation::valid_omitted_and_null_values_still_edit ... ok
+test hatch_options::dash_hatchedit_adds_and_removes_boundaries ... ok
+test hatch_options::dash_hatchedit_options_at_the_command_line ... ok
+test hatch_options::gap_tolerance_closes_small_gaps ... ok
+test hatch_options::hatch_origin_and_separate_keywords_at_the_command_line ... ok
+test hatch_options::hatchedit_added_object_boundary_stays_associative ... ok
+test hatch_options::hatchedit_adds_and_removes_boundary_loops ... ok
+test hatch_options::hatchedit_needs_a_hatch ... ok
+test hatch_options::hatchedit_refuses_invalid_boundary_changes_without_editing ... ok
+test hatch_options::hatchedit_refuses_unknown_patterns_and_region_boundaries ... ok
+test hatch_options::hatchedit_unlinks_relinks_and_recreates_boundaries ... ok
+test hatch_options::lines_ending_on_an_ellipse_close_a_boundary ... ok
+test hatch_options::multiline_wall_hatch_keeps_the_room_as_an_island ... ok
+test hatch_options::pattern_origin_options ... ok
+test hatch_options::separate_hatches_and_island_style ... ok
+test helix::helix_edits_grips_snaps_and_explode ... ok
+test helix::helix_is_an_object_on_its_points ... ok
+test inquiry_keywords::area_object_add_and_subtract_keep_a_running_total ... ok
+test inquiry_keywords::area_object_on_an_open_polyline_closes_the_area_but_not_the_perimeter ... ok
+test inquiry_keywords::area_of_an_ellipse_reports_its_exact_perimeter ... ok
+test inquiry_keywords::area_of_an_open_elliptical_arc_is_refused_and_a_full_ellipse_is_measured ... ok
+test inquiry_keywords::area_unsupported_keywords_say_so_and_length_extends_the_last_segment ... ok
+test inquiry_keywords::dist_multiple_points_sums_the_segments ... ok
+test inquiry_keywords::measure_with_points_that_are_not_points_is_an_error_not_the_selection ... ok
+test inquiry_keywords::measuregeom_angle_measures_an_arc_a_circle_two_lines_and_a_vertex ... ok
+test inquiry_keywords::measuregeom_radius_measures_a_polyline_arc_segment ... ok
+test inquiry_keywords::measuregeom_typed_asks_for_the_option_then_the_points ... ok
+test inquiry_keywords::measuregeom_volume_multiplies_an_area_by_a_height ... ok
+test inquiry_keywords::measuregeom_volume_too_large_to_hold_is_refused ... ok
+test inquiry_keywords::tools_inquiry_angle_asks_for_the_objects ... ok
+test inquiry_keywords::tools_inquiry_radius_asks_for_the_object ... ok
+test inquiry_keywords::tools_inquiry_volume_adds_and_subtracts_a_running_total ... ok
+test inquiry_z::a_mirrored_contours_elevation_is_down_z ... ok
+test inquiry_z::dist_between_two_levels_gives_the_3d_distance_and_the_rise ... ok
+test inquiry_z::id_reports_the_z_of_what_is_at_the_point ... ok
+test inquiry_z::list_shows_the_z_values_objects_have ... ok
+test insert_prompts::script_insert_reads_x_and_y_scale_then_rotation_and_honours_its_options ... ok
+test isometric::ellipse_isocircle_in_each_plane ... ok
+test isometric::hostile_isometric_inputs_never_panic ... ok
+test isometric::isodraft_and_isoplane_at_the_command_line ... ok
+test isometric::isodraft_and_isoplane_set_snapstyl_and_snapisopair ... ok
+test isometric::isometric_snap_follows_the_lattice ... ok
+test isometric::ortho_follows_the_isometric_plane_axes ... ok
+test join_close::join_close_by_json_and_its_refusals ... ok
+test join_close::join_close_prompt_takes_more_arcs_and_is_only_for_arcs ... ok
+test join_close::join_close_turns_a_single_arc_into_its_circle ... ok
+test join_close::join_close_turns_a_single_elliptical_arc_into_its_ellipse ... ok
+test json_param_validation::dimension_style_sizes_out_of_range_are_ignored ... ok
+test json_param_validation::invalid_sizes_and_points_are_refused ... ok
+test json_param_validation::repeated_line_points_make_no_zero_length_line ... ok
+test json_param_validation::valid_values_still_work ... ok
+test layer_cmdline::layer_commands_reject_unloaded_linetypes_and_duplicate_renames ... ok
+test layer_cmdline::make_and_color_then_the_next_command_runs ... ok
+test layer_cmdline::options_reach_every_layer_property ... ok
+test layer_merge_delete::laydel_deletes_the_layer_and_its_objects ... ok
+test layer_merge_delete::layer_delete_clears_viewport_overrides_for_the_layer ... ok
+test layer_merge_delete::laymrg_refusals ... ok
+test layer_merge_delete::laymrg_typed_moves_everything_and_deletes_the_source ... ok
+test layoff_repeat::an_empty_pick_keeps_layoff_running ... ok
+test layoff_repeat::esc_ends_layoff_and_keeps_what_it_turned_off ... ok
+test layoff_repeat::layoff_keeps_asking_until_enter ... ok
+test layoff_repeat::pickfirst_and_json_calls_are_unchanged ... ok
+test layout_prompts::typed_layout_options_prompt_for_names ... ok
+test lisp_corpus::autolisp_corpus ... ok
+test malformed_handles::malformed_handles_are_rejected_instead_of_using_the_selection ... ok
+test matchprop::matchprop_copies_object_specific_properties ... ok
+test matchprop::matchprop_json_with_property_list ... ok
+test matchprop::matchprop_skips_locked_layers ... ok
+test matchprop::matchprop_typed_picker_and_settings ... ok
+test measure_distance_snapping::clipped_deferred_curves_do_not_hide_a_visible_candidate ... ok
+test measure_distance_snapping::clipped_endpoints_do_not_hide_a_visible_candidate ... ok
+test measure_distance_snapping::deferred_curves_are_projected_into_paper_coordinates ... ok
+test measure_distance_snapping::distance_uses_model_units_for_two_snaps_in_the_same_viewport ... ok
+test measure_distance_snapping::explicit_endpoint_and_intersection_overrides_work_from_the_command_line ... ok
+test measure_distance_snapping::malformed_and_paper_space_viewports_are_not_snap_sources ... ok
+test measure_distance_snapping::model_space_running_snaps_and_disabled_snaps_keep_their_behavior ... ok
+test measure_distance_snapping::multiple_points_length_and_undo_keep_the_measurement_units ... ok
+test measure_distance_snapping::off_viewport_borders_keep_contents_but_frozen_or_hidden_viewports_do_not ... ok
+test measure_distance_snapping::paper_space_snaps_to_visible_model_endpoints_and_intersections ... ok
+test measure_distance_snapping::points_from_different_viewports_use_paper_units ... ok
+test measure_distance_snapping::typed_and_programmatic_points_are_measured_in_paper_units ... ok
+test measure_distance_snapping::viewport_frozen_layers_apply_inside_nested_block_references ... ok
+test measure_distance_snapping::viewport_frozen_layers_do_not_hide_paper_space_geometry ... ok
+test metric_linetypes::centerline_loads_the_metric_center_linetype ... ok
+test metric_linetypes::embedded_text_scales_with_the_pattern ... ok
+test metric_linetypes::metric_drawings_load_millimetre_patterns ... ok
+test mleader_content::block_content_inserts_the_block_at_the_landing ... ok
+test mleader_content::block_content_keeps_the_block_alive ... ok
+test mleader_content::json_form_takes_leader_type_and_block ... ok
+test mleader_content::mleader_sizes_ignore_dimscale ... ok
+test mleader_content::no_leader_places_only_the_content ... ok
+test mleader_content::spline_leader_curves_through_its_points ... ok
+test mleader_remember::mleader_remembers_order_and_options ... ok
+test mline::hostile_mline_params_never_panic ... ok
+test mline::mledit_crosses ... ok
+test mline::mledit_tees_and_corner ... ok
+test mline::mledit_vertices_cuts_and_welds ... ok
+test mline::mline_command_line_style_option ... ok
+test mline::mline_is_one_object_with_the_standard_style ... ok
+test mline::mlstyle_defines_elements_caps_and_fill ... ok
+test mline::snaps_selection_extents_and_render ... ok
+test mline::transforms_grips_explode ... ok
+test mocoro::a_point_at_the_option_prompt_is_not_an_option ... ok
+test mocoro::copy_leaves_the_originals_and_later_options_act_on_them ... ok
+test mocoro::escape_keeps_what_was_done_as_one_undo_step ... ok
+test mocoro::json_form_is_checked_before_the_drawing_changes ... ok
+test mocoro::json_form_runs_the_options_in_order ... ok
+test mocoro::move_carries_the_base_point_and_rotate_turns_about_it ... ok
+test mocoro::objects_on_locked_layers_stay_put_but_can_be_copied ... ok
+test mocoro::options_on_objects_that_are_gone_record_nothing ... ok
+test mocoro::rotate_follows_angdir ... ok
+test mocoro::scale_by_factor_or_point_and_refuses_a_zero_factor ... ok
+test mocoro::undo_after_base_undoes_only_the_new_base_point ... ok
+test mocoro::undo_steps_back_one_option_and_restores_the_base_point ... ok
+test modify_curves::extend_refuses_closed_splines ... ok
+test modify_curves::extend_runs_a_spline_on_along_its_end_tangent ... ok
+test modify_curves::fillet_and_chamfer_a_line_into_a_polyline ... ok
+test modify_curves::fillet_and_chamfer_two_segments_of_one_polyline ... ok
+test modify_curves::fillet_at_the_command_line_with_no_trim ... ok
+test modify_curves::fillet_failures_leave_the_drawing_alone ... ok
+test modify_curves::fillet_line_and_elliptical_arc ... ok
+test modify_curves::fillet_radius_zero_extends_an_elliptical_arc_to_a_line ... ok
+test modify_curves::fillet_spline_and_line ... ok
+test compare_export::says_when_blocks_both_drawings_define_differently_were_left_out ... ok
+test modify_curves::join_at_the_command_line_names_the_result ... ok
+test modify_curves::join_makes_one_spline_from_lines_arcs_polylines_and_splines ... ok
+test modify_curves::join_merges_elliptical_arcs_on_one_ellipse ... ok
+test modify_curves::join_names_an_elliptical_arc_twice_without_losing_it ... ok
+test modify_curves::join_refuses_unconnected_curves ... ok
+test modify_curves::lengthen_at_the_command_line_on_an_elliptical_arc ... ok
+test modify_curves::lengthen_elliptical_arcs_along_the_ellipse ... ok
+test modify_curves::lengthen_open_splines ... ok
+test modify_curves::polyline_fillet_refusals_leave_it_alone ... ok
+test modify_curves::polyline_fillets_at_the_command_line_and_with_no_trim ... ok
+test modify_curves::shortening_a_tightly_bent_spline_reaches_the_requested_length ... ok
+test modify_curves::trimming_a_closed_spline_leaves_one_open_spline ... ok
+test mtext_columns::columns_shape_the_drawn_text_and_its_extents ... ok
+test modify_curves::hostile_curve_edits_do_not_panic ... ok
+test mtext_columns::dynamic_columns_and_defaults ... ok
+test compare_export::says_when_blocks_of_the_other_drawing_were_left_out ... ok
+test mtext_columns::json_columns_and_lists ... ok
+test mtext_columns::scale_scales_multileader_text_width_and_columns ... ok
+test mtext_columns::static_columns_from_the_command_line ... ok
+test mtext_options::height_justify_and_corners ... ok
+test mtext_options::json_form_takes_justify_style_and_spacing ... ok
+test mtext_options::line_spacing_type_and_factor_or_distance ... ok
+test mtext_options::rotation_turns_the_box ... ok
+test mtext_options::style_and_columns ... ok
+test mtext_options::width_replaces_the_opposite_corner ... ok
+test multiline_attributes::a_value_given_on_insert_replaces_the_definition_text ... ok
+test multiline_attributes::references_get_the_multiline_text_and_carry_it ... ok
+test named_views::paper_space_view_switches_to_its_layout ... ok
+test named_views::layer_snapshot_restores_layers_and_the_setting_turns_it_off ... ok
+test named_views::typed_save_restore_list_delete ... ok
+test named_views::window_option_and_json_forms ... ok
+test named_views::zoom_dynamic_places_and_sizes_the_view_box ... ok
+test named_views::zoomfactor_scales_the_wheel ... ok
+test named_views::zoom_realtime_drags_and_enter_ends ... ok
+test non_finite_edits::typed_move_that_overflows_is_refused ... ok
+test offset_ellipse_side::full_ellipse_offset_follows_side_point ... ok
+test offset_closed_spline::offset_of_closed_spline_is_closed ... ok
+test non_finite_edits::json_transforms_that_overflow_are_refused ... ok
+test offset_move::copy_displacement ... ok
+test offset_move::move_displacement ... ok
+test offset_move::offset_erase_source ... ok
+test offset_move::offset_json_erase_and_layer ... ok
+test offset_move::offset_layer_current ... ok
+test options_profile::grips_show_up_to_the_object_limit ... ok
+test offset_move::offset_multiple_and_undo ... ok
+test options_profile::preview_filter_excludes_each_kind_it_names ... ok
+test options_profile::options_json_reports_sets_and_resets_the_profile ... ok
+test options_profile::saved_profile_restores_and_hostile_entries_are_skipped ... ok
+test options_profile::selection_preview_follows_its_bits ... ok
+test options_profile::selection_tab_variables_have_autocads_defaults_ranges_and_are_saved ... ok
+test options_profile::selection_highlight_variables ... ok
+test options_profile::typed_options_without_a_dialog_reports_how_to_change_settings ... ok
+test overkill::associated_objects_stay ... ok
+test overkill::arcs_on_one_circle ... ok
+test overkill::collinear_lines_overlap_and_end_to_end ... ok
+test overkill::duplicates_tolerance_and_ignored_properties ... ok
+test overkill::hostile_params_are_refused ... ok
+test overkill::typed_options ... ok
+test overkill::polyline_segments ... ok
+test pedit_splinedit::break_json_opens_a_closed_polyline_and_refuses_the_ends ... ok
+test pedit_splinedit::closed_splines_honour_the_fit_tolerance ... ok
+test pedit_splinedit::control_edits_drop_fit_data_and_keep_closed_splines_closed ... ok
+test pedit_splinedit::edit_vertex_add_and_elevate_order_keep_the_shape ... ok
+test pedit_splinedit::edit_vertex_break_splits_an_open_polyline_and_undo_joins_it ... ok
+test pedit_splinedit::edit_vertex_move_weight_and_delete ... ok
+test pedit_splinedit::edit_vertex_straighten_removes_the_vertices_between_the_markers ... ok
+test pedit_splinedit::edit_vertex_tangent_steers_fit ... ok
+test pedit_splinedit::fit_data_json_options ... ok
+test pedit_splinedit::fit_data_options_at_the_command_line ... ok
+test pedit_splinedit::join_adds_connected_curves_and_undo_brings_them_back ... ok
+test pick_text::a_dimension_drawn_from_its_block_is_picked_on_the_block_text ... ok
+test pick_text::dimension_and_multileader_text_is_picked_anywhere_on_its_words ... ok
+test pick_text::slanted_dimension_text_is_picked_inside_its_turned_box_only ... ok
+test pickdrag::pickdrag_is_saved_reset_and_validated ... ok
+test pickdrag::two_click_selection_works_with_drag_disabled ... ok
+test pline_arc_xline_options::angle_then_endpoint_center_or_radius ... ok
+test helix::helix_command_line_preview_and_hostile_values ... ok
+test pline_arc_xline_options::bad_arc_answers_reprompt ... ok
+test pline_arc_xline_options::center_then_endpoint_angle_or_length ... ok
+test pline_arc_xline_options::direction_radius_and_second_point ... ok
+test pline_arc_xline_options::included_angle_follows_angdir ... ok
+test pline_arc_xline_options::line_back_and_length ... ok
+test pline_arc_xline_options::xline_options ... ok
+test plot_styles::pagesetup_sets_table_and_display_flag ... ok
+test plot_styles::plotstyle_sets_objects_and_the_current_style ... ok
+test point_modifiers::angle_override_locks_the_direction_of_the_next_point ... ok
+test point_modifiers::enter_drops_the_modifiers_and_text_is_not_a_point ... ok
+test plot_styles::stylesmanager_creates_edits_saves_and_loads_tables ... ok
+test point_modifiers::from_takes_a_base_point_and_an_offset ... ok
+test point_modifiers::m2p_and_mtp_give_the_midpoint_between_two_points ... ok
+test point_modifiers::modifiers_nest_and_work_in_scripts ... ok
+test point_modifiers::point_filters_take_coordinates_from_two_points ... ok
+test point_modifiers::star_prefix_reads_world_coordinates ... ok
+test post_command_passes::erase_runs_every_pass_on_both_paths ... ok
+test post_command_passes::move_runs_every_pass_on_both_paths ... ok
+test prompt_keywords::break_first_point_option ... ok
+test prompt_keywords::ellipse_rotation_sets_the_axis_ratio ... ok
+test prompt_keywords::elliptical_arc_parameter_values ... ok
+test props_bad_lineweight::malformed_lineweight_is_rejected_and_keeps_previous_value ... ok
+test props_insert_scale_attribs::scale_property_is_absolute_about_the_insertion_point ... ok
+test props_insert_scale_attribs::scale_property_moves_and_resizes_attribute ... ok
+test purge_mlinestyles::purge_all_frees_styles_of_purged_blocks ... ok
+test purge_mlinestyles::purge_mlinestyles_at_the_command_line ... ok
+test purge_mlinestyles::purge_mlinestyles_keeps_used_standard_and_current ... ok
+test purge_prompts::all_without_verify_purges_every_named_type ... ok
+test purge_prompts::json_type_and_names_and_kept_linetypes ... ok
+test purge_prompts::layers_only_then_the_next_command_runs ... ok
+test purge_prompts::verify_asks_for_each_name_and_absent_types_take_their_tokens ... ok
+test qdim_modes::linear_modes ... ok
+test qdim_modes::ordinate_radius_diameter_and_edit ... ok
+test qdim_modes::qdim_prompts ... ok
+test query_entities::malformed_filters_are_errors ... ok
+test query_entities::selection_filter_combines_before_paging_without_changing_state ... ok
+test query_entities::selection_is_empty_by_default_and_limited_to_active_space ... ok
+test quickcalc::cal_and_picks_at_the_command_line ... ok
+test quickcalc::cal_converts_units ... ok
+test quickcalc::cal_evaluates_points_and_vector_functions ... ok
+test quickcalc::hostile_expressions_never_panic ... ok
+test quickcalc::picks_read_values_from_points ... ok
+test recent_commands::recent_commands_newest_first_without_repeats ... ok
+test rectang_ortho::array_unit_cell_ignores_ortho ... ok
+test rectang_ortho::rectang_other_corner_ignores_ortho ... ok
+test refedit::a_block_that_references_itself_in_a_file_does_not_hang ... ok
+test parallel_display_list::parallel_model_space_matches_one_thread ... ok
+test refedit::a_block_that_would_contain_itself_is_refused_and_the_edit_survives ... ok
+test refedit::discard_leaves_everything_as_it_was ... ok
+test refedit::edit_and_save_updates_every_reference ... ok
+test refedit::erasing_a_working_object_removes_it_from_the_block ... ok
+test refedit::hostile_requests_never_panic ... ok
+test refedit::files_never_hold_half_an_edit ... ok
+test refedit::interactive_refedit_refset_and_refclose ... ok
+test refedit::objects_outside_the_working_set_cannot_be_edited ... ok
+test refedit::refset_adds_and_removes_objects ... ok
+test refedit::undo_takes_the_edit_back_with_its_state ... ok
+test refedit::xrefs_are_refused_with_a_message ... ok
+test region::hostile_region_params_never_panic ... ok
+test region::massprop_does_not_flag_area_without_visible_extents ... ok
+test region::massprop_self_check_reports_skipped_objects ... ok
+test region::region_from_closed_objects_measures ... ok
+test region::regions_move_grip_explode_and_snap ... ok
+test region::booleans_on_separate_and_nested_regions ... ok
+test region::subtract_on_the_command_line ... ok
+test rename_cmdline::json_block_rename_repoints_every_insert ... ok
+test rename_cmdline::rename_prompts_type_old_and_new_name ... ok
+test rotate_reference::rotate_reference_by_points ... ok
+test rotate_reference::rotate_reference_typed_angles ... ok
+test select_keywords::auto_and_multiple_keep_picking_until_enter ... ok
+test select_keywords::box_follows_the_direction_of_its_corners ... ok
+test select_keywords::group_selects_a_group_by_name ... ok
+test select_keywords::remove_add_and_undo ... ok
+test select_keywords::single_ends_the_prompt_with_the_first_selection ... ok
+test select_similar::isolate_hide_and_unisolate ... ok
+test select_similar::isolate_typed_and_all_skips_hidden ... ok
+test select_similar::selectsimilar_matches_type_and_mode_properties ... ok
+test select_similar::selectsimilar_typed_with_settings_keyword ... ok
+test select_underscore_keywords::underscore_previous_beats_a_command_keyword_sharing_the_letter ... ok
+test selection_cycling::a_cycled_pick_of_an_erased_object_selects_nothing ... ok
+test select_underscore_keywords::underscore_selection_keywords_select_like_the_plain_ones ... ok
+test selection_cycling::a_cycled_pick_selects_like_a_click ... ok
+test selection_cycling::cycling_candidates_follow_selectioncycling ... ok
+test selection_cycling::pick_all_lists_every_object_under_the_pick_box ... ok
+test selection_modes::escape_during_a_mode_cancels_the_command ... ok
+test selection_modes::crossing_and_window_ignore_the_drag_direction ... ok
+test selection_modes::fence_selects_what_it_crosses ... ok
+test selection_modes::window_and_crossing_polygons ... ok
+test setvar_cecolor::getvar_cecolor_after_the_color_command ... ok
+test setvar_cecolor::getvar_cecolor_of_a_new_drawing_is_bylayer ... ok
+test setvar_cecolor::getvar_cecolor_restores_a_true_colour ... ok
+test setvar_cecolor::setvar_cecolor_accepts_names ... ok
+test setvar_cecolor::setvar_cecolor_name_replaces_a_true_colour ... ok
+test setvar_cecolor::setvar_cecolor_lists_cecolor_as_text ... ok
+test setvar_cecolor::setvar_cecolor_number_replaces_a_true_colour ... ok
+test setvar_cecolor::setvar_cecolor_refuses_what_is_not_a_colour ... ok
+test setvar_coverage::bad_values_and_unknown_names_are_refused ... ok
+test setvar_coverage::metric_defaults ... ok
+test setvar_coverage::defaults_are_the_ones_the_commands_use ... ok
+test setvar_coverage::values_reach_the_commands ... ok
+test shapes::bulged_side_is_exact ... ok
+test shapes::bow_tie_reports_its_crossing ... ok
+test shapes::circle_and_skipped_entities ... ok
+test shapes::open_polyline_with_matching_ends_is_closed ... ok
+test shapes::paging_and_bad_options ... ok
+test shapes::repeated_vertex_is_listed ... ok
+test shapes::self_check_counts_found_analyzed_and_skipped ... ok
+test shapes::self_check_does_not_flag_an_extents_filling_rectangle ... ok
+test shapes::self_check_flags_implausible_geometry ... ok
+test shapes::self_check_has_no_area_bound_without_visible_extents ... ok
+test shapes::square_both_windings ... ok
+test shapes::self_check_reports_the_caps_it_hits ... ok
+test snap_annotations::dimensions_snap_to_their_lines_and_definition_points ... ok
+test snap_annotations::grid_snap_follows_snapbase_and_snapang ... ok
+test snap_annotations::hatches_snap_only_with_osnaphatch ... ok
+test snap_annotations::justified_text_snaps_and_grips_at_its_alignment_point ... ok
+test snap_blocks::snaps_inside_nested_and_arrayed_references_but_not_hidden_objects ... ok
+test snap_blocks::snaps_inside_rotated_scaled_and_mirrored_references ... ok
+test snap_curves::elliptical_arc_midpoint_and_quadrants ... ok
+test snap_curves::elliptical_arc_perpendicular_and_tangent_from_a_base_point ... ok
+test snap_intersections_aperture::apparent_intersection_keeps_segments_outside_the_finite_aperture ... ok
+test snap_intersections_aperture::ellipse_bounds_covering_cursor_do_not_create_a_curve_hit ... ok
+test snap_curves::spline_midpoint_perpendicular_and_tangent ... ok
+test snap_intersections_aperture::finite_intersection_just_outside_the_aperture_is_rejected ... ok
+test snap_intersections_aperture::finite_intersection_on_the_aperture_boundary_is_included ... ok
+test snap_intersections_aperture::finite_line_parameter_tolerance_is_preserved ... ok
+test snap_intersections_aperture::large_tessellated_chord_parameter_slack_is_not_pruned ... ok
+test snap_intersections_aperture::line_and_circle_intersections_remain_available ... ok
+test snap_intersections_aperture::non_finite_query_inputs_return_no_hit ... ok
+test snap_intersections_aperture::real_intersection_keeps_precedence_when_app_is_also_enabled ... ok
+test snap_intersections_aperture::tessellated_ellipse_intersection_near_cursor_is_kept ... ok
+test snap_intersections_aperture::tessellated_line_parameter_tolerance_is_preserved ... ok
+test snap_nearest::nearest_prefers_the_closer_object_in_any_drawing_order ... ok
+test snap_overrides::a_command_keyword_wins_over_a_snap_word ... ok
+test snap_overrides::an_override_lasts_one_point_and_non_turns_snapping_off ... ok
+test snap_overrides::from_nests_with_a_snap_override ... ok
+test snap_overrides::nothing_to_snap_to_rejects_the_point ... ok
+test snap_overrides::tab_cycling_candidates_start_with_the_running_snap ... ok
+test snap_overrides::typed_overrides_snap_the_next_typed_point ... ok
+test snap_tracking::a_tracking_path_snaps_where_it_crosses_an_object ... ok
+test snap_tracking::apparent_intersection_where_extensions_meet ... ok
+test snap_tracking::default_cursor_tracking_acquires_nested_block_geometry ... ok
+test snap_tracking::extension_runs_on_from_a_line_end_and_round_an_arc ... ok
+test snap_tracking::osnaphatch_geometry_is_not_used_for_tracking_extension ... ok
+test snap_tracking::parallel_path_through_the_base_point ... ok
+test snap_tracking::polar_angles_increment_additional_and_tracking ... ok
+test snap_tracking::resting_again_releases_and_seven_points_at_most ... ok
+test snap_tracking::shift_ortho_override_wins_over_polar ... ok
+test snap_tracking::shift_overrides_ortho_while_held ... ok
+test snap_tracking::shift_to_acquire ... ok
+test snap_tracking::sysvars_polarmode_polaraddang_autosnap ... ok
+test snap_tracking::two_acquired_points_snap_where_their_paths_cross ... ok
+test snaps_more::closed_curves_have_no_midpoint ... ok
+test snaps_more::geometric_center_of_a_closed_spline ... ok
+test snaps_more::insertion_snaps_to_a_multileader_text ... ok
+test snaps_more::insertion_snaps_to_attribute_definitions ... ok
+test space_is_enter::leading_blanks_before_a_command_name_are_not_enter ... ok
+test space_is_enter::trailing_and_double_spaces_are_enter ... ok
+test spline_degree::programmatic_spline_control_count_is_limited ... ok
+test spline_degree::programmatic_spline_degree_is_limited ... ok
+test spline_options::json_form_takes_the_fit_options ... ok
+test spline_options::knots_option_sets_the_parametrisation_and_is_remembered ... ok
+test snap_tracking::hostile_inputs_never_panic ... ok
+test spline_options::object_option_converts_polylines ... ok
+test spline_options::tangency_options_fix_the_end_directions ... ok
+test spline_options::tolerance_option_approximates_the_fit_points ... ok
+test stretch::stretch_displacement_option ... ok
+test stretch::stretch_keeps_selecting_until_enter ... ok
+test stretch::stretch_script_with_crossing_keyword ... ok
+test stretch_select::crossing_polygon_moves_the_vertices_inside_it ... ok
+test stretch_select::fence_moves_what_it_crosses_whole ... ok
+test stretch_select::json_polygon_and_fence ... ok
+test stretch_select::polygon_moves_only_the_multiline_vertices_inside_it ... ok
+test stretch_select::hostile_polygon_and_fence_never_panic ... ok
+test stretch_select::small_area_around_a_multiline_vertex_moves_it_at_a_large_scale ... ok
+test stretch_select::undo_takes_back_a_polygon_point_and_too_few_points_select_nothing ... ok
+test stretch_select::window_polygon_takes_only_what_is_wholly_inside ... ok
+test table_formulas::errors_show_as_text ... ok
+test table_formulas::insert_formula_options ... ok
+test table_formulas::inserting_and_deleting_rows_moves_references ... ok
+test table_formulas::regen_recalculates ... ok
+test table_formulas::sum_average_count_and_arithmetic ... ok
+test table_formulas::tabledit_at_the_command_line ... ok
+test table_formulas::tableexport_writes_csv ... ok
+test table_styles::define_cell_styles_with_json ... ok
+test table_styles::rows_and_cells_take_cell_styles ... ok
+test table_styles::styles_are_drawn ... ok
+test table_styles::typed_cell_style ... ok
+test temp_tracking::enter_at_the_first_tracking_point_and_hostile_input_are_harmless ... ok
+test temp_tracking::extension_runs_around_an_elliptical_arc_and_off_a_spline_end ... ok
+test temp_tracking::polar_angles_relative_to_the_last_segment ... ok
+test temp_tracking::polarsnap_steps_along_polar_paths_by_polardist ... ok
+test temp_tracking::tk_runs_orthogonal_tracking_points_until_enter ... ok
+test temp_tracking::tk_takes_snaps_and_nests_under_from ... ok
+test temp_tracking::tt_acquires_a_point_that_tracks_until_the_next_point ... ok
+test temp_tracking::tt_point_is_the_last_point_and_takes_snap_overrides ... ok
+test text_commands::script_mtext_takes_lines_until_an_empty_line ... ok
+test text_commands::textedit_prompt_mode_and_undo ... ok
+test text_left_justify::moving_top_left_text_through_properties_moves_it ... ok
+test tolerance::command_line_prompts ... ok
+test tolerance::command_line_rejects_bad_symbols_and_empty_frames ... ok
+test tolerance::explode_gives_lines_symbols_and_text ... ok
+test tolerance::hostile_params_are_refused_without_panicking ... ok
+test tolerance::json_form_composes_the_frame ... ok
+test tolerance::transforms_and_grips ... ok
+test transparent::transparent_zoom_resumes_the_running_command ... ok
+test trim_closed_polyline::a_closing_arc_is_dropped_with_the_picked_piece ... ok
+test trim_closed_polyline::a_pick_after_the_last_cutting_edge_keeps_only_the_complementary_run ... ok
+test trim_closed_polyline::a_single_cut_still_opens_the_outline_there ... ok
+test trim_closed_polyline::picks_on_the_other_pieces_still_leave_the_other_run ... ok
+test trim_closed_polyline::the_stored_start_vertex_does_not_change_the_result ... ok
+test trim_closed_polyline::undo_restores_the_closed_polyline ... ok
+test trim_extend_options::crossing_window_trims_what_it_touches ... ok
+test trim_extend_options::cutting_edges_option_in_quick_mode ... ok
+test trim_extend_options::edge_extend_trims_to_an_implied_edge ... ok
+test trim_extend_options::erase_undo_and_project ... ok
+test trim_extend_options::extend_fence_and_crossing ... ok
+test trim_extend_options::fence_crossing_one_line_twice_trims_both_parts ... ok
+test trim_extend_options::fence_trims_every_crossed_object ... ok
+test trim_extend_options::json_forms_take_fence_crossing_edge_mode_and_mode ... ok
+test trim_extend_options::quick_mode_trims_to_all_objects_and_erases_an_object_with_no_edge ... ok
+test trim_extend_options::standard_mode_uses_the_selected_cutting_edges ... ok
+test undo_count::undo_options_and_u ... ok
+test undo_count::undo_takes_a_count ... ok
+test undo_layout_tab::undo_and_redo_of_a_rename_follow_the_current_layout ... ok
+test undo_layout_tab::undoing_the_current_layouts_creation_returns_to_model ... ok
+test viewport_clip::hostile_viewport_params_never_panic ... ok
+test viewport_clip::on_off_lock_restore_and_arrangements ... ok
+test viewport_clip::polygonal_viewport_clips_model_space ... ok
+test viewport_clip::polygonal_viewport_menu_item_asks_for_points ... ok
+test viewport_clip::typed_polygonal_with_arc_and_object ... ok
+test viewport_clip::vpclip_clips_keeps_the_view_and_deletes ... ok
+test vplayer_prompts::typed_vplayer_changes_layers_in_chosen_viewports ... ok
+test vports::menu_viewports_in_the_model_tab_and_limits ... ok
+test vports::named_configurations_save_restore_list_delete ... ok
+test vports::split_activate_and_each_tile_keeps_its_view ... ok
+test vports::typed_three_right_then_join_and_single ... ok
+test xdata_follows_entity::a_copy_saves_its_xdata ... ok
+test xdata_follows_entity::copies_keep_the_xdata ... ok
+test xdata_follows_entity::exploded_pieces_do_not_keep_the_xdata ... ok
+test xdata_follows_entity::reading_puts_xdata_on_the_entity ... ok
+test zoom_keywords::zoom_center_scale_dynamic_and_paper_space_all ... ok
+test zoom_keywords::zoom_window_command_frames_the_region ... ok
+test zoom_viewport::a_view_too_large_for_the_viewport_is_refused_and_keeps_the_viewport ... ok
+test zoom_viewport::zoom_in_a_locked_viewport_or_on_the_model_tab_is_unchanged ... ok
+test zoom_viewport::zoom_inside_a_viewport_acts_on_the_viewport ... ok
+test zoom_window_ortho::zoom_window_corner_ignores_ortho ... ok
+test qdim::qdim_attaches_like_dimreassociate_and_large_input_is_capped ... ok
+test overkill::many_objects_stay_fast ... ok
+test table_formulas::hostile_formulas_never_panic ... ok
+
+test result: ok. 697 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 10.88s
+
+     Running tests\lin_pat_files.rs (target\debug\deps\lin_pat_files-2dbd169ad0fc015d.exe)
+
+running 7 tests
+test a_pat_file_cannot_replace_a_library_pattern ... ok
+test hatch_uses_a_pattern_from_a_pat_file_and_keeps_its_definition ... ok
+test hatch_pattern_prompt_takes_a_pat_file_name ... ok
+test dash_linetype_loads_from_a_file_and_the_library_at_the_command_line ... ok
+test linetype_json_loads_named_linetypes_from_file_text ... ok
+test hostile_support_files_never_panic ... ok
+test linetype_json_reads_a_lin_file_by_path ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.09s
+
+     Running tests\loops.rs (target\debug\deps\loops-cad027be89488caa.exe)
+
+running 12 tests
+test a_slot_of_lines_and_arcs ... ok
+test a_t_junction_is_reported_not_resolved ... ok
+test a_line_whose_own_ends_meet_within_a_large_tolerance_is_still_open ... ok
+test a_corner_off_by_a_gap_is_an_open_chain ... ok
+test bad_options_are_errors ... ok
+test coincident_endpoints_never_panic ... ok
+test clockwise_chain_reports_cw ... ok
+test degenerate_entities_and_bad_options_never_panic ... ok
+test four_lines_make_a_closed_loop ... ok
+test loop_facts_match_shapes ... ok
+test paging_caps_loops_open_chains_and_junctions ... ok
+test the_pair_cap_is_reported ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests\measureinit.rs (target\debug\deps\measureinit-9c84dfeabd6b5671.exe)
+
+running 4 tests
+test imperial_by_default ... ok
+test kept_in_the_profile ... ok
+test new_follows_measureinit ... ok
+test only_zero_or_one ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests\new_open_end_command.rs (target\debug\deps\new_open_end_command-3a531ea11217c3d8.exe)
+
+running 3 tests
+test new_ends_the_command_of_the_previous_drawing ... ok
+test new_without_a_command_keeps_the_selection_of_the_previous_drawing ... ok
+test open_ends_the_command_of_the_previous_drawing ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\offset_preselection.rs (target\debug\deps\offset_preselection-f18e4b114a86ef0b.exe)
+
+running 3 tests
+test one_preselected_non_offsettable_object_still_asks_to_select ... ok
+test one_preselected_object_goes_straight_to_the_side_prompt ... ok
+test two_preselected_objects_still_ask_to_select_one ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\open_svg.rs (target\debug\deps\open_svg-051c674864f210a4.exe)
+
+running 1 test
+test an_opened_svg_is_not_saved_over ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests\plot_sheets.rs (target\debug\deps\plot_sheets-a2f2a8160c171869.exe)
+
+running 2 tests
+test bad_sheet_lists_are_errors ... ok
+test layouts_name_the_sheets_of_one_pdf ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests\plot_transparency.rs (target\debug\deps\plot_transparency-9b8b3049cba1def9.exe)
+
+running 3 tests
+test the_override_decides_what_the_plotter_is_told ... ok
+test page_setup_stores_plot_transparency ... ok
+test preview_follows_the_plot_setting ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests\plotters.rs (target\debug\deps\plotters-de0fcd194928649b.exe)
+
+running 7 tests
+test hostile_names_and_values_are_refused ... ok
+test page_setup_takes_a_device_and_its_papers ... ok
+test manage_devices ... ok
+test plotwindow_keeps_the_picked_window_for_the_plot_dialog ... ok
+test plot_uses_the_device ... ok
+test plotwindow_picks_both_corners_with_ortho_on ... ok
+test typed_plotter_manager ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+     Running tests\purge_arrow_blocks.rs (target\debug\deps\purge_arrow_blocks-2b1f26c04b68ff5f.exe)
+
+running 1 test
+test purge_keeps_arrowhead_blocks_dimension_styles_name ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\save_as_export.rs (target\debug\deps\save_as_export-8163a5e19bfc83a2.exe)
+
+running 1 test
+test saveas_to_an_image_keeps_the_drawing_unsaved_under_its_name ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+
+     Running tests\save_reports_not_saved.rs (target\debug\deps\save_reports_not_saved-b3b1a111a68e49a4.exe)
+
+running 3 tests
+test solids_whose_geometry_the_data_store_keeps_are_not_reported_from_2013 ... ok
+test templates_report_what_dwg_does_not_keep ... ok
+test save_lists_the_entities_the_file_does_not_keep ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests\save_version.rs (target\debug\deps\save_version-d19b0498b30e7677.exe)
+
+running 3 tests
+test bad_save_options_are_errors ... ok
+test opening_binary_dxf_keeps_it_binary ... ok
+test saveas_version_and_binary_reach_the_writer_and_stay_with_the_drawing ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.07s
+
+     Running tests\stretch_window_ortho.rs (target\debug\deps\stretch_window_ortho-893a15caa3fc5e6d.exe)
+
+running 3 tests
+test stretch_crossing_mode_ignores_ortho ... ok
+test stretch_implied_window_ignores_ortho ... ok
+test rectangle_corner_prompts_ignore_ortho ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests\table_breaks.rs (target\debug\deps\table_breaks-2952dc617df68b83.exe)
+
+running 4 tests
+test part_grips_move_parts ... ok
+test breaking_draws_parts_with_repeated_labels ... ok
+test data_links_saved_in_a_drawing_are_read_beside_it_or_on_this_computer_only ... ok
+test data_links_fill_and_update ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+
+     Running tests\table_malformed_handle.rs (target\debug\deps\table_malformed_handle-46f5400427a69786.exe)
+
+running 1 test
+test malformed_table_handle_does_not_edit_the_selected_table ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\templates.rs (target\debug\deps\templates-901807b931b3f9fa.exe)
+
+running 3 tests
+test a_template_that_cannot_be_read_makes_no_drawing ... ok
+test qnewtemplate_is_the_default_for_new_and_qnew ... ok
+test saveas_dwt_then_new_from_the_template ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests\thread.rs (target\debug\deps\thread-6daaf49520839c14.exe)
+
+running 3 tests
+test thread_rejects_bad_params ... ok
+test thread_creates_expected_entities ... ok
+test thread_command_line_draws_the_same_pair ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests\undo_control.rs (target\debug\deps\undo_control-37166874989efd27.exe)
+
+running 9 tests
+test begin_end_group_is_one_undo_step ... ok
+test back_at_the_command_line_and_marks_undone_away ... ok
+test control_none_and_one ... ok
+test auto_combine_and_layer_set_undoctl ... ok
+test group_from_a_script_and_nested_begin ... ok
+test mark_and_back_undo_to_the_mark ... ok
+test redo_and_mredo_counts ... ok
+test hostile_undo_params_never_panic ... ok
+test saving_closes_an_open_group ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests\units_bearing.rs (target\debug\deps\units_bearing-8264863f5dd94b33.exe)
+
+running 1 test
+test bearing_rejects_out_of_range_angles ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\usage.rs (target\debug\deps\usage-e2156d08c6f98fea.exe)
+
+running 6 tests
+test blocks_report_references_and_reachability ... ok
+test layers_report_uses_and_where ... ok
+test nothing_is_modified ... ok
+test a_complete_scan_is_marked_complete ... ok
+test paging_and_filters ... ok
+test styles_and_linetypes_report_uses ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests\wblock_base.rs (target\debug\deps\wblock_base-716f7ac4c4e1024a.exe)
+
+running 1 test
+test wblock_honours_the_base_point ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+     Running tests\xref.rs (target\debug\deps\xref-ee53a06c0a1d2d0d.exe)
+
+running 10 tests
+test command_line_xref_and_xattach ... ok
+test attach_loads_the_file_and_saving_keeps_only_the_reference ... ok
+test bind_makes_the_xref_part_of_the_drawing ... ok
+test hostile_xref_input_never_panics ... ok
+test circular_and_deeply_nested_references_are_bounded ... ok
+test overlays_do_not_load_in_the_drawings_that_reference_their_host ... ok
+test missing_files_leave_the_host_intact ... ok
+test saved_xref_paths_are_followed_beside_the_host_or_on_this_computer_only ... ok
+test reload_unload_path_and_detach ... ok
+test xref_layer_overrides_survive_save_and_reopen_in_dxf_and_dwg ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.54s
+
+     Running unittests src\lib.rs (target\debug\deps\cadcraft_fonts-3f505d6e976a3adb.exe)
+
+running 59 tests
+test bidi::tests::levels_and_reorder ... ok
+test bidi::tests::mixed_line_visual_order ... ok
+test bidi::tests::hostile_input_never_panics ... ok
+test bidi::tests::persian_letters_join ... ok
+test bidi::tests::salam_takes_contextual_forms_and_the_lam_alef_ligature ... ok
+test bidi::tests::zwnj_breaks_and_zwj_forces_joining ... ok
+test complex::tests::empty_complex_glyph_keeps_advance_without_geometry ... ok
+test complex::tests::invisible_controls_take_no_space ... ok
+test complex::tests::devanagari_run_is_reordered_with_line_clusters_and_advances_per_1000_em ... ok
+test complex::tests::rtl_order_of_stroke_glyphs ... ok
+test complex::tests::persian_is_shaped_by_an_installed_font_when_available ... ok
+test complex::tests::stroke_font_rtl_lines_keep_latin_and_digits_in_the_stroke_font ... ok
+test craft_fonts::tests::embedded_fonts_load_and_cover_their_scripts ... ok
+test craft_fonts::tests::empty_without_craft_fonts_dir ... ok
+test craft_fonts::tests::no_barred_family_is_embedded ... ok
+test craft_fonts::tests::a_static_font_is_found_by_name_and_loaded_on_use ... ok
+test craft_fonts::tests::stems_are_lower_case_without_spaces ... ok
+test mtext::para::tests::list_labels ... ok
+test mtext::para::tests::plain_contents_lay_out_as_the_plain_path ... ok
+test mtext::para::tests::props_parse_and_persist ... ok
+test mtext::tests::absolute_and_relative_height ... ok
+test mtext::tests::colour_runs ... ok
+test mtext::tests::indents_are_drawing_units ... ok
+test mtext::tests::line_char_offsets_track_incrementally ... ok
+test mtext::tests::font_switch_falls_back_to_stroke ... ok
+test mtext::tests::middle_centre_attach ... ok
+test complex::tests::hostile_rtl_lines_never_panic ... ok
+test mtext::tests::paragraphs_make_lines ... ok
+test mtext::tests::rtl_paragraph_lays_words_out_right_to_left ... ok
+test mtext::tests::stacked_fraction_is_small_over_large ... ok
+test mtext::tests::strips_formatting ... ok
+test mtext::tests::rtl_wrapping_keeps_the_column_and_attachment ... ok
+test mtext::tests::stroke_word_space_matches_text ... ok
+test mtext::tests::underline_and_overline ... ok
+test mtext::tests::wrap_respects_runs_and_width ... ok
+test mtext::tests::wraps_to_width ... ok
+test subset::tests::junk_fonts_are_not_embedded ... ok
+test tests::center_alignment_centres_on_point ... ok
+test tests::control_codes ... ok
+test tests::every_ascii_printable_has_a_glyph ... ok
+test tests::fit_spans_both_points ... ok
+test tests::glyph_points_stay_in_grid ... ok
+test tests::line_metrics_scale_with_height ... ok
+test ttf::family_tests::a_family_is_looked_for_in_files_starting_with_its_first_word ... ok
+test ttf::geometry_budget_tests::an_unmapped_glyph_with_contours_still_draws ... ok
+test tests::rtl_text_justification_works_on_the_text_box ... ok
+test ttf::geometry_budget_tests::mapped_empty_glyph_keeps_text_and_a_valid_outline_slot ... ok
+test ttf::geometry_budget_tests::flattened_outlines_are_bounded_before_caching ... ok
+test ttf::geometry_budget_tests::placement_checks_source_size_and_accepts_empty_glyphs ... ok
+test ttf::geometry_budget_tests::unmapped_empty_glyph_does_not_make_the_shape_nonempty ... ok
+test ttf_tests::cjk_falls_back_to_an_installed_font_when_available ... ok
+test ttf_tests::cjk_in_stroke_text_fills_a_square_cell_like_a_big_font ... ok
+test ttf_tests::fallback_ranking_prefers_wide_coverage_regular_fonts ... ok
+test ttf_tests::font_alt_that_is_not_installed_keeps_the_stroke_font ... ok
+test ttf_tests::hostile_collections_never_panic ... ok
+test ttf_tests::missing_glyph_without_fallback_draws_a_box ... ok
+test ttf_tests::stroke_names_are_not_ttf ... ok
+test ttf_tests::system_font_outlines_when_available ... ok
+test mtext::tests::hostile_contents_do_not_panic ... ok
+
+test result: ok. 59 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.61s
+
+     Running tests\mtext_paragraphs.rs (target\debug\deps\mtext_paragraphs-ab07be05f8750014.exe)
+
+running 9 tests
+test dynamic_columns_add_columns_and_column_breaks_force_one ... ok
+test hanging_indent_list_aligns_wrapped_lines_after_the_label ... ok
+test justified_lines_fill_the_width_but_the_last ... ok
+test left_indent_moves_every_line ... ok
+test paragraph_alignment_overrides_the_attachment ... ok
+test reversed_columns_run_right_to_left ... ok
+test tabs_go_to_the_stops_then_every_default_interval ... ok
+test text_flows_through_static_columns ... ok
+test hostile_paragraph_codes_do_not_panic ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.42s
+
+     Running unittests src\lib.rs (target\debug\deps\cadcraft_geom-c80ee70ea6e2ed5a.exe)
+
+running 104 tests
+test bounds::tests::center_stays_finite_for_opposite_large_coordinates ... ok
+test fillet::seed_budget_tests::crossing_visits_have_an_independent_work_limit ... ok
+test fillet::tests::degenerate_input_gives_nothing ... ok
+test fillet::tests::fillet_line_and_ellipse ... ok
+test nurbs::tests::conic_arcs_are_exact ... ok
+test nurbs::tests::derivative_matches_finite_differences ... ok
+test nurbs::tests::elevation_keeps_the_curve ... ok
+test fillet::tests::fillet_spline_with_line_and_circle ... ok
+test nurbs::tests::extension_runs_on_along_the_tangent ... ok
+test nurbs::tests::ellipse_arc_length ... ok
+test nurbs::tests::join_line_arc_and_spline ... ok
+test nurbs::tests::param_at_length_on_invalid_domain_does_not_panic ... ok
+test nurbs::tests::periodic_spline_clamps_to_the_same_curve ... ok
+test nurbs::tests::spline_arc_length_and_inverse ... ok
+test nurbs::tests::split_and_sub_keep_the_curve ... ok
+test property_tests::arc_closest_is_on_the_circle_or_an_endpoint ... ok
+test property_tests::arc_endpoints_and_sampling_are_consistent ... ok
+test property_tests::arc_from_3_points_passes_through_the_inputs ... ok
+test property_tests::bounds_union_contains_both_boxes ... ok
+test nurbs::tests::spline_arc_length_on_a_tight_bend ... ok
+test property_tests::circle_circle_degenerate_and_hostile_never_panic ... ok
+test property_tests::circle_circle_hits_lie_on_both_and_match_the_closed_form ... ok
+test property_tests::large_coordinate_known_answers_stay_accurate ... ok
+test property_tests::line_circle_hits_lie_on_both ... ok
+test property_tests::line_circle_hostile_inputs_stay_finite ... ok
+test property_tests::line_closest_is_a_fixed_point_and_perpendicular ... ok
+test property_tests::line_line_infinite_lies_on_both_and_is_symmetric ... ok
+test property_tests::line_line_matches_infinite_parameters ... ok
+test property_tests::segment_extension_only_adds_hits ... ok
+test property_tests::vector_identities_hold_for_finite_inputs ... ok
+test region::tests::boundaries_at_large_world_coordinates_keep_distinct_vertices ... ok
+test region::tests::crossing_lines_make_faces ... ok
+test region::tests::finds_square_around_point ... ok
+test region::tests::gap_tolerance_closes_small_gaps ... ok
+test region::tests::innermost_of_nested ... ok
+test region::tests::island_from_separate_lines ... ok
+test region::tests::island_outline_ignores_dangling_ends_and_inner_edges ... ok
+test region::tests::line_ending_just_short_of_a_chord_is_joined_to_it ... ok
+test region::tests::nested_islands_and_outside_curves ... ok
+test region::tests::open_curves_and_attached_lines_are_not_islands ... ok
+test region::tests::open_shape_has_no_boundary ... ok
+test region::tests::outer_sources_outline_and_interior_point ... ok
+test region::tests::overlapping_separate_lines ... ok
+test spline::tests::a_degree_one_spline_with_a_negative_weight_is_sampled ... ok
+test region::tests::snap_ends_skips_input_over_the_segment_cap ... ok
+test region::tests::long_segment_crossing_in_unsampled_cell_is_split ... ok
+test spline::tests::a_huge_degree_spline_is_invalid_and_cheap_to_tessellate ... ok
+test region::tests::hostile_input_does_not_panic ... ok
+test spline::tests::a_normal_low_degree_spline_is_valid ... ok
+test spline::tests::an_off_grid_peak_in_a_narrow_span_is_within_a_percent ... ok
+test spline::tests::basis_into_needs_room_for_every_function ... ok
+test spline::tests::bounds_keep_their_cap_over_huge_knot_spans ... ok
+test spline::tests::bounds_see_an_extreme_inside_a_narrow_knot_span ... ok
+test spline::tests::degenerate_splines_get_their_control_box ... ok
+test spline::tests::bounds_keep_their_cap_over_many_spans ... ok
+test spline::tests::zero_weights_are_sampled_not_boxed ... ok
+test spline_fit::knot_boundary_tests::uniform_knots_skip_the_strict_lower_tolerance_boundary ... ok
+test spline_fit::tests::default_options_match_the_plain_fit ... ok
+test spline_fit::tests::end_tangents_set_the_end_directions ... ok
+test spline_fit::tests::hostile_options_never_panic ... ok
+test spline_fit::tests::knot_parametrisations_differ_and_still_interpolate ... ok
+test spline_fit::tests::repeated_fit_points_make_kinks ... ok
+test spline_fit::tests::tolerance_approximates_closed_curves ... ok
+test spline_fit::tests::tolerance_approximates_with_fewer_control_points ... ok
+test spline_fit::tests::too_many_fit_points_are_not_interpolated ... ok
+test spline_fit::tests::transform_turns_the_tangents ... ok
+test tests::angles_normalize ... ok
+test spline::tests::stack_basis_matches_the_heap_basis_bit_for_bit ... ok
+test tests::arc_bounds_include_quadrants ... ok
+test tests::arc_segments_bounded ... ok
+test tests::arc_three_points_direction ... ok
+test tests::bulge_quarter_arc ... ok
+test tests::bulge_semicircle ... ok
+test tests::circle_circle_hits ... ok
+test tests::circle_three_points_accepts_small_valid_triangles ... ok
+test tests::circle_three_points_preserves_large_world_coordinates ... ok
+test tests::circle_through_three_points ... ok
+test tests::closed_spline_is_smooth_at_the_seam ... ok
+test tests::common_tangents_of_two_circles ... ok
+test tests::ellipse_bounds_find_analytic_extrema ... ok
+test tests::ellipse_points ... ok
+test tests::elliptical_arc_bounds_exclude_extrema_outside_the_sweep ... ok
+test tests::huge_circle_secants_remain_finite ... ok
+test tests::line_circle_hits ... ok
+test tests::line_intersections ... ok
+test tests::long_secant_keeps_both_intersections ... ok
+test tests::mat_inverse_roundtrip ... ok
+test tests::mirror_matrix ... ok
+test tests::near_tangent_long_line_does_not_invent_a_circle_hit ... ok
+test tests::ocs_identity_for_z ... ok
+test tests::open_polyline_centroid_ignores_last_bulge ... ok
+test tests::polyline_area_and_length ... ok
+test tests::polyline_area_is_exact_for_bulge_segments ... ok
+test tests::polyline_area_is_stable_far_from_the_origin ... ok
+test tests::segment_offset ... ok
+test tests::shoelace_preserves_small_polygon_area_at_large_coordinates ... ok
+test tests::small_circle_crossing_a_huge_circle_gives_two_hits ... ok
+test tests::spline_interpolates_fit_points ... ok
+test tests::tiny_bulge_is_not_a_full_circle ... ok
+test tests::tiny_circle_secants_and_separated_circles ... ok
+test vec::tests::large_finite_vec3_has_finite_length_and_unit_direction ... ok
+test vec::tests::midpoint_handles_finite_coordinate_extremes ... ok
+test vec::tests::near_uses_finite_nonnegative_tolerance_without_squaring ... ok
+test spline::tests::bounds_stay_within_a_small_margin_of_the_finely_sampled_box ... ok
+
+test result: ok. 104 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.42s
+
+     Running unittests src\lib.rs (target\debug\deps\cadcraft_io-c207ee5237b9b1ad.exe)
+
+running 97 tests
+test dxf_ext::tests::every_dimvar_has_a_code ... ok
+test dxf_ext::tests::arrow_names ... ok
+test dxf_read::table_budget_tests::exhausted_budget_rejects_before_materializing_cells ... ok
+test dxf_read::table_budget_tests::blocks_and_entity_sections_share_one_budget ... ok
+test dxf_table::tests::chunks_respect_byte_limit_and_characters ... ok
+test plotter::tests::model_plot_placement_preserves_centering_and_applies_mm_offsets ... ok
+test plotter::tests::invalid_and_unsupported_plot_offsets_are_reported ... ok
+test svg_read::tests::compact_arc_flags_read_as_single_characters ... ok
+test plotter::tests::plot_offsets_keep_default_bytes_and_match_across_pdf_and_png ... ok
+test tests::attdef_prompt_survives_dxf_roundtrip ... ok
+test tests::autocad_header_dim_variables_are_not_overrides ... ok
+test tests::arc_length_dimension_keeps_its_kind_and_centre_on_roundtrip ... ok
+test tests::block_definition_properties_and_constant_attdefs_roundtrip ... ok
+test tests::constraints_and_parameters_roundtrip_exactly ... ok
+test tests::dimension_associativity_roundtrips ... ok
+test tests::dimension_overrides_roundtrip_as_dstyle_xdata ... ok
+test tests::dimension_text_rotation_roundtrips ... ok
+test tests::dimstyle_roundtrips_every_field ... ok
+test tests::drawing_without_insunits_stays_unitless ... ok
+test tests::dwg_roundtrip_keeps_extension_data ... ok
+test tests::dwg_roundtrip_keeps_non_ascii_text ... ok
+test tests::dxf_roundtrip_preserves_entities ... ok
+test tests::dxf_roundtrips_page_setup ... ok
+test tests::entity_transparency_roundtrips_as_group_440 ... ok
+test tests::extension_sample_roundtrips_and_can_be_exported ... ok
+test tests::file_arrowhead_blocks_with_standard_names_are_kept ... ok
+test tests::foreign_table_reads_cell_text_height_and_keeps_style_scale ... ok
+test tests::damaged_dwg_opens_partially_and_says_what_it_left_out ... ok
+test tests::generated_arrowhead_blocks_are_not_kept_as_user_blocks ... ok
+test tests::gradient_falls_back_to_xdata_and_native_groups_win ... ok
+test tests::gradient_hatch_roundtrips_through_dwg ... ok
+test tests::hatch_edges_keep_full_circles_splines_and_clockwise_ellipses ... ok
+test tests::gradient_hatch_roundtrips_through_dxf ... ok
+test tests::hatch_spline_edge_caps_degree_like_spline ... ok
+test tests::hostile_dxf_does_not_panic ... ok
+test tests::hostile_export_window_is_an_error ... ok
+test tests::hostile_gradient_groups_never_panic ... ok
+test plotter::tests::png_and_svg_devices ... ok
+test tests::kept_xrecord_application_group_roundtrips_as_read ... ok
+test tests::layer_states_roundtrip_next_to_constraints ... ok
+test tests::layer_transparency_and_description_roundtrip ... ok
+test tests::layout_page_setup_plot_transparency_is_used ... ok
+test tests::long_gradient_name_is_cut_only_in_xdata ... ok
+test tests::lwpolyline_elevation_roundtrips ... ok
+test tests::mirrored_2d_polyline_extrusion_flips_x_and_bulge ... ok
+test tests::mirrored_ellipse_extrusion_reverses_parameters ... ok
+test tests::mirrored_hatch_extrusion_flips_boundary ... ok
+test tests::image_export_frames_window ... ok
+test tests::mirrored_mtext_extrusion_keeps_its_footprint ... ok
+test tests::mirrored_text_extrusion_keeps_its_footprint ... ok
+test tests::mirrored_insert_extrusion_maps_to_negative_x_scale ... ok
+test tests::mleader_is_written_as_multileader ... ok
+test tests::non_ascii_text_is_escaped_for_r2000_and_roundtrips ... ok
+test tests::pdf_clips_a_primitive_beyond_the_coordinate_range ... ok
+test tests::hostile_extension_data_never_panics ... ok
+test tests::pdf_hostile_options_and_empty ... ok
+test tests::pdf_layout_one_to_one_with_viewport ... ok
+test tests::pdf_model_fitted_to_sheet ... ok
+test tests::pdf_plots_a_zero_length_line_as_a_dot ... ok
+test tests::pdf_plots_transparency_only_when_asked ... ok
+test tests::pdf_strokes_each_transparent_primitive_inside_a_block ... ok
+test tests::pdf_strokes_overlapping_transparent_objects_one_by_one ... ok
+test tests::polyline_vertex_dimensions_round_trip_by_segment ... ok
+test tests::polyline_vertex_references_name_the_segment ... ok
+test tests::png_and_svg_plots_blend_transparency_when_asked ... ok
+test tests::reads_r12_style_polyline_and_paper_flag ... ok
+test tests::oversized_dwg_and_dxf_are_rejected_early ... ok
+test tests::reads_utf8_and_code_page_text ... ok
+test tests::proxies_keep_their_class_when_classes_are_rewritten ... ok
+test tests::second_roundtrip_is_stable ... ok
+test tests::svg_group_transforms_apply ... ok
+test tests::svg_hidden_and_defs_subtrees_are_skipped ... ok
+test tests::svg_hostile_input_errors_without_panicking ... ok
+test tests::svg_inkscape_layers_are_kept ... ok
+test tests::svg_left_out_content_is_noted ... ok
+test tests::svg_no_geometry_yields_an_empty_drawing ... ok
+test tests::svg_path_lines_curves_and_arcs ... ok
+test tests::svg_read_dispatches_by_extension ... ok
+test tests::svg_shapes_become_entities_in_millimetres ... ok
+test tests::svg_viewbox_scaling_and_mm_units ... ok
+test tests::svg_viewbox_with_px_or_unitless_root_size_uses_reference_pixel ... ok
+test tests::svgz_gunzips_to_the_same_drawing ... ok
+test tests::table_block_is_relative_to_the_insertion_point ... ok
+test tests::text_style_flags_roundtrip ... ok
+test tests::tables_roundtrip_with_title_header_and_merges ... ok
+test tests::user_block_arrowheads_are_referenced_not_regenerated ... ok
+test tests::viewport_frozen_layers_read_from_341_without_xdata ... ok
+test tests::viewport_frozen_layers_roundtrip ... ok
+test tests::svg_and_png_export ... ok
+test tests::viewport_frozen_layers_written_as_341_handles ... ok
+test tests::viewport_frozen_layers_survive_dwg ... ok
+test tests::viewport_frozen_xdata_wins_over_341 ... ok
+test tests::viewport_layer_colors_roundtrip ... ok
+test tests::wipeout_boundary_keeps_its_orientation ... ok
+test tests::wipeout_survives_dxf_roundtrip ... ok
+test tests::view_exports_draw_transparency ... ok
+test tests::ac1024_dwg_with_many_entities_opens ... ok
+
+test result: ok. 97 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.73s
+
+     Running tests\dimassoc_angular_radial.rs (target\debug\deps\dimassoc_angular_radial-f55268951dff473e.exe)
+
+running 2 tests
+test angular_diameter_and_radius_dimensions_are_saved_with_dimassoc ... ok
+test standard_dimassoc_associates_in_dxf_and_dwg ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+     Running tests\dwg_active_layout.rs (target\debug\deps\dwg_active_layout-2fdb45a064169a88.exe)
+
+running 4 tests
+test the_active_layout_survives_dxf_too ... ok
+test the_active_layout_name_is_matched_ignoring_case ... ok
+test without_an_active_layout_the_first_tab_is_active ... ok
+test the_active_layout_stays_active_through_dwg_saves ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+     Running tests\dwg_polyline_vertex_order.rs (target\debug\deps\dwg_polyline_vertex_order-e6a590d9c4c51f82.exe)
+
+running 1 test
+test dwg_read_keeps_polyline_vertex_order ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+     Running tests\dwg_required_dictionaries.rs (target\debug\deps\dwg_required_dictionaries-dd7ac68499cfb1bd.exe)
+
+running 5 tests
+test a_variable_dictionary_the_drawing_has_is_left_alone ... ok
+test an_ac1032_dwg_stays_as_it_was ... ok
+test an_ac1018_dwg_gets_the_variable_dictionary_autocad_always_writes ... ok
+test impossible_header_values_fall_back_to_the_defaults ... ok
+test the_dictionary_keeps_the_drawings_dimassoc_and_hidetext ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.07s
+
+     Running tests\it\main.rs (target\debug\deps\it-9674e88c8c1d906c.exe)
+
+running 236 tests
+test acad_interop::an_insertion_point_from_autocad_is_kept ... ok
+test acad_interop::a_dimension_block_takes_the_style_colours ... ok
+test acad_interop::a_rotated_linear_dimension_stores_its_projected_length ... ok
+test acad_interop::justified_text_made_here_writes_its_baseline_start_for_every_justification ... ok
+test acad_interop::justified_text_is_written_with_its_baseline_start_as_insertion_point ... ok
+test acad_interop::an_angular_dimension_stores_its_angle_in_radians ... ok
+test acis_data_store::dxf_keeps_the_data_store_and_drops_records_of_deleted_entities ... ok
+test acad_interop::the_current_dimension_style_and_its_variables_reach_autocad ... ok
+test acis_data_store::dwg_keeps_the_solids_geometry ... ok
+test angle_header::angbase_angdir_aunits_round_trip_through_dxf ... ok
+test angle_header::angbase_in_degrees_is_read_as_radians ... ok
+test annotative_roundtrip::annotative_scaling_round_trips ... ok
+test annotative_roundtrip::hostile_scales_and_records_are_ignored ... ok
+test annotative_roundtrip::plain_drawings_write_no_annotation_record_and_keep_their_default_list ... ok
+test assoc_array_roundtrip::array_parameters_survive_a_dxf_round_trip ... ok
+test assoc_array_roundtrip::damaged_array_xdata_is_ignored ... ok
+test attrib_modes::a_280_before_the_tag_is_the_version_not_lock_position ... ok
+test assoc_array_roundtrip::renamed_blocks_are_followed ... ok
+test attrib_props::attribute_properties_roundtrip ... ok
+test attrib_props::hostile_attrib_groups_do_not_panic ... ok
+test attrib_props::attributes_without_properties_stay_without ... ok
+test block_expansion::ordinary_nested_and_arrayed_blocks_are_drawn_whole ... ok
+test attrib_modes::modes_survive_dxf_and_dwg ... ok
+test closed_spline::closed_fit_spline_roundtrips_as_periodic ... ok
+test codepages::binary_dxf_honours_the_code_page ... ok
+test codepages::hostile_multibyte_never_panics ... ok
+test codepages::pre_2007_dwg_text_decodes_through_the_bridge ... ok
+test codepages::code_page_text_survives_a_round_trip ... ok
+test codepages::reads_text_in_its_code_page ... ok
+test codepages::shift_jis_backslash_trail_byte_is_not_an_escape ... ok
+test codepages::unknown_code_page_falls_back_to_ansi_1252 ... ok
+test codepages::utf8_wins_when_valid ... ok
+test dim_block_resave_roundtrip::an_unedited_dimension_keeps_the_block_it_was_read_with ... ok
+test dim_block_resave_roundtrip::hostile_handle_seed_does_not_panic ... ok
+test dim_block_resave_roundtrip::one_dimension_keeps_one_block_over_three_cycles ... ok
+test dim_block_resave_roundtrip::dwg_reopen_and_save_keeps_one_block_per_dimension ... ok
+test dim_block_resave_roundtrip::reopened_dimension_reuses_its_block_name_and_handles ... ok
+test dim_block_resave_roundtrip::stale_dimension_blocks_are_dropped_and_referenced_ones_kept ... ok
+test dim_block_resave_roundtrip::two_dimensions_and_a_user_block_keep_their_blocks ... ok
+test dim_block_text::dimension_block_text_has_the_drawn_height ... ok
+test dim_block_text::dwg_angular_block_text_keeps_the_decimal_separator ... ok
+test dim_marks_roundtrip::damaged_marks_are_skipped ... ok
+test dim_block_text::dxf_angular_block_text_keeps_the_decimal_separator ... ok
+test dim_marks_roundtrip::dimension_marks_roundtrip ... ok
+test dimstyle_vars_roundtrip::header_jog_angle_is_read_in_degrees_and_hostile_values_are_dropped ... ok
+test dimstyle_vars_roundtrip::new_dimstyle_variables_roundtrip_in_the_table ... ok
+test dimtfill_roundtrip::dimension_block_holds_the_text_background ... ok
+test dimstyle_vars_roundtrip::new_variables_roundtrip_as_dimension_overrides ... ok
+test dimtfill_roundtrip::hostile_text_fill_groups_fall_back_to_defaults ... ok
+test dimtfill_roundtrip::record_flags_are_not_read_as_dimtfillclr ... ok
+test dimtfill_roundtrip::reopened_color_fill_is_drawn_once ... ok
+test dimtfill_roundtrip::reopened_dimension_keeps_its_background_mask ... ok
+test dimtfill_roundtrip::reopened_inspection_frame_stays_over_the_background ... ok
+test dimtfill_roundtrip::text_fill_roundtrips_in_the_dimstyle_table ... ok
+test dimtfill_roundtrip::unset_text_fill_writes_no_groups ... ok
+test drafting_spacing::first_active_vport_overrides_header_and_named_viewports ... ok
+test drafting_spacing::incomplete_or_invalid_active_spacing_preserves_legacy_values ... ok
+test drafting_spacing::missing_or_invalid_legacy_spacing_uses_the_default ... ok
+test drafting_spacing::reads_legacy_spacing_without_an_active_vport ... ok
+test drafting_spacing::invalid_in_memory_spacing_exports_safe_defaults ... ok
+test drafting_spacing::writes_spacing_to_header_and_active_vport_and_roundtrips ... ok
+test drafting_spacing::zero_grid_components_roundtrip_as_follow_snap_spacing ... ok
+test dwg_header_vars::header_settings_round_trip_through_dwg ... ok
+test dwg_header_vars::header_settings_round_trip_through_dxf ... ok
+test dwg_layout_owner::entities_of_a_second_layout_are_owned_by_its_block ... ok
+test dwg_roundtrip_losses::a_paper_viewport_behind_a_model_viewport_stays_id_1_through_dwg ... ok
+test dwg_roundtrip_losses::dwg_keeps_paper_space_entities_in_their_layout ... ok
+test dwg_roundtrip_losses::dwg_keeps_table_styles ... ok
+test dwg_roundtrip_losses::dwg_keeps_true_colours_and_transparency ... ok
+test dwg_roundtrip_losses::viewport_ids_survive_dwg_and_the_paper_viewport_stays_implicit ... ok
+test dwt_template::a_dxf_template_reads_under_either_name ... ok
+test dxf_versions::binary_is_for_dxf_only ... ok
+test dwt_template::dwt_is_written_as_dwg_and_read_back ... ok
+test dxf_versions::default_version_is_the_drawings_own ... ok
+test dxf_versions::dwg_default_is_at_least_2004 ... ok
+test dxf_versions::r2000_ascii_is_unchanged ... ok
+test dxf_versions::dwg_at_every_version_reads_back ... ok
+test dxf_versions::dxf_at_every_version_reads_back_the_same ... ok
+test dynblock_read::a_change_is_recorded_in_the_references_history_and_data ... ok
+test dynblock_read::a_distance_stretches_the_block_and_snaps_to_its_values ... ok
+test dynblock_read::a_dynamic_block_reads_its_parameters_and_actions ... ok
+test dynblock_read::a_lookup_value_sets_its_distance ... ok
+test dynblock_read::a_dynamic_block_with_handles_above_2_pow_48_is_kept ... ok
+test dynblock_read::a_saved_drawing_keeps_the_dynamic_block_as_read ... ok
+test dynblock_read::bad_values_are_refused_and_change_nothing ... ok
+test dynblock_read::changing_the_visibility_state_makes_a_new_anonymous_block ... ok
+test dynblock_read::connections_are_read_in_either_group_order ... ok
+test dynblock_read::damaged_dynamic_block_data_is_skipped_not_trusted ... ok
+test dynblock_read::dragging_a_distance_grip_changes_the_distance ... ok
+test dynblock_read::dynamic_block_references_show_their_values ... ok
+test dynblock_read::dynamic_references_show_the_grips_of_their_state ... ok
+test dynblock_read::dynamic_block_references_survive_a_save ... ok
+test dynblock_read::parameters_in_a_stretch_selection_are_carried_along ... ok
+test entity_props_roundtrip::builtin_font_name_roundtrips_and_other_readers_get_txt ... ok
+test entity_props_roundtrip::hatch_origin_background_and_elevation_roundtrip ... ok
+test entity_props_roundtrip::point_angle_roundtrips ... ok
+test entity_props_roundtrip::polyface_and_polygon_mesh_polylines_become_faces_not_bogus_vertices ... ok
+test entity_props_roundtrip::thickness_roundtrips_on_every_entity_that_has_one ... ok
+test entity_props_roundtrip::xref_block_flag_and_path_roundtrip ... ok
+test followups_626::code_page_is_kept_before_2007 ... ok
+test followups_626::multileader_before_2007_is_leader_and_mtext ... ok
+test followups_626::modelled_dictionaries_are_not_kept_twice ... ok
+test followups_626::multileader_from_2007_is_native ... ok
+test followups_626::newer_dimstyle_variables_are_table_groups_from_2004 ... ok
+test followups_626::multileader_in_dwg_follows_the_dwg_version ... ok
+test groups_roundtrip::groups_survive_dwg_round_trip ... ok
+test hatch_assoc_roundtrip::source_boundary_objects_roundtrip ... ok
+test hatch_assoc_roundtrip::a_hatch_in_a_block_keeps_its_boundary_and_the_boundary_its_reactor ... ok
+test hatch_assoc_roundtrip::sources_after_spline_fit_data_and_hostile_counts ... ok
+test hatch_pattern_def::file_definition_is_drawn_instead_of_the_librarys ... ok
+test hatch_pattern_def::custom_pattern_lines_roundtrip_scaled_and_rotated ... ok
+test hatch_pattern_def::hostile_pattern_definitions_are_capped ... ok
+test hatch_pattern_def::library_named_patterns_keep_the_files_definition ... ok
+test helix_roundtrip::foreign_helix_reads ... ok
+test helix_roundtrip::helix_survives_save_and_reopen ... ok
+test helix_roundtrip::helix_survives_dwg_save_and_reopen ... ok
+test layout_paper_units::a_millimetre_layout_plots_in_millimetres_whatever_measurement_says ... ok
+test layout_paper_units::plot_paper_units_round_trip_through_dxf ... ok
+test layout_plot_window::plot_window_corners_round_trip_through_dxf ... ok
+test mleader_content::spline_leader_and_block_content_are_written ... ok
+test mleader_roundtrip::foreign_multileader_with_two_landings ... ok
+test low_handseed::faces_made_while_reading_do_not_take_the_files_handles ... ok
+test mleader_roundtrip::multileader_in_a_block_and_in_paper_space ... ok
+test mleader_roundtrip::multileader_through_dwg ... ok
+test mleader_roundtrip::multileader_without_leader_lines ... ok
+test mleader_roundtrip::hostile_multileaders_do_not_panic ... ok
+test mleader_roundtrip::spline_leader_with_block_content_and_attributes ... ok
+test mline_roundtrip::foreign_mline_reads_with_its_style ... ok
+test mleader_roundtrip::text_multileader_survives_as_multileader ... ok
+test mline_roundtrip::mline_survives_dwg_save_and_reopen ... ok
+test mline_roundtrip::mline_without_its_style_keeps_its_offsets ... ok
+test mline_roundtrip::hostile_mline_does_not_panic ... ok
+test mline_roundtrip::mlines_and_styles_survive_save_and_reopen ... ok
+test model_layout_plot_type::model_layout_plots_extents_fitted_and_layouts_their_sheet ... ok
+test model_layout_plot_type::model_layout_plot_type_survives_the_dwg_bridge ... ok
+test mtext_columns_roundtrip::dynamic_manual_heights_and_rotation_round_trip ... ok
+test mtext_columns_roundtrip::paragraph_codes_tabs_and_carets_round_trip ... ok
+test mtext_columns_roundtrip::hostile_column_groups_do_not_panic ... ok
+test mtext_columns_roundtrip::static_columns_round_trip ... ok
+test mtext_embedded_object::embedded_object_insertion_point_is_not_the_direction ... ok
+test mtext_embedded_object::rotated_mtext_keeps_its_rotation_with_an_embedded_object ... ok
+test multiline_attributes::a_multiline_attribute_is_drawn ... ok
+test mtext_line_spacing::line_spacing_style_roundtrips ... ok
+test multiline_attributes::an_edited_value_replaces_the_multiline_text ... ok
+test multiline_attributes::files_before_2007_get_single_line_attributes ... ok
+test multiline_attributes::multiline_attributes_are_read_with_their_text ... ok
+test multiline_attributes::damaged_embedded_text_does_not_panic ... ok
+test multiline_attributes::multiline_attributes_survive_a_save ... ok
+test paperview_marker::viewport_with_a_layer_named_paperview_survives_dxf_roundtrip ... ok
+test passthrough_image_roundtrip::image_and_its_definition_survive_save_and_reopen ... ok
+test passthrough_image_roundtrip::image_without_definition_is_still_written ... ok
+test passthrough_image_roundtrip::image_survives_dwg_save_and_reopen ... ok
+test pdf_followups::model_space_pdf_uses_the_device_margins ... ok
+test passthrough_image_roundtrip::images_of_one_file_share_a_definition ... ok
+test pdf_followups::pe_url_hyperlinks_become_link_annotations ... ok
+test pdf_layers::bad_sheet_lists_are_errors ... ok
+test pdf_layers::drawing_layers_become_pdf_layers ... ok
+test pdf_layers::hyperlinks_become_link_annotations ... ok
+test pdf_followups::png_and_svg_plots_draw_plot_style_ends ... ok
+test pdf_layers::layers_that_are_off_are_included_hidden_on_request ... ok
+test pdf_layers::layers_that_are_off_are_plotted_only_on_request ... ok
+test pdf_layers::several_sheets_in_one_file_with_page_labels ... ok
+test pdf_layers::several_sheets_share_one_pdf_layer_per_drawing_layer ... ok
+test pdf_layers::unusual_layer_names_are_kept ... ok
+test pdf_layers::unusual_titles_are_kept ... ok
+test pdf_layers::viewport_contents_keep_their_layers ... ok
+test plot_layout_scale::layout_plot_honours_explicit_scale_without_fit ... ok
+test plot_model_png_scale::model_png_without_fit_or_scale_plots_one_to_one ... ok
+test plot_styles::layout_svg_follows_display_plot_styles ... ok
+test plot_styles::named_plot_styles_round_trip_through_the_plot_style_dictionary ... ok
+test plot_styles::page_setup_table_and_display_flag_round_trip ... ok
+test plot_styles::pdf_applies_a_named_table_from_the_drawing ... ok
+test plot_styles::pdf_uses_the_page_setup_table ... ok
+test region_roundtrip::foreign_region_stays_unknown ... ok
+test pdf_layers::layers_past_the_cap_print_without_a_pdf_layer ... ok
+test region_roundtrip::region_with_islands_survives_save_and_reopen ... ok
+test roundtrip_audit::a_new_colour_drops_the_colour_book_name ... ok
+test roundtrip_audit::class_records_have_instance_counts_for_generated_and_preserved_records ... ok
+test roundtrip_audit::dictionary_variables_xrecords_and_persistent_reactors_are_kept ... ok
+test roundtrip_audit::dwg_keeps_extension_dictionaries_xrecords_and_entity_xdata ... ok
+test roundtrip_audit::erased_entities_take_their_extension_data_with_them ... ok
+test roundtrip_audit::every_reference_names_a_written_object ... ok
+test roundtrip_audit::extension_dictionaries_on_entities_and_table_records_are_kept ... ok
+test roundtrip_audit::foreign_xdata_on_entities_tables_and_blocks_is_kept ... ok
+test roundtrip_audit::hostile_raw_data_never_panics ... ok
+test roundtrip_audit::hyperlinks_are_kept ... ok
+test roundtrip_audit::image_imagedef_and_reactor_are_kept ... ok
+test roundtrip_audit::saving_twice_writes_the_same_records ... ok
+test roundtrip_audit::transparency_is_kept ... ok
+test roundtrip_audit::true_colours_and_colour_books_are_kept ... ok
+test roundtrip_audit::ucs_layer_states_and_block_descriptions_are_kept ... ok
+test roundtrip_audit::unknown_entities_in_model_paper_and_blocks_are_kept ... ok
+test roundtrip_audit::unknown_objects_in_named_and_nested_dictionaries_are_kept ... ok
+test skipped_records::a_file_cadcraft_wrote_skips_nothing ... ok
+test skipped_records::records_the_reader_cannot_place_are_counted_by_section ... ok
+test sortents::broken_sortentstables_are_ignored ... ok
+test sortents::sortentstable_sets_the_draw_order ... ok
+test spline_fit_data::fit_data_is_written_with_the_documented_groups ... ok
+test spline_fit_data::fit_options_roundtrip_through_dxf ... ok
+test split_entities_section::entities_of_every_entities_section_are_read ... ok
+test style_typeface::style_without_a_font_file_uses_the_xdata_typeface ... ok
+test svg_arc_budget::a_modest_arc_svg_still_reads ... ok
+test block_expansion::block_expansion_bombs_are_bounded ... ok
+test svg_tiny_extents::normal_drawing_keeps_six_decimals ... ok
+test svg_tiny_extents::single_point_has_a_visible_view_box_and_radius ... ok
+test svg_tiny_extents::small_drawing_has_a_non_zero_stroke_and_keeps_precision ... ok
+test table_cellstyle_roundtrip::breaks_and_data_links_roundtrip_and_the_block_draws_the_parts ... ok
+test table_cellstyle_roundtrip::cell_styles_rows_and_formulas_roundtrip ... ok
+test table_cellstyle_roundtrip::documented_groups_carry_the_builtin_styles ... ok
+test table_cellstyle_roundtrip::hostile_table_xdata_is_ignored ... ok
+test table_cellstyle_roundtrip::table_block_draws_fills_and_styles ... ok
+test tables_objects_roundtrip::foreign_and_hostile_tables_objects ... ok
+test tables_objects_roundtrip::layout_page_setup_and_paper_view_round_trip ... ok
+test tables_objects_roundtrip::linetype_text_and_shape_elements_round_trip ... ok
+test tables_objects_roundtrip::multileader_styles_and_current_style_round_trip ... ok
+test tables_objects_roundtrip::named_views_ucss_and_groups_round_trip ... ok
+test text_left_justify::left_justified_text_is_placed_by_its_alignment_point ... ok
+test tolerance_roundtrip::hostile_tolerance_does_not_panic ... ok
+test tolerance_roundtrip::missing_direction_defaults_to_x ... ok
+test tolerance_roundtrip::tolerance_reads_draws_and_roundtrips ... ok
+test user_lin_pat_roundtrip::user_linetypes_and_patterns_survive_dxf ... ok
+test view_tables_roundtrip::foreign_paper_view_and_hostile_twist ... ok
+test view_tables_roundtrip::hostile_vport_records_are_skipped ... ok
+test view_tables_roundtrip::model_and_paper_views_round_trip ... ok
+test view_tables_roundtrip::tiled_viewports_and_saved_configurations_round_trip ... ok
+test viewport_clip_roundtrip::clip_boundary_lock_and_off_roundtrip ... ok
+test viewport_clip_roundtrip::clipped_viewport_plots_through_its_outline ... ok
+test svg_arc_budget::an_arc_heavy_svg_is_rejected_by_the_vertex_budget ... ok
+test xref_roundtrip::objects_in_a_read_xref_block_are_ignored ... ok
+test xref_roundtrip::the_written_block_records_carry_the_xref_flags ... ok
+test xref_roundtrip::xref_dependent_symbols_are_not_saved ... ok
+test xref_roundtrip::xref_layers_are_saved_as_dependent_layer_records ... ok
+test xref_roundtrip::xrefs_are_saved_as_references_without_their_objects ... ok
+test viewport_clip_roundtrip::hostile_clip_handles_do_not_panic ... ok
+test region_roundtrip::hostile_region_xdata_does_not_panic ... ok
+test helix_roundtrip::hostile_helix_does_not_panic ... ok
+
+test result: ok. 236 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 13.68s
+
+     Running tests\pdf_text.rs (target\debug\deps\pdf_text-ebcc9e1007c6e829.exe)
+
+running 8 tests
+test a_font_the_writer_cannot_subset_plots_as_outlines ... ok
+test rotation_width_factor_and_obliquing_go_into_the_text_matrix ... ok
+test fonts_that_forbid_embedding_and_the_geometry_option_draw_outlines ... ok
+test text_sits_in_its_layers_marked_content ... ok
+test text_seen_through_a_viewport_and_on_layers ... ok
+test the_subset_is_a_valid_truetype_font ... ok
+test truetype_text_is_embedded_as_text ... ok
+test hostile_text_never_panics ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.07s
+
+     Running tests\wipeout_frame.rs (target\debug\deps\wipeout_frame-b05f45df2480d5f1.exe)
+
+running 1 test
+test wipeoutvariables_sets_the_frame_flag ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src\lib.rs (target\debug\deps\cadcraft_mcp-b64e5f0f3019b4f8.exe)
+
+running 20 tests
+test backend::tests::timeout_reply_says_whether_a_retry_is_safe ... ok
+test backend::tests::lost_reply_to_a_mutation_is_not_resent ... ok
+test backend::tests::failed_mutation_write_is_not_resent ... ok
+test control_token::tests::issuance_creates_missing_parent ... ok
+test control_token::tests::issue_then_read_round_trips ... ok
+test control_token::tests::matches_is_exact ... ok
+test control_token::tests::windows_requires_local_app_data ... ok
+test backend::tests::safe_retry_rereads_a_rotated_token_after_a_lost_reply ... ok
+test tests::agent_draws_a_plate_with_holes ... ok
+test tests::bad_tool_calls_are_invalid_params ... ok
+test tests::errors_are_tool_errors_not_crashes ... ok
+test tests::find_text_reads_texts_and_render_shows_one_area ... ok
+test tests::lifecycle_and_tools ... ok
+test tests::list_commands_filter_matches_names_not_docs ... ok
+test tests::open_tool_description_names_dxf_and_dwg ... ok
+test tests::query_entities_pages_and_windows_by_geometry ... ok
+test tests::query_entities_selection_filter_is_discoverable_and_forwarded ... ok
+test backend::tests::unauthorized_not_run_is_resent_once_with_the_new_token ... ok
+test backend::tests::unauthorized_is_resent_at_most_once_and_only_when_not_run ... ok
+test tests::a_lazy_bridge_starts_without_the_app_and_says_how_to_open_it ... ok
+
+test result: ok. 20 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.47s
+
+     Running tests\it\main.rs (target\debug\deps\it-af1428523e569d5f.exe)
+
+running 7 tests
+test cmdline_parity::open_without_a_path_is_refused_before_the_engine ... ok
+test cmdline_key::refused_enter_is_echoed_and_reported_in_error ... ok
+test cmdline_parity::accepted_input_has_no_error_and_reports_the_prompt ... ok
+test cmdline_key::accepted_keys_have_output_and_no_error ... ok
+test cmdline_parity::refused_input_is_echoed_to_output_and_reported_in_error ... ok
+test control_methods::ping_answers_and_unknown_method_points_to_control_methods ... ok
+test control_methods::control_methods_lists_what_headless_answers ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+     Running unittests src\lib.rs (target\debug\deps\cadcraft_render-4d8f41004efe6296.exe)
+
+running 101 tests
+test clip::tests::polygon_clip_lines_points_and_fills ... ok
+test clip::tests::segments_and_polylines ... ok
+test clip::tests::triangles ... ok
+test dim::tests::arrowhead_shapes ... ok
+test dim::tests::dimblk_dot_and_none ... ok
+test dim::tests::dimtad_one_uses_autocad_text_clearance ... ok
+test dim::tests::horizontal_measures_dx ... ok
+test dim::tests::hostile_styles_do_not_panic ... ok
+test dim::tests::iso_suppresses_zeros ... ok
+test dim::tests::jogged_radius_with_nan_radius_draws_no_lines ... ok
+test dim::tests::mtext_contents_write_the_diameter_sign_as_a_code ... ok
+test dim::tests::justification_moves_text ... ok
+test dim::tests::override_text ... ok
+test dim::tests::overrides_apply_per_dimension ... ok
+test dim::tests::radial_and_angular_text ... ok
+test dim::tests::text_above_and_centred ... ok
+test dim::tests::text_alignment_vertical_dimension ... ok
+test dim::tests::text_moves_outside_when_it_does_not_fit ... ok
+test dim::tests::text_that_does_not_fit_follows_dimtmove_1 ... ok
+test dim::tests::text_that_does_not_fit_follows_dimtmove_2 ... ok
+test dim::tests::ticks_replace_arrows_and_extend_line ... ok
+test dim::tests::tolerance_and_limits ... ok
+test dim::tests::unit_formats_and_post ... ok
+test dim::tests::vertical_measures_dy ... ok
+test clip::tests::degenerate_and_hostile_outlines ... ok
+test dim::text_budget_tests::bounds_post_without_markers ... ok
+test dim::text_budget_tests::oversized_value_is_substituted_and_truncated_at_a_character_boundary ... ok
+test fill::tests::bowtie_crossing_inside_a_slab ... ok
+test fill::tests::bowtie_off_centre_crossing ... ok
+test fill::tests::degenerate_input ... ok
+test fill::tests::square_with_hole ... ok
+test fill::tests::simple_loops_still_match_the_oracle ... ok
+test fill::tests::triangle_area ... ok
+test hatch::dedup_budget_tests::unequal_loops_do_not_spend_the_comparison_budget ... ok
+test hatch::tests::fill_loops_deduplicates_coincident_loops ... ok
+test linetype::tests::an_all_gap_pattern_draws_nothing_without_spinning ... ok
+test linetype::tests::dash_continues_across_vertices ... ok
+test linetype::tests::dashes_split_line ... ok
+test linetype::tests::dots_are_single_points ... ok
+test linetype::tests::tiny_pattern_is_continuous ... ok
+test linetype_text::tests::hostile_values_never_panic ... ok
+test linetype_text::tests::no_text_when_drawn_continuous ... ok
+test linetype_text::tests::one_text_per_repeat_at_the_end_of_its_element ... ok
+test outline::tests::a_ring_from_the_slab_filler_has_two_clean_loops ... ok
+test fill::tests::two_loops_crossing_each_other ... ok
+test outline::tests::a_square_of_two_triangles_is_one_loop ... ok
+test outline::tests::contours_keep_their_start_direction_and_order_between_calls ... ok
+test paper::tests::lookup_and_sheet ... ok
+test pen::tests::caps_change_the_outline_length ... ok
+test pen::tests::pattern_is_bounded ... ok
+test table::budget_tests::overlapping_merges_use_outline_fallback ... ok
+test tests::attributes_draw_with_their_own_transparency ... ok
+test tests::attributes_follow_the_reference_layer_and_have_no_definition ... ok
+test outline::tests::huge_and_hostile_inputs_do_not_panic ... ok
+test tests::backwards_and_upside_down_mirror_text ... ok
+test tests::builds_lines_and_circles ... ok
+test tests::cancelled_build_stops_early ... ok
+test tests::big_hatch_seen_through_a_wide_view_is_drawn ... ok
+test tests::dash_repeat_under_two_pixels_is_one_run ... ok
+test tests::dense_hatch_on_screen_is_one_solid_fill ... ok
+test tests::dimension_colours_by_role ... ok
+test tests::frozen_layer_hidden ... ok
+test tests::hatch_in_a_squashed_block_keeps_lines_that_show ... ok
+test tests::hatch_pattern_and_solid ... ok
+test tests::hatch_pattern_only_inside_the_view ... ok
+test tests::hostile_transparency_values_are_clamped ... ok
+test tests::hostile_viewports_do_not_panic ... ok
+test tests::layout_viewport_frozen_layer_and_id1 ... ok
+test tests::layout_viewport_shows_model_clipped ... ok
+test tests::linetype_dashes_line ... ok
+test tests::max_scale_is_the_most_stretched_axis ... ok
+test tests::mtext_exact_spacing_ignores_taller_lines ... ok
+test tests::normal_zoom_pattern_is_unchanged ... ok
+test tests::raster_draws_pixels ... ok
+test tests::scattered_dot_pattern_reads_solid_once_dots_fill_the_pixels ... ok
+test tests::raster_rejects_bad_size ... ok
+test tests::sparse_dots_keep_their_look_when_lines_are_close ... ok
+test tests::table_cell_text_height_scales_with_the_table ... ok
+test tests::table_title_is_centred_and_merged ... ok
+test table::budget_tests::part_clips_merges_using_displayed_column_count ... ok
+test tests::text_produces_strokes ... ok
+test tests::transparency_resolves_by_object_layer_and_block ... ok
+test tests::transparent_solid_hatch_blends_with_the_line_under_it ... ok
+test tests::thin_wide_polyline_keeps_every_side_at_every_zoom ... ok
+test tests::missing_font_falls_back_to_stroke ... ok
+test tests::truetype_text_is_filled_or_outlined ... ok
+test tests::truetype_mtext_and_dimension_text ... ok
+test tests::viewport_contents_can_be_left_out_and_built_for_any_area ... ok
+test tests::wide_polyline_centre_line_is_drawn_on_screen_only ... ok
+test units::tests::angles ... ok
+test units::tests::architectural_units_and_stacking ... ok
+test units::tests::decimal_and_zero_suppression ... ok
+test units::tests::dms_carries_and_non_negative_sweeps ... ok
+test units::tests::dms_rounds_at_displayed_precision ... ok
+test units::tests::fractional_units ... ok
+test units::tests::engineering_units ... ok
+test units::tests::negative_values_rounding_to_zero_have_no_sign ... ok
+test units::tests::rounding ... ok
+test units::tests::scientific_units ... ok
+test tests::viewport_contents_built_on_all_cores_match_one_thread ... ok
+test units::tests::hostile_numbers ... ok
+
+test result: ok. 101 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.11s
+
+     Running tests\block_ltscale.rs (target\debug\deps\block_ltscale-5b84b527d97a33cc.exe)
+
+running 1 test
+test the_linetype_scale_of_a_block_reference_scales_the_dashes_inside ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\it\main.rs (target\debug\deps\it-b237b84ec5bf53eb.exe)
+
+running 63 tests
+test annotative_viewport::model_space_uses_cannoscale ... ok
+test annotative_viewport::same_paper_height_at_every_supported_scale ... ok
+test aci7_display::png_draws_true_colours ... ok
+test aci7_display::only_colour_7_flips_with_the_background ... ok
+test dim_angular_centre::angular_extension_lines_follow_their_legs_when_the_arc_is_swapped ... ok
+test dim_angular_centre::centre_mark_only_when_the_dimension_line_is_outside_the_circle ... ok
+test dim_post_tolerance::dimpost_suffix_applies_to_tolerances ... ok
+test annotative_viewport::unsupported_viewport_scale_hides_or_shows_at_the_objects_scale ... ok
+test dim_text_fill::a_block_with_turned_text_gets_a_turned_background ... ok
+test dim_text_fill::a_dimension_read_with_its_block_keeps_the_block_and_gets_the_background ... ok
+test dim_text_fill::every_text_of_a_block_gets_a_background ... ok
+test dim_text_fill::a_block_that_holds_its_background_gets_no_second_one ... ok
+test dim_text_fill::inspection_frame_is_drawn_over_the_background ... ok
+test dim_text_fill::text_fill_2_paints_dimtfillclr ... ok
+test dim_text_fill::text_fill_gives_the_text_a_background_box ... ok
+test dim_text_fill::text_fill_hides_what_is_drawn_under_the_text ... ok
+test dim_text_format::angular_decimal_separator_respects_overrides_and_literal_text ... ok
+test dim_text_format::angular_decimal_separator_keeps_dms_notation ... ok
+test dim_text_format::angular_zero_suppression_works_with_a_decimal_comma ... ok
+test dim_text_format::angular_dimensions_use_the_style_decimal_separator ... ok
+test hatch_fill::brick_joints_are_drawn_once_half_a_brick_apart_course_to_course ... ok
+test dim_text_format::dimpost_is_not_added_to_angular_dimensions ... ok
+test dim_text_format::dimrnd_rounds_neither_tolerances_nor_alternate_units ... ok
+test hatch_fill::island_detection_styles ... ok
+test hatch_fill::pattern_background_is_filled_under_the_lines ... ok
+test hatch_fill::pattern_lines_from_a_file_are_drawn_for_unknown_names ... ok
+test hatch_fill::hostile_gradients_stay_bounded ... ok
+test linetype_text::fenceline_draws_a_circle_in_every_gap ... ok
+test hatch_fill::pattern_swatches_stay_in_their_square_and_show_a_few_repeats ... ok
+test linetype_text::text_follows_the_line_or_keeps_an_absolute_rotation ... ok
+test hatch_fill::linear_gradient_blends_from_the_layer_colour_to_colour_2 ... ok
+test lwdefault::default_lineweight_follows_lwdefault ... ok
+test linetype_text::text_height_follows_the_linetype_scale ... ok
+test plot_line_styles::hostile_scales_and_huge_fills_do_not_hang ... ok
+test plot_line_styles::joins_shape_the_corner ... ok
+test plot_line_styles::fill_patterns_replace_solid_fills ... ok
+test plot_line_styles::viewport_contents_get_their_pens ... ok
+test plot_line_styles::layouts_draw_pens_while_building ... ok
+test plot_line_styles::line_ends_shape_wide_lines ... ok
+test plot_styles::hostile_tables_do_not_panic ... ok
+test plot_styles::layout_display_plot_styles_flag ... ok
+test plot_styles::grayscale_and_default_tables ... ok
+test plot_styles::named_styles_by_layer_by_block_and_name ... ok
+test plot_styles::screening_lineweight_and_linetype_overrides ... ok
+test plot_styles::monochrome_prints_every_colour_black ... ok
+test point_style::dot_and_nothing ... ok
+test point_style::cross_in_circle_with_absolute_size ... ok
+test point_style::relative_sizes_follow_the_view_height ... ok
+test point_style::hostile_point_settings_do_not_panic ... ok
+test psltscale::psltscale_on_keeps_paper_dash_length ... ok
+test psltscale::model_space_ignores_psltscale ... ok
+test psltscale::psltscale_off_scales_dashes_with_the_viewport ... ok
+test hatch_fill::radial_and_inverted_gradients ... ok
+test render_props::attributes_draw_with_their_own_properties ... ok
+test raster_points::points_at_subpixel_positions_do_not_panic ... ok
+test render_props::dimensions_take_the_viewport_layer_colour ... ok
+test render_props::leader_arrows_use_their_style_dimscale ... ok
+test viewport_frozen_layer::frozen_viewport_layer_hides_the_contents_off_only_the_border ... ok
+test wide_pline_linetype::plinegen_runs_the_pattern_along_the_whole_polyline ... ok
+test wide_pline_linetype::wide_polyline_dashes_are_filled_bands ... ok
+test wipeout_mask::wipeout_hides_what_is_drawn_before_it ... ok
+test wipeout_mask::wipeoutframe_controls_the_frame ... ok
+test raster_points::point_in_large_png_export_does_not_panic ... ok
+
+test result: ok. 63 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.23s
+
+     Running unittests src\lib.rs (target\debug\deps\cadcraft_ui_egui-68604b2d980fb2d8.exe)
+
+running 181 tests
+test animation::tests::egui_stops_animating_and_starts_again ... ok
+test animation::tests::the_choice_parses_and_resolves_against_the_os ... ok
+test animation::tests::a_wheel_notch_scrolls_whole_in_its_frame_with_animation_effects_off ... ok
+test animation::tests::a_zoom_notch_zooms_whole_in_its_frame_with_animation_effects_off ... ok
+test animation::tests::the_wheel_reads_as_egui_reads_it ... ok
+test autosave::tests::utc_dates ... ok
+test canvas::grid_range_tests::grid_index_ranges_survive_extreme_views ... ok
+test canvas::hatch_pick_tests::hatch_at_finds_a_hatch_under_the_cursor_only ... ok
+test canvas::rebuild::tests::cancelled_run_makes_nothing ... ok
+test canvas::rebuild::tests::dropping_a_job_cancels_its_build ... ok
+test canvas::rebuild::tests::worker_build_matches_a_synchronous_one ... ok
+test canvas::tests::a_wheel_notch_zooms_whole_in_its_own_frame ... ok
+test canvas::tests::dragged_objects_keep_their_transparency ... ok
+test canvas::tests::prim_index_matches_a_scan_and_follows_list_rebuilds ... ok
+test canvas::tests::rebuilt_previews_stay_opaque_on_a_transparent_current_layer ... ok
+test canvas::highlight_stability_tests::moving_the_pointer_does_not_move_cpu_fill_highlight_dashes ... ok
+test canvas::tests::selection_area_fill_follows_the_area_effect_settings ... ok
+test canvas::tests::viewport_highlight_is_tessellated_once_per_selection_and_zoom_band ... ok
+test canvas::tests::viewport_highlight_tolerance_is_constant_within_a_zoom_band ... ok
+test canvas::tests::wheel_zoom_reads_every_notch_of_the_frame ... ok
+test canvas::tests::dynamic_input_distance_follows_the_drawing_units ... ok
+test canvas::hatch_pick_tests::double_clicking_a_hatch_opens_the_hatch_edit_dialog ... ok
+test capture::tests::a_drawing_created_and_closed_between_observations_still_bumps_the_identity_epoch ... ok
+test capture::tests::a_document_switch_that_returns_still_rejects_the_queued_capture ... ok
+test capture::tests::admission_counts_completed_but_undrained_and_never_evicts ... ok
+test capture::tests::an_invalid_pass_invalidates_the_retained_surface ... ok
+test capture::tests::a_discarded_pass_does_not_issue_and_the_settled_pass_does_once ... ok
+test capture::tests::a_settled_window_does_not_keep_changing_the_surface_epoch ... ok
+test capture::tests::a_resize_while_settling_is_absorbed_at_issue ... ok
+test capture::tests::deadline_is_checked_before_writing_a_completed_image ... ok
+test capture::tests::document_change_cancels_before_issuing ... ok
+test capture::tests::callback_completed_before_cancel_all_is_inert ... ok
+test capture::tests::every_observed_geometry_change_bumps_the_generation ... ok
+test capture::tests::focus_change_cancels_an_unissued_capture ... ok
+test capture::tests::completed_callback_after_timeout_writes_nothing ... ok
+test capture::tests::per_image_and_aggregate_budgets_reject_before_issue ... ok
+test capture::tests::document_switch_after_issue_rejects_the_completed_callback_without_writing ... ok
+test capture::tests::raw_geometry_uses_screen_rect_when_inner_rect_is_absent ... ok
+test chrome::tests::layout_tabs_that_do_not_fit_keep_the_current_one ... ok
+test chrome::tests::mac_title_row_centres_and_clears_the_traffic_lights ... ok
+test closing::tests::cancel_keeps_the_app_open ... ok
+test closing::tests::clean_drawing_closes_without_prompt ... ok
+test closing::tests::close_all_asks_per_dirty_drawing_and_cancel_stops ... ok
+test closing::tests::dirty_drawing_prompts_and_cancel_keeps_it ... ok
+test closing::tests::discard_closes_the_dirty_drawing ... ok
+test closing::tests::programmatic_close_never_prompts ... ok
+test closing::tests::quitting_asks_about_each_dirty_drawing_then_quits ... ok
+test closing::tests::programmatic_quit_skips_the_prompt ... ok
+test closing::tests::unsuccessful_save_keeps_the_drawing ... ok
+test closing::tests::save_on_close_puts_the_block_editor_changes_into_the_block_first ... ok
+test closing::tests::window_close_with_unsaved_changes_is_held ... ok
+test cmdline::autocomplete_tests::prefix_without_alias_shows_command_id ... ok
+test cmdline::autocomplete_tests::tab_autocompletes_alias_to_resolved_command ... ok
+test cmdline::delete_key_tests::holding_delete_to_clear_typing_never_erases ... ok
+test cmdline::autocomplete_tests::exact_alias_is_first_suggestion_with_alias_display ... ok
+test cmdline::delete_key_tests::mac_delete_erases_a_fresh_selection ... ok
+test cmdline::delete_key_tests::typing_is_forgotten_when_the_selection_changes ... ok
+test cmdline::tests::compact_canvas_contains_history_controls_without_changing_line_preference ... ok
+test capture::tests::issued_callbacks_reply_once_with_matching_tokens_and_distinct_pathless_files ... ok
+test capture::tests::issuance_uses_the_settled_interface_scale_not_the_admission_estimate ... ok
+test control::tests::render_reply_has_base64_width_height_and_keeps_old_keys ... ok
+test control::tests::pathless_screenshots_are_unique_private_png_files ... ok
+test control::tests::render_view_fit_finds_offscreen_drawing ... ok
+test control::tests::reply_sent_right_at_the_timeout_still_counts ... ok
+test control::tests::reply_in_time_is_returned ... ok
+test control::tests::timed_out_request_already_running_may_have_run ... ok
+test control::tests::timed_out_request_that_never_started_is_skipped ... ok
+test credits::tests::alphabetical_ignores_at_and_case ... ok
+test credits::tests::delta_and_dates ... ok
+test credits::tests::formatting ... ok
+test credits::tests::names_fall_back_to_the_username ... ok
+test dialogs::tests::fractional_length_precisions_list_binary_fractions ... ok
+test dialogs::tests::picking_a_block_starts_insert_with_its_name ... ok
+test dialogs::tests::picking_a_missing_block_keeps_asking_for_a_name ... ok
+test cmdline::tests::history_expands_by_click_chevron_f2_and_resizes_by_drag_without_touching_the_drawing ... ok
+test dyninput::tests::absolute_setting_measures_from_the_origin ... ok
+test dyninput::tests::empty_box_takes_the_cursor ... ok
+test dyninput::tests::empty_text_is_an_empty_entry ... ok
+test dyninput::tests::first_point_is_absolute ... ok
+test dyninput::tests::locked_value_holds_the_cursor ... ok
+test dyninput::tests::options_menu_cycles_the_keywords ... ok
+test dyninput::tests::plain_numbers_and_other_text_go_through_as_typed ... ok
+test dyninput::tests::rectangle_corner_with_comma_is_relative ... ok
+test dyninput::tests::relative_entries_use_at_only_when_the_base_is_the_last_point ... ok
+test dyninput::tests::tab_locks_the_second_value_and_pins_the_cursor ... ok
+test dyninput::tests::tab_types_the_separator_for_the_format_on_show ... ok
+test gpu::tests::batch_ranges_cover_a_range_across_batches ... ok
+test gpu::tests::frame_cap_waits_out_the_minimum_interval_only ... ok
+test gpu::tests::highlight_dashes_run_on_along_each_polyline ... ok
+test exchange::tests::typed_and_menu_commands_ask_json_calls_never_do ... ok
+test gpu::tests::highlight_fills_fills_and_outlines_wipeouts ... ok
+test gpu::tests::lineweights_become_quads ... ok
+test gpu::tests::mesh_counts_and_precision ... ok
+test gpu::tests::origin_follows_deep_zoom ... ok
+test gpu::tests::rebuilding_dashed_fill_highlights_keeps_the_same_gpu_dash_positions ... ok
+test gpu::tests::surface_config_prefers_low_latency_where_asked_and_honours_override ... ok
+test gpu::tests::transparent_objects_get_premultiplied_alpha ... ok
+test gpu::tests::wipeout_masks_start_a_draw_order_group ... ok
+test cmdline::tests::ime_preedit_is_shown_and_its_commit_is_inserted_once ... ok
+test gpu::tests::shader_is_valid_for_webgpu_and_webgl2 ... ok
+test dyninput::tests::down_arrow_lists_the_options_and_enter_or_a_click_picks_one ... ok
+test hatchdlg::tests::a_failed_ok_keeps_the_dialog_open_with_the_error ... ok
+test hatchdlg::tests::a_gradient_hatch_offers_the_current_pattern_on_the_pattern_tab ... ok
+test hatchdlg::tests::create_ok_hatches_points_and_objects_in_one_call ... ok
+test grip_dyn::tests::length_fields_follow_the_drawing_units ... ok
+test hatchdlg::tests::create_ok_runs_and_makes_one_hatch ... ok
+test hatchdlg::tests::edit_dialog_sends_boundary_additions_and_removals ... ok
+test hatchdlg::tests::create_state_reads_the_header_and_survives_bad_values ... ok
+test hatchdlg::tests::edit_ok_sends_only_what_changed ... ok
+test hatchdlg::tests::escape_brings_the_dialog_back_unchanged ... ok
+test hatchdlg::tests::hatch_pick_opens_edit_mode_or_nothing ... ok
+test hatchdlg::tests::hatchedit_opens_edit_mode_on_the_selection_or_asks_for_a_hatch ... ok
+test grip_dyn::tests::typed_length_tab_and_enter_place_the_grip_and_keywords_pass_through ... ok
+test hatchdlg::tests::ok_makes_the_hatch_and_closes ... ok
+test hatchdlg::tests::picks_merge_into_the_state ... ok
+test hatchdlg::tests::pick_points_hides_the_dialog_and_brings_it_back_with_the_points ... ok
+test hatchdlg::tests::switching_drawings_drops_the_dialog ... ok
+test grip_dyn::tests::circle_radius_shows_one_distance_field_and_typed_value_is_the_radius ... ok
+test hatchdlg::tests::edit_mode_on_an_out_of_range_hatch_changes_nothing_by_itself ... ok
+test hatchdlg::tests::typed_and_menu_hatch_open_the_dialog_but_dash_and_json_do_not ... ok
+test i18n::picker_order_tests::picker_lists_auto_and_english_first_then_names_alphabetically ... ok
+test hatchdlg::tests::switching_to_a_layout_drops_the_picks ... ok
+test i18n::tests::chinese_needs_a_cjk_font ... ok
+test i18n::tests::counts_and_templates_follow_each_catalog_and_keep_inserted_text ... ok
+test i18n::tests::catalog_is_valid_and_preserves_placeholders_and_ellipses ... ok
+test hatchdlg::tests::the_dialog_draws_both_modes_and_tabs_and_stays_open ... ok
+test hatchdlg::tests::the_dialog_fits_on_screen_with_its_buttons ... ok
+test i18n::tests::korean_without_a_hangul_font_stays_english_and_says_why ... ok
+test i18n::tests::korean_ui_fonts_cover_the_language_picker_in_both_families ... ok
+test i18n::tests::locale_and_saved_preference_resolution ... ok
+test i18n::tests::plural_rules_pick_the_cldr_form ... ok
+test i18n::tests::production_font_chain_covers_latin_and_shortcut_symbols ... ok
+test i18n::tests::interface_fonts_cover_every_letter_in_each_catalog ... ok
+test i18n::tests::translation_gaps ... ignored, a report, printed by `cargo xtask i18n`
+test layers::tests::dialog_keeps_its_height ... ok
+test layers::tests::layer_search ... ok
+test managers::plot_dialog_tests::a_device_brings_its_papers_and_the_plot_names_them ... ok
+test managers::plot_dialog_tests::plot_center_and_offsets_are_model_only_and_omitted_for_svg ... ok
+test managers::plot_dialog_tests::plot_transparency_checkbox_reaches_the_plot ... ok
+test managers::plot_dialog_tests::window_pick_brings_the_dialog_back_with_the_picked_window ... ok
+test menus::shortcut_label_tests::shortcut_label_per_platform ... ok
+test menus::tests::cancelled_export_writes_nothing ... ok
+test menus::tests::plot_and_print_open_the_plot_dialog_and_exportpdf_asks_for_a_file ... ok
+test menus::units_dialog_tests::units_typed_opens_dialog_json_runs_command ... ok
+test mtext_editor::tests::diameter_button_is_painted_and_named_under_bundled_fonts ... ok
+test mtext_editor::tests::diameter_insertion_keeps_real_text_and_renders_without_optional_fonts ... ok
+test mtext_editor::tests::editor_opens_only_for_mtext_text_entry_and_finishes_with_formatted_contents ... ok
+test mtext_editor::tests::height_field_is_named_for_accessibility_under_bundled_fonts ... ok
+test mtext_editor::tests::the_whole_toolbar_uses_bundled_glyphs_and_names_its_controls ... ok
+test opening::tests::card_text_names_the_file_and_counts_queued_ones ... ok
+test opening::tests::open_path_reads_in_the_background_and_reports_failure ... ok
+test options::tests::hex_colours_round_trip_and_bad_ones_are_refused ... ok
+test palettes::layer_menu_tests::selected_entity_layer_menu_scrolls_to_its_last_layer ... ok
+test palettes::quickcalc::tests::value_field_is_named_by_its_visible_label ... ok
+test palettes::tests::selected_bylayer_entity_paints_its_layer_color_swatch ... ok
+test panel_state::tests::a_new_key_is_never_overwritten ... ok
+test panel_state::tests::old_key_is_copied_to_the_scoped_key_once ... ok
+test parametric::tests::line_intersection ... ok
+test parametric::tests::number_trimming ... ok
+test parametric::tests::pending_expression_survives_window_blur ... ok
+test quick::tests::pretty_names ... ok
+test tests::a_two_pass_frame_executes_a_control_request_once ... ok
+test tests::a_two_pass_frame_runs_frame_logic_once ... ok
+test tests::default_save_format_persists_and_names_new_drawings ... ok
+test tests::hidden_logic_advances_a_long_lisp_routine_without_a_ui_pass ... ok
+test i18n::tests::the_wcs_pill_draws_its_arrow_instead_of_a_glyph_a_font_may_lack ... ok
+test tests::hidden_logic_does_not_run_frame_only_work ... ok
+test i18n::tests::live_switch_translates_the_shell_without_mutating_drawing_or_automation ... ok
+test tests::one_synthetic_batch_waits_for_a_real_ui_pass ... ok
+test tests::system_theme_follows_the_os_live_and_stays_saved_as_system ... ok
+test theme::tests::embedded_faces_answer_for_their_scripts ... ok
+test theme::tests::embedded_faces_lead_with_the_interfaces_own_script ... ok
+test theme::tests::korean_font_rejects_invalid_or_glyphless_files ... ok
+test viewcube::tests::parts_are_found_where_they_are_drawn ... ok
+test tests::system_theme_keeps_egui_on_the_system_preference ... ok
+test tests::theme_choice_persists_and_drives_tokens ... ok
+test vpscale::tests::engineering_scales_for_imperial_drawings ... ok
+test vpscale::tests::labels ... ok
+test viewcube::tests::ucs_icon_and_wcs_pill_open_the_coordinate_system_menu ... ok
+test viewcube::tests::viewcube_clicks_reach_the_cube_not_the_drawing ... ok
+test i18n::tests::dialogs_render_in_every_language_and_keep_their_source_ids ... ok
+
+test result: ok. 180 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 14.99s
+
+     Running tests\accessibility_names.rs (target\debug\deps\accessibility_names-4fa23f58becdd5a0.exe)
+
+running 4 tests
+test accesskit_root_carries_the_interface_language ... ok
+test parameters_manager_fields_have_a_semantic_label ... ok
+test options_autosave_path_has_a_semantic_label ... ok
+test every_options_tab_names_its_controls ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.51s
+
+     Running tests\alias_dialog.rs (target\debug\deps\alias_dialog-34e2084d2b0215d9.exe)
+
+running 7 tests
+test add_then_ok_defines_the_alias_and_cancel_drops_it ... ok
+test aliasedit_typed_while_open_keeps_the_changes_not_applied ... ok
+test edit_on_a_built_in_alias_overrides_it ... ok
+test refused_aliases_stay_out_of_the_list_and_say_why ... ok
+test remove_is_offered_for_user_aliases_only ... ok
+test the_dialog_names_the_alias_file_reinit_reads ... ok
+test typed_and_menu_aliasedit_open_the_dialog_but_json_does_not ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.98s
+
+     Running tests\appload_dialog.rs (target\debug\deps\appload_dialog-385150958d7a592f.exe)
+
+running 7 tests
+test a_cancelled_picker_is_a_no_op ... ok
+test refused_and_failed_loads_are_ordinary_errors_and_never_pick ... ok
+test a_picked_file_that_asks_for_a_point_waits_for_the_user ... ok
+test a_json_path_loads_the_file_and_lists_its_commands_and_never_picks ... ok
+test where_there_is_no_file_system_appload_says_to_drop_the_file ... ok
+test typed_appload_opens_the_picker_and_remembers_the_directory ... ok
+test without_a_picker_appload_asks_for_the_name_on_the_command_line ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+
+     Running tests\bedit_dialog.rs (target\debug\deps\bedit_dialog-98c4c7ce93e83bf2.exe)
+
+running 4 tests
+test a_selected_reference_and_json_calls_skip_the_dialog ... ok
+test bedit_without_a_selected_reference_opens_the_dialog ... ok
+test a_new_name_starts_a_new_block_and_a_bad_one_keeps_the_dialog ... ok
+test opening_a_drawing_with_authoring_elements_offers_the_block_editor ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.17s
+
+     Running tests\canvas_shift_click.rs (target\debug\deps\canvas_shift_click-bbe801bbce4fb3e7.exe)
+
+running 1 test
+test shift_left_click_does_not_cancel_a_running_command ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.12s
+
+     Running tests\canvas_shift_zoom.rs (target\debug\deps\canvas_shift_zoom-2b4fa0c2db21c186.exe)
+
+running 3 tests
+test shift_double_click_returns_to_the_previous_view ... ok
+test shift_drag_when_idle_applies_zoom_window ... ok
+test shift_drag_while_command_runs_applies_zoom_window ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.13s
+
+     Running tests\cursor_contrast.rs (target\debug\deps\cursor_contrast-5c15958d27a9444b.exe)
+
+running 4 tests
+test model_cursor_keeps_following_live_background_preferences ... ok
+test mspace_and_isometric_cursor_use_the_paper_display_transform ... ok
+test paper_and_surround_follow_the_sheet_after_pan_and_zoom ... ok
+test paper_preferences_are_independent_of_model_preferences ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.18s
+
+     Running tests\cursor_over_menus.rs (target\debug\deps\cursor_over_menus-ee4dd491a22e8aae.exe)
+
+running 6 tests
+test docked_palettes_keep_the_os_cursor_visible ... ok
+test a_selection_cycling_row_keeps_the_os_cursor_visible ... ok
+test an_open_menu_keeps_the_os_cursor_visible_over_the_drawing ... ok
+test a_dynamic_input_options_row_keeps_the_os_cursor_visible ... ok
+test show_system_cursor_restores_the_arrow_off_the_canvas ... ok
+test the_menu_bar_brings_the_os_cursor_back ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.30s
+
+     Running tests\drawing_recovery.rs (target\debug\deps\drawing_recovery-690c3d9e94e03646.exe)
+
+running 1 test
+test recovery_list_opens_copies_and_discards_files ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests\file_tab_close.rs (target\debug\deps\file_tab_close-39c4bdd366d0e659.exe)
+
+running 1 test
+test an_inactive_tabs_close_button_stays_under_the_pointer_and_closes_it ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.16s
+
+     Running tests\gpu_faults.rs (target\debug\deps\gpu_faults-7524f027e9e85a80.exe)
+
+running 1 test
+test faults_are_recorded_autosaved_and_shown ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.11s
+
+     Running tests\it\main.rs (target\debug\deps\it-9ae701d684946002.exe)
+
+running 130 tests
+test animation_effects::the_menu_offers_the_three_choices_and_they_reach_the_setting ... ok
+test animation_effects::the_choice_is_a_saved_preference ... ok
+test animation_effects::the_system_choice_follows_the_os_live ... ok
+test animation_effects::wheel_scrolling_glides_only_while_animation_effects_show ... ok
+test chrome_geometry::compact_toolbar_overflow_keeps_help_reachable ... ok
+test chrome_geometry::layout_tabs_and_add_button_work_with_toolsets_shown_or_hidden ... ok
+test animation_effects::zooming_the_drawing_with_the_wheel_never_glides_with_animation_effects_off ... ok
+test chrome_geometry::layout_tabs_stay_anchored_when_toolsets_toggle_resize_or_move ... ok
+test context_menu::clipboard_events_run_the_clipboard_commands ... ok
+test context_menu::context_menu_offers_the_clipboard ... ok
+test chrome_geometry::toolbar_plot_preview_opens_dialog ... ok
+test context_menu::snap_menu_types_point_modifiers_and_snap_overrides ... ok
+test context_menus::a_selected_block_reference_offers_the_block_editor ... ok
+test context_menu::shift_right_click_opens_the_snap_menu ... ok
+test context_menus::command_menu_offers_enter_cancel_options_snaps_and_views ... ok
+test context_menus::idle_menu_lists_recent_commands_and_selection_commands ... ok
+test context_menus::snap_overrides_only_at_point_prompts ... ok
+test context_menus::selection_menu_has_the_object_types_edit_commands ... ok
+test control_cmdline::accepted_input_has_no_error_and_reports_the_prompt ... ok
+test control_cmdline::open_without_a_path_is_refused_before_the_engine ... ok
+test control_cmdline::refused_input_is_echoed_to_output_and_reported_in_error ... ok
+test control_cmdline_key::accepted_keys_have_output_and_no_error ... ok
+test control_cmdline_key::refused_enter_is_echoed_and_reported_in_error ... ok
+test control_methods::control_methods_matches_the_documented_table ... ok
+test context_menus::time_sensitive_right_click ... ok
+test control_methods::every_listed_method_is_answered ... ok
+test control_methods::ping_answers ... ok
+test control_methods::unknown_method_points_to_control_methods ... ok
+test dialog_dispatch::json_file_commands_never_open_pickers ... ok
+test dialog_dispatch::drafting_settings_menu_opens_the_dialog ... ok
+test dialog_dispatch::print_opens_the_plot_dialog_but_json_plot_never_does ... ok
+test dialog_dispatch::properties_menu_shows_the_palette ... ok
+test dialog_dispatch::typed_json_form_runs_the_command ... ok
+test animation_effects::dialogs_fade_in_only_while_animation_effects_show ... ok
+test docking_workflows::automation_reaches_column_and_group_resizes_tab_reorder_and_minimize_through_the_same_handler ... ok
+test docking_workflows::canvas_reset_during_column_drag_discards_old_resize_and_ends_gesture ... ok
+test docking_workflows::collapsed_tool_sets_leave_a_visible_control_that_expands_them ... ok
+test docking_workflows::default_layout_is_tool_sets_left_and_the_palettes_right_in_dock_columns ... ok
+test docking_workflows::explicit_properties_open_restores_closed_panel_and_activates_inactive_tab ... ok
+test chrome_geometry::status_labels_never_overlap_at_standard_and_compact_sizes ... ok
+test docking_workflows::grouped_restore_preserves_order_and_rectangle_in_both_close_orders_after_reload ... ok
+test docking_workflows::group_divider_resizes_by_pointer_and_keyboard_without_changing_the_drawing ... ok
+test docking_workflows::group_drag_bar_moves_the_whole_group_into_the_other_dock ... ok
+test docking_workflows::invalid_requests_leave_document_and_panel_layout_unchanged ... ok
+test docking_workflows::middle_press_over_floating_panel_does_not_pan_drawing ... ok
+test docking_workflows::palette_icons_are_painted_in_code_and_shown_in_an_iconic_column ... ok
+test docking_workflows::palettes_off_and_on_reopen_a_floating_group_as_one_window ... ok
+test docking_workflows::docking_renders_default_float_and_redocked_at_normal_and_narrow_sizes ... ok
+test docking_workflows::palettes_off_and_on_restore_the_right_dock_column ... ok
+test docking_workflows::palettes_dock_only_in_the_left_and_right_columns ... ok
+test docking_workflows::properties_typed_in_rendered_command_line_reopens_and_selects_actual_workspace ... ok
+test docking_workflows::reset_typed_in_canvas_preserves_authoritative_workspace_replacement ... ok
+test drafting_polar_increment::a_finer_polar_increment_is_shown_rounded_and_kept ... ok
+test drafting_spacing::opening_the_dialog_preserves_loaded_spacing_outside_drag_ranges ... ok
+test drafting_polar_increment::polar_increment_angles_show_as_picked ... ok
+test drafting_spacing::spacing_controls_update_the_drawing_and_mark_it_dirty ... ok
+test docking_workflows::window_menu_reopens_closed_and_new_palettes_in_their_dock_groups ... ok
+test file_tab_titles::long_names_are_cut_short_inside_the_tab ... ok
+test docking_workflows::real_panel_drag_float_close_reopen_and_full_workspace_reload ... ok
+test instant_modals::close_prompt_is_fully_drawn_in_the_frame_of_the_menu_choice ... ok
+test hidden_command_line::hidden_command_line_keyboard ... ok
+test lisp_files::a_canvas_click_answers_a_routine_waiting_for_a_point ... ok
+test lisp_files::a_dropped_lisp_file_loads_and_defines_its_commands ... ok
+test measure_distance_snapping::measure_distance_toolbar_keeps_model_space_snaps_working ... ok
+test measure_distance_snapping::measure_distance_toolbar_snaps_to_model_geometry_through_paper_viewports ... ok
+test menubar_hover::clicking_the_open_title_closes_it ... ok
+test menubar_hover::escape_closes_the_open_menu_and_pointing_then_opens_nothing ... ok
+test menubar_hover::pointing_at_a_title_with_no_menu_open_opens_nothing ... ok
+test menubar_hover::pointing_at_another_title_switches_the_open_menu ... ok
+test mspace_viewport_view::leaving_the_viewport_puts_its_contents_back_in_the_layout ... ok
+test menubar_hover::submenus_open_and_close_with_their_menu ... ok
+test mspace_viewport_view::without_a_stencil_buffer_a_clipped_viewport_follows_realtime_navigation_in_the_layout_list ... ok
+test mspace_viewport_view::panning_inside_the_active_viewport_moves_its_contents_without_rebuilding ... ok
+test gpu_viewport_stencil::clipped_viewport_contents_draw_only_inside_their_outline ... ok
+test native_windows::a_main_window_modifier_change_outlasts_keys_forwarded_meanwhile ... ok
+test native_menu_text_keys::edit_menu_keys_edit_the_focused_text_field_and_otherwise_the_drawing ... ok
+test native_windows::keys_forwarded_from_a_native_window_reach_the_command_line_and_shortcuts ... ok
+test native_windows::modal_dialogs_block_native_panel_windows ... ok
+test options_dialog::hostile_saved_profiles_are_ignored ... ok
+test options_dialog::json_form_sets_interface_and_engine_preferences_all_or_nothing ... ok
+test mspace_viewport_view::zooming_inside_the_active_viewport_rebuilds_per_2x_and_once_it_settles ... ok
+test options_dialog::profile_survives_a_restart_and_keeps_the_prefs_format ... ok
+test options_dialog::model_background_reaches_the_drawing_area_tokens ... ok
+test options_dialog::typed_and_menu_open_the_dialog_json_never_does ... ok
+test options_dialog::every_tab_renders ... ok
+test options_dialog::selection_highlight_settings_set_save_and_show_in_the_selection_tab ... ok
+test parameters_rename::double_click_types_a_new_name_and_enter_renames ... ok
+test pickdrag::default_mode_keeps_drag_selection_available ... ok
+test parameters_rename::escape_leaves_the_name_as_it_was ... ok
+test properties_units::text_height_is_shown_in_the_drawing_units ... ok
+test pickdrag::selection_tab_checkbox_updates_and_persists_the_preference ... ok
+test properties_units::text_height_takes_feet_and_inches ... ok
+test properties_units::unreadable_text_is_reported_not_dropped ... ok
+test rapid_clicks::a_click_made_while_the_mouse_moves_still_places_the_point ... ok
+test rapid_clicks::two_clicks_within_one_frame_place_two_points ... ok
+test selection_cycling::a_click_over_overlapping_objects_lists_them_and_a_row_picks_one ... ok
+test selection_cycling::a_command_closes_the_list_and_gets_its_first_click ... ok
+test pickdrag::drag_is_disabled_but_two_clicks_still_complete_the_window ... ok
+test selection_cycling::after_an_erase_a_row_never_selects_an_object_that_is_gone ... ok
+test selection_cycling::after_shift_space_a_command_still_gets_its_first_click ... ok
+test shared_controls::drafting_button_keyboard_disabled_state_and_click_cancellation ... ok
+test shared_controls::drafting_button_preserves_multicolor_selection_and_accessibility ... ok
+test selection_cycling::shift_space_steps_the_highlight_and_a_click_picks_it ... ok
+test selection_cycling::with_selectioncycling_0_a_click_picks_the_top_object ... ok
+test shared_controls::shared_controls_visuals ... ok
+test shared_controls::toolsets_collapse_arrow_hides_menu ... ok
+test shortcut_menus::command_line_menu ... ok
+test shortcut_menus::drawing_tab_menu ... ok
+test shortcut_menus::every_id_is_a_command ... ok
+test shortcut_menus::layer_and_properties_palette_menus ... ok
+test shortcut_menus::layout_tab_menu ... ok
+test shared_controls::right_palettes_collapse_arrow_hides_menu ... ok
+test style_dialogs::json_calls_never_open_the_dialogs ... ok
+test shared_controls::drafting_palette_pointer_and_keyboard_start_the_same_commands ... ok
+test style_dialogs::menu_items_open_their_dialogs ... ok
+test status_bar_toggles::clicking_grid_and_snap_on_the_status_bar_keeps_line_running ... ok
+test system_cursor::system_cursor_stays_visible_over_the_canvas_when_requested ... ok
+test text_double_click::double_clicked_text_takes_ime_composition_and_commit ... ok
+test text_double_click::double_click_elsewhere_starts_no_command ... ok
+test text_double_click::double_click_on_text_starts_textedit_for_that_object ... ok
+test toolsets_gear::a_hidden_tool_leaves_the_palette_and_show_all_puts_it_back ... ok
+test toolsets_gear::the_gear_opens_the_options_and_the_header_keeps_collapsing ... ok
+test toolsets_gear::the_options_menu_hides_a_tool_and_remembers_the_choice ... ok
+test toolsets_parametric::the_parametric_category_lists_fix_symmetric_and_delete_constraints ... ok
+test toolsets_parametric::clicking_fix_in_the_tool_set_starts_gcfix ... ok
+test viewport_double_click_selection::double_click_viewport_does_not_leave_pending_window ... ok
+test workspace_focus::toolbar_tab_and_shift_tab_skip_title_drag_and_activate_once ... ok
+test workspace_focus::document_tabs_have_distinct_keyboard_identity_and_activation ... ok
+test lisp_files::a_long_routine_runs_across_frames ... ok
+test workspace_focus::toolset_tabs_traverse_and_activate_without_drafting_commands ... ok
+
+test result: ok. 130 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 6.18s
+
+     Running tests\open_bytes.rs (target\debug\deps\open_bytes-aa8ebc7588c8af95.exe)
+
+running 1 test
+test open_bytes_opens_the_named_drawing_and_reports_failures ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests\options_followups.rs (target\debug\deps\options_followups-94fe89c92c7e549f.exe)
+
+running 2 tests
+test interface_scale_in_options ... ok
+test autosave_save_version_and_right_click_in_options ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.26s
+
+     Running tests\quickcalc_toggle.rs (target\debug\deps\quickcalc_toggle-c2aacf85c19025b1.exe)
+
+running 5 tests
+test explicit_opens_still_reveal_and_calculations_do_not_open_the_palette ... ok
+test toggle_restores_floating_or_docked_location_without_hiding_other_panels ... ok
+test quickcalc_shortcut_does_not_bypass_the_unsaved_drawing_prompt ... ok
+test window_menu_toggle_preserves_calculator_history_and_command_line_input ... ok
+test platform_shortcut_toggles_with_expression_focus_and_preserves_drafting ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.43s
+
+     Running tests\recent_files.rs (target\debug\deps\recent_files-7270d27da321b3fc.exe)
+
+running 2 tests
+test opened_drawings_are_listed_newest_first_and_survive_a_restart ... ok
+test start_page_lists_recent_files_and_opens_one_on_click ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.25s
+
+     Running tests\save_version.rs (target\debug\deps\save_version-a1a47b692fa4cdc1.exe)
+
+running 1 test
+test default_save_version_applies_to_new_drawings_and_persists ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.25s
+
+     Running tests\xref_palette.rs (target\debug\deps\xref_palette-e9dad8dec9aa884e.exe)
+
+running 2 tests
+test json_xref_lists_and_never_opens_the_palette ... ok
+test xref_opens_the_palette_and_its_buttons_manage_the_xref ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.33s
+
+     Running unittests src\main.rs (target\debug\deps\cadcraft_web-b35aed65714f62c1.exe)
+
+running 4 tests
+test tests::changed_title_reaches_the_document_title_writer_once ... ok
+test tests::viewport_title_names_the_document_and_marks_unsaved_changes ... ok
+test tests::viewport_title_follows_open_rename_and_dirty_changes_only ... ok
+test tests::cpu_flag_is_detected ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src\main.rs (target\debug\deps\xtask-81577f86a97c4f9e.exe)
+
+running 24 tests
+test assets::tests::detects_unattributed_assets ... ok
+test ico::tests::packs_directory_and_payloads ... ok
+test ico::tests::rejects_bad_input ... ok
+test layers::tests::apps_and_xtask_exempt ... ok
+test layers::tests::clean_downward_graph_passes ... ok
+test layers::tests::l0_foundation_chain_allowed_one_way ... ok
+test layers::tests::metadata_parsing ... ok
+test layers::tests::self_dev_dependency_ignored ... ok
+test layers::tests::sideways_dependency_flagged ... ok
+test layers::tests::testkit_only_as_dev_dependency ... ok
+test layers::tests::unregistered_crate_is_error ... ok
+test layers::tests::ui_crates_below_l6_flagged ... ok
+test layers::tests::upward_dependency_flagged ... ok
+test layers::tests::upward_dev_dependency_flagged ... ok
+test parity::tests::civil_dates ... ok
+test parity::tests::leaves_with_paths ... ok
+test stats::tests::counts_attributes_and_proptest_blocks ... ok
+test ico::tests::committed_icon_is_valid ... ok
+test version::tests::reads_the_workspace_version ... ok
+test version::tests::keeps_crlf_line_endings ... ok
+test version::tests::replaces_only_the_workspace_version ... ok
+test version::tests::validates_versions ... ok
+test version::tests::the_real_manifest_has_a_valid_version ... ok
+test stats::tests::walk_reports_budget_exhaustion ... ok
+
+test result: ok. 24 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.12s
+

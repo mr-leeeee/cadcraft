@@ -1400,7 +1400,7 @@ pub fn show(app: &mut CadApp, ui: &mut egui::Ui) {
             i.pointer.button_double_clicked(egui::PointerButton::Primary),
         )
     });
-// The drawing area alone: a menu popup's frame (between its items and its border), a tooltip
+    // The drawing area alone: a menu popup's frame (between its items and its border), a tooltip
     // or a floating palette lives on a layer above the canvas, where `hovered()` alone still
     // counts the canvas. Over those the OS cursor stays visible and the crosshair stays put, as
     // over the menu bar (#1701).
@@ -1696,9 +1696,9 @@ pub fn show(app: &mut CadApp, ui: &mut egui::Ui) {
     if inside
         && pressed_primary
         && !middle_down
-&& !cycled
-&& !resp.dragged_by(egui::PointerButton::Primary)
-&& !shift_click
+        && !cycled
+        && !resp.dragged_by(egui::PointerButton::Primary)
+        && !shift_click
         && let Some(p) = app.canvas.cursor
     {
         if app.session.prompting() {
@@ -1730,7 +1730,7 @@ pub fn show(app: &mut CadApp, ui: &mut egui::Ui) {
     }
     // Press-and-drag selection window (PICKDRAG = 2; click-click still works): a drag
     // that starts while objects are being selected opens a window where the button went down,
-// Press-and-drag selection window (PICKDRAG = 2; click-click still works): a drag
+    // Press-and-drag selection window (PICKDRAG = 2; click-click still works): a drag
     // that starts while objects are being selected opens a window where the button went down,
     // and letting go closes it. Drags on grips and drags while drawing are left alone.
     if !app.session.settings.pickdrag {

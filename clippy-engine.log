@@ -1,0 +1,117 @@
+    Checking cadcraft-geom v0.6.1 (C:\vibecode\cadcraft\crates\geom)
+    Checking serde_json v1.0.151
+    Checking lyon_geom v1.0.19
+    Checking read-fonts v0.44.0
+    Checking read-fonts v0.41.0
+    Checking cadcraft-color v0.6.1 (C:\vibecode\cadcraft\crates\color)
+    Checking miniz_oxide v0.8.9
+    Checking fdeflate v0.3.7
+    Checking arrayref v0.3.9
+    Checking bitflags v1.3.2
+    Checking log v0.4.34
+    Checking strict-num v0.1.1
+   Compiling cadcraft-fonts v0.6.1 (C:\vibecode\cadcraft\crates\fonts)
+    Checking tiny-skia-path v0.11.4
+    Checking png v0.17.16
+    Checking cadcraft-doc v0.6.1 (C:\vibecode\cadcraft\crates\doc)
+    Checking lyon_path v1.0.19
+    Checking minimal-lexical v0.2.1
+    Checking float_next_after v1.0.0
+    Checking unicode-bidi v0.3.18
+    Checking hashbrown v0.17.1
+    Checking equivalent v1.0.2
+    Checking indexmap v2.14.2
+    Checking lyon_tessellation v1.0.22
+    Checking nom v7.1.3
+    Checking tiny-skia v0.11.4
+    Checking anyhow v1.0.104
+    Checking hash32 v0.3.1
+    Checking foldhash v0.2.0
+    Checking web-time v1.1.0
+    Checking ryu v1.0.23
+    Checking memmap2 v0.9.11
+    Checking stable_deref_trait v1.2.1
+    Checking heapless v0.8.0
+    Checking acadrust v0.6.3
+    Checking cadcraft-dxf v0.6.1 (C:\vibecode\cadcraft\crates\dxf)
+    Checking rstar v0.12.2
+    Checking cadcraft-constraints v0.6.1 (C:\vibecode\cadcraft\crates\constraints)
+    Checking quick-xml v0.41.0
+    Checking skrifa v0.47.0
+    Checking harfrust v0.12.0
+    Checking cadcraft-render v0.6.1 (C:\vibecode\cadcraft\crates\render)
+    Checking cadcraft-engine v0.6.1 (C:\vibecode\cadcraft\crates\engine)
+error: this `if` can be collapsed into the outer `match`
+   --> crates\engine\src\audit.rs:458:21
+    |
+458 | /                     if !has_name(&d.table_styles, &t.style, |s| &s.name) {
+459 | |                         note("table style", &t.style);
+460 | |                         t.style = "Standard".into();
+461 | |                     }
+    | |_____________________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.95.0/index.html#collapsible_match
+    = note: `-D clippy::collapsible-match` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::collapsible_match)]`
+help: collapse nested if block
+    |
+457 ~                 EntityKind::Table(t)
+458 ~                     if !has_name(&d.table_styles, &t.style, |s| &s.name) => {
+459 |                         note("table style", &t.style);
+460 |                         t.style = "Standard".into();
+461 ~                     }
+    |
+
+error: this `if` can be collapsed into the outer `match`
+   --> crates\engine\src\audit.rs:464:21
+    |
+464 | /                     if !ok_dim(d, &l.style) {
+465 | |                         note("dimension style", &l.style);
+466 | |                         l.style = "Standard".into();
+467 | |                     }
+    | |_____________________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.95.0/index.html#collapsible_match
+help: collapse nested if block
+    |
+463 ~                 EntityKind::Leader(l)
+464 ~                     if !ok_dim(d, &l.style) => {
+465 |                         note("dimension style", &l.style);
+466 |                         l.style = "Standard".into();
+467 ~                     }
+    |
+
+    Checking cadcraft-dwg v0.6.1 (C:\vibecode\cadcraft\crates\dwg)
+    Checking cadcraft-io v0.6.1 (C:\vibecode\cadcraft\crates\io)
+error: this `if` can be collapsed into the outer `match`
+   --> crates\engine\src\cmd\inquiry.rs:454:21
+    |
+454 | /                     if pts.len() > 1 {
+455 | |                         pts.pop();
+456 | |                         self.sources.pop();
+457 | |                     }
+    | |_____________________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.95.0/index.html#collapsible_match
+help: collapse nested if block
+    |
+453 ~                 Input::Keyword(k) if k == "Undo"
+454 ~                     && pts.len() > 1 => {
+455 |                         pts.pop();
+456 |                         self.sources.pop();
+457 ~                     }
+    |
+
+error: this boolean expression can be simplified
+   --> crates\engine\src\snap.rs:189:12
+    |
+189 |         if !model_cursor.is_finite() || !(model_aperture.is_finite() && model_aperture > 0.0) || model_base.is_some_and(|p| !p.is_f...
+    |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ help: try: `!(model_cursor.is_finite() && model_aperture.is_finite() && model_aperture > 0.0)`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.95.0/index.html#nonminimal_bool
+    = note: `-D clippy::nonminimal-bool` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::nonminimal_bool)]`
+
+error: could not compile `cadcraft-engine` (lib) due to 4 previous errors
+warning: build failed, waiting for other jobs to finish...
+error: could not compile `cadcraft-engine` (lib test) due to 4 previous errors

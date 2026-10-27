@@ -23,7 +23,7 @@ fn call(app: &mut CadApp, ctx: &egui::Context, method: &str, params: Value) -> V
 fn step(app: &mut CadApp, ctx: &egui::Context, events: Vec<Event>, time: f64) {
     let mut raw =
         RawInput { screen_rect: Some(Rect::from_min_size(Pos2::ZERO, Vec2::new(1280.0, 800.0))), time: Some(time), events, ..Default::default() };
-    app.raw_input_hook(&mut raw);
+    app.raw_input_hook(ctx, &mut raw);
     cadcraft_ui_egui::cmdline::capture_tab(ctx, &mut raw);
     let mut out = ctx.run_ui(raw, |ui| {
         app.logic(ui.ctx());

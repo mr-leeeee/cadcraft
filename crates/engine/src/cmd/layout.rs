@@ -759,8 +759,10 @@ fn run_modelpagesetup(s: &mut Session, p: &Value) -> Result<Value> {
         "plotTransparency",
     ];
     let changes = keys.iter().any(|k| p.get(k).is_some());
-    let mut page = s.doc()?.model_page_setup.clone().unwrap_or_else(|| {
-        cadcraft_doc::PageSetup { plot_area: "extents".into(), scale_to_fit: true, ..Default::default() }
+    let mut page = s.doc()?.model_page_setup.clone().unwrap_or_else(|| cadcraft_doc::PageSetup {
+        plot_area: "extents".into(),
+        scale_to_fit: true,
+        ..Default::default()
     });
     // A plotter's own papers (with their printable areas) come first.
     let device_paper = super::plotters::page_device(cmd, p, &mut page)?;

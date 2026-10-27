@@ -494,7 +494,15 @@ impl FrameFindOptions {
         Self { frame_height: Some(frame_height), height_tolerance: 0.0005, unit, ..Default::default() }
     }
     pub fn flexible(unit: f64) -> Self {
-        Self { frame_height: None, height_tolerance: 10.0, unit, min_size_mm: 50.0, max_size_mm: 2000.0, find_all_rectangles: true, aspect_tolerance: 0.3, ..Default::default() }
+        Self {
+            frame_height: None,
+            height_tolerance: 10.0,
+            unit,
+            min_size_mm: 50.0,
+            max_size_mm: 2000.0,
+            find_all_rectangles: true,
+            aspect_tolerance: 0.3,
+        }
     }
 }
 
@@ -511,12 +519,7 @@ pub struct FrameFindOptionsInternal {
 
 /// Sheet frames grouped into books: rows of equal lower edge, bottom to top, each left to right.
 pub fn frame_books(d: &Drawing, frame_height: f64, unit: f64) -> (Vec<Vec<Frame>>, usize) {
-    frame_books_with_options(d, FrameFindOptionsInternal {
-        frame_height: Some(frame_height),
-        height_tolerance: 0.0005,
-        unit,
-        ..Default::default()
-    })
+    frame_books_with_options(d, FrameFindOptionsInternal { frame_height: Some(frame_height), height_tolerance: 0.0005, unit, ..Default::default() })
 }
 
 pub fn frame_books_with_options(d: &Drawing, opts: FrameFindOptionsInternal) -> (Vec<Vec<Frame>>, usize) {
@@ -532,21 +535,24 @@ pub fn frame_books_with_options(d: &Drawing, opts: FrameFindOptionsInternal) -> 
             continue;
         }
         let (w, h) = (b.width() * opts.unit, b.height() * opts.unit);
-        
-        // Size filtering
-        if w < opts.min_size_mm || h < opts.min_size_mm || w > opts.max_size_mm || h > opts.max_size_mm {
+
+        // Size filtering. 0 is "no bound": exact frame-height search sets no size limits.
+        let too_small = w < opts.min_size_mm || h < opts.min_size_mm;
+        let too_big = opts.max_size_mm > 0.0 && (w > opts.max_size_mm || h > opts.max_size_mm);
+        if too_small || too_big {
             skipped += 1;
             continue;
         }
-        
+
         // Height matching (if frame_height specified)
-        if let Some(fh) = opts.frame_height {
-            if (h - fh).abs() > opts.height_tolerance && (w - fh).abs() > opts.height_tolerance {
-                skipped += 1;
-                continue;
-            }
+        if let Some(fh) = opts.frame_height
+            && (h - fh).abs() > opts.height_tolerance
+            && (w - fh).abs() > opts.height_tolerance
+        {
+            skipped += 1;
+            continue;
         }
-        
+
         // Paper matching (unless find_all_rectangles)
         let (paper, landscape) = if opts.find_all_rectangles {
             // Find best matching paper with aspect tolerance
@@ -555,16 +561,19 @@ pub fn frame_books_with_options(d: &Drawing, opts: FrameFindOptionsInternal) -> 
                 None if opts.aspect_tolerance > 0.0 => {
                     // Find paper with similar aspect ratio
                     let target_aspect = w / h;
-                    cadcraft_render::PAPER_SIZES.iter().find_map(|p| {
-                        let pa = p.width_mm / p.height_mm;
-                        if (pa - target_aspect).abs() <= opts.aspect_tolerance * target_aspect {
-                            Some((p.name, false))
-                        } else if (1.0/pa - target_aspect).abs() <= opts.aspect_tolerance * target_aspect {
-                            Some((p.name, true))
-                        } else {
-                            None
-                        }
-                    }).unwrap_or(("Unknown", false))
+                    cadcraft_render::PAPER_SIZES
+                        .iter()
+                        .find_map(|p| {
+                            let pa = p.width_mm / p.height_mm;
+                            if (pa - target_aspect).abs() <= opts.aspect_tolerance * target_aspect {
+                                Some((p.name, false))
+                            } else if (1.0 / pa - target_aspect).abs() <= opts.aspect_tolerance * target_aspect {
+                                Some((p.name, true))
+                            } else {
+                                None
+                            }
+                        })
+                        .unwrap_or(("Unknown", false))
                 }
                 None => ("Custom", false),
             }
@@ -577,7 +586,7 @@ pub fn frame_books_with_options(d: &Drawing, opts: FrameFindOptionsInternal) -> 
                 }
             }
         };
-        
+
         let row = (b.min.y * 1000.0).round();
         if row.is_finite() && row.abs() < 9e15 {
             found.push((row as i64, b.min.x, Frame { window: b, paper, landscape }));
@@ -643,7 +652,6 @@ fn run_pdfbook(s: &mut Session, p: &Value) -> Result<Value> {
     let message = format!("Plotted {} book(s), {} sheet(s)", out.len(), books.iter().map(Vec::len).sum::<usize>());
     Ok(json!({ "books": out, "skipped": skipped, "message": message }))
 }
-
 
 /// MULTIPLOT command: opens the multi-plot dialog (UI only, no-op in JSON mode).
 fn run_multiplot(_s: &mut Session, _p: &Value) -> Result<Value> {

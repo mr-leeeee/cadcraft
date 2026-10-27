@@ -460,18 +460,16 @@ fn references(d: &mut Drawing, out: &mut Vec<Issue>) {
                         m.style = "Standard".into();
                     }
                 }
-                EntityKind::Table(t) => {
-                    if !has_name(&d.table_styles, &t.style, |s| &s.name) {
-                        note("table style", &t.style);
-                        t.style = "Standard".into();
-                    }
+                EntityKind::Table(t) if !has_name(&d.table_styles, &t.style, |s| &s.name) => {
+                    note("table style", &t.style);
+                    t.style = "Standard".into();
                 }
-                EntityKind::Leader(l) => {
-                    if !ok_dim(d, &l.style) {
-                        note("dimension style", &l.style);
-                        l.style = "Standard".into();
-                    }
+                EntityKind::Table(_) => {}
+                EntityKind::Leader(l) if !ok_dim(d, &l.style) => {
+                    note("dimension style", &l.style);
+                    l.style = "Standard".into();
                 }
+                EntityKind::Leader(_) => {}
                 EntityKind::Dimension(dim) => {
                     if !ok_dim(d, &dim.style) {
                         note("dimension style", &dim.style);

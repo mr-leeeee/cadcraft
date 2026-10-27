@@ -2697,7 +2697,8 @@ fn tags_for(d: &Drawing, version: Version, target: Version) -> Vec<Tag> {
     // default page's "layout" area is plot type 5, "Layout information" (DXF Reference,
     // PLOTSETTINGS group 74), which means nothing for model space: another program's Plot dialog
     // then shows no plot area or scale.
-    let model_page = d.model_page_setup.clone().unwrap_or_else(|| PageSetup { plot_area: "extents".into(), scale_to_fit: true, ..PageSetup::default() });
+    let model_page =
+        d.model_page_setup.clone().unwrap_or_else(|| PageSetup { plot_area: "extents".into(), scale_to_fit: true, ..PageSetup::default() });
     layout_obj(&mut w, &model_layout, ("Model", 0), &ms_br, 1, &model_page, None);
     for (i, (_, brh, l)) in ps_brs.iter().enumerate() {
         let h = layout_handles.get(i).cloned().unwrap_or_default();

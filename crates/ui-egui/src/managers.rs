@@ -5,41 +5,36 @@
 //! the command. The dialogs read the drawing and change it only through the same commands
 //! (`app.run`), so every change is undoable and scriptable.
 
-use std::path::PathBuf;
 use std::process::Command;
 use std::sync::atomic::{AtomicU32, Ordering};
 
-use cadcraft_doc::{Drawing, EntityKind, PageSetup, Space, PlotterConfig};
-use cadcraft_geom::{Bounds2, Vec2};
-use cadcraft_engine::cmd::plotters::{devices, find_device};
+use cadcraft_doc::{Drawing, Space};
 use cadcraft_engine::cmd::file::io;
-use cadcraft_render::paper::{PAPER_SIZES};
+use cadcraft_engine::cmd::plotters::devices;
+use cadcraft_geom::Bounds2;
+use cadcraft_render::paper::PAPER_SIZES;
 use egui::{RichText, Sense, Stroke, vec2};
 use serde_json::{Value, json};
 
 use crate::CadApp;
 use crate::parametric::expr_field;
 use crate::theme::Tokens;
-use cadcraft_engine::cmd::{frame_books, frame_books_with_options, FrameFindOptionsInternal};
-
-
+use cadcraft_engine::cmd::frame_books_with_options;
 
 /// Print PDF bytes to system printer (stage 1: delegate to OS print command).
 fn print_pdf_to_system_printer(pdf_bytes: &[u8], printer: Option<&str>) -> Result<(), String> {
     let tmp = std::env::temp_dir().join(format!("cadcraft_print_{}.pdf", uuid::Uuid::new_v4()));
     std::fs::write(&tmp, pdf_bytes).map_err(|e| format!("write temp PDF: {e}"))?;
-    
+
     #[cfg(target_os = "windows")]
     {
-        // Windows: use rundll32 to print via ShellExecute (uses default printer or specified)
+        // Windows: ShellExecute through rundll32, "printto" for a chosen printer.
         let mut cmd = Command::new("rundll32.exe");
         cmd.args(["shell32.dll,ShellExecuteW"]);
         if let Some(p) = printer {
-            // For specific printer, use printto verb
-            cmd.args(["0", "printto", tmp.to_str().unwrap(), p, "", "SW_HIDE"]);
+            cmd.args(["0", "printto"]).arg(&tmp).arg(p).args(["", "SW_HIDE"]);
         } else {
-            // Default printer
-            cmd.args(["0", "print", tmp.to_str().unwrap(), "", "", "SW_HIDE"]);
+            cmd.args(["0", "print"]).arg(&tmp).args(["", "", "SW_HIDE"]);
         }
         cmd.spawn().map_err(|e| format!("spawn print command: {e}"))?;
     }
@@ -71,65 +66,15 @@ fn print_pdf_to_system_printer(pdf_bytes: &[u8], printer: Option<&str>) -> Resul
     Ok(())
 }
 
-/// Print PDF to system printer using native print dialog (stage 2: native dialog).
-/// Currently falls back to stage 1 (command delegation) on all platforms.
-/// Native Windows PrintDlgEx implementation pending proper windows crate feature resolution.
-fn print_pdf_to_system_printer_native(pdf_bytes: &[u8], printer: Option<&str>) -> Result<(), String> {
-    // For now, fall back to stage 1 implementation (command delegation)
-    // Native Windows PrintDlgEx implementation pending proper windows crate feature resolution
-    print_pdf_to_system_printer(pdf_bytes, printer)
-}
-
-/// Get list of system printers.
-fn system_printers() -> Vec<String> {
-    let mut printers = Vec::new();
-    #[cfg(target_os = "windows")]
-    {
-        if let Ok(out) = Command::new("wmic").args(["printer", "get", "name"]).output() {
-            let text = String::from_utf8_lossy(&out.stdout);
-            for line in text.lines().skip(1) { // skip header
-                let name = line.trim();
-                if !name.is_empty() && name != "Name" {
-                    printers.push(name.to_string());
-                }
-            }
-        }
-    }
-    #[cfg(any(target_os = "macos", all(unix, not(target_os = "macos"))))]
-    {
-        if let Ok(out) = Command::new("lpstat").args(["-p"]).output() {
-            let text = String::from_utf8_lossy(&out.stdout);
-            for line in text.lines() {
-                if let Some(name) = line.split_whitespace().nth(1) {
-                    printers.push(name.to_string());
-                }
-            }
-        }
-    }
-    printers
-}
-
 /// Page setup choices for multi-plot dialog.
 struct MultiPlotPageChoices {
-    papers: Vec<PaperChoice>,
+    papers: Vec<String>,
     devices: Vec<cadcraft_doc::PlotterConfig>,
 }
 
-struct PaperChoice {
-    name: String,
-    width_mm: f64,
-    height_mm: f64,
-    margins_mm: [f64; 4],
-}
-
 impl MultiPlotPageChoices {
-    fn new(_ctx: &egui::Context, d: &Drawing) -> Self {
-        let papers: Vec<PaperChoice> = PAPER_SIZES.iter().map(|p| PaperChoice {
-            name: p.name.into(),
-            width_mm: p.width_mm,
-            height_mm: p.height_mm,
-            margins_mm: p.margins_mm(),
-        }).collect();
+    fn new(_ctx: &egui::Context, _d: &Drawing) -> Self {
+        let papers: Vec<String> = PAPER_SIZES.iter().map(|p| p.name.to_string()).collect();
         let devices = devices();
         MultiPlotPageChoices { papers, devices }
     }
@@ -969,9 +914,9 @@ struct MultiPlotSheet {
 /// Where a sheet comes from.
 #[derive(Clone)]
 enum SheetSource {
-    Layout(String),           // Layout name
-    ModelWindow(Bounds2),     // Model space window bounds
-    ModelFrame(Bounds2),      // Model space frame (from PDFBOOK-like detection)
+    Layout(String),       // Layout name
+    ModelWindow(Bounds2), // Model space window bounds
+    ModelFrame(Bounds2),  // Model space frame (from PDFBOOK-like detection)
 }
 
 /// The Multi-Plot dialog's settings.
@@ -999,54 +944,64 @@ const MULTIPLOT_STATE_KEY: &str = "multiplot_state";
 
 /// The Multi-Plot dialog: manage multiple sheets, preview, and batch plot.
 fn multi_plot(app: &mut CadApp, ctx: &egui::Context, open: &mut bool) -> Action {
-    let t = Tokens::get();
+    let _t = Tokens::get();
     let Ok(d) = app.session.doc() else {
         no_drawing(ctx, "Multi-Plot", open);
         return None;
     };
     let generation = MULTIPLOT_GEN.load(Ordering::Relaxed);
-    let mut st = temp::<MultiPlotState>(ctx, MULTIPLOT_STATE_KEY)
-        .filter(|s| s.generation == generation)
-        .unwrap_or_else(|| {
-            let mut sheets = Vec::new();
-            // Default: all layouts + Model (extents)
-            let mut targets: Vec<String> = vec!["Model".to_string()];
-            let mut layouts: Vec<(u32, String)> = d.layouts.iter().map(|l| (l.tab_order, l.name.clone())).collect();
-            layouts.sort_by_key(|l| l.0);
-            targets.extend(layouts.into_iter().map(|l| l.1));
-            for name in targets {
-                let (source, paper, landscape, page) = if name == "Model" {
-                    let ext = d.extents(&Space::Model);
-                    let pg = cadcraft_doc::PageSetup { plot_area: "extents".into(), scale_to_fit: true, ..Default::default() };
-                    (SheetSource::ModelWindow(ext), "A4".to_string(), false, pg)
-                } else if let Some(l) = d.layouts.iter().find(|l| l.name == name) {
-                    let p = &l.page;
-                    (SheetSource::Layout(name.clone()), p.paper.clone(), p.landscape, p.clone())
-                } else {
-                    continue;
-                };
-                sheets.push(MultiPlotSheet {
-                    enabled: true,
-                    source,
-                    paper,
-                    landscape,
-                    device: "CADCraft PDF".to_string(),
-                    margins_mm: page.margins_mm,
-                    scale: page.scale,
-                    center: page.center,
-                    plot_area: page.plot_area.clone(),
-                    plot_style_table: page.plot_style_table.clone(),
-                    show_plot_styles: page.show_plot_styles,
-                    plot_transparency: page.plot_transparency,
-                    preview_texture: None,
-                });
-            }
-            MultiPlotState { generation, sheets, frame_height: 297.0, unit: 1.0, output_path: String::new(), exact_match: true, aspect_tolerance: 0.0, min_size_mm: 50.0, max_size_mm: 2000.0, show_preview_modal: false, preview_modal_sheet: None }
-        });
-    
+    let mut st = temp::<MultiPlotState>(ctx, MULTIPLOT_STATE_KEY).filter(|s| s.generation == generation).unwrap_or_else(|| {
+        let mut sheets = Vec::new();
+        // Default: all layouts + Model (extents)
+        let mut targets: Vec<String> = vec!["Model".to_string()];
+        let mut layouts: Vec<(u32, String)> = d.layouts.iter().map(|l| (l.tab_order, l.name.clone())).collect();
+        layouts.sort_by_key(|l| l.0);
+        targets.extend(layouts.into_iter().map(|l| l.1));
+        for name in targets {
+            let (source, paper, landscape, page) = if name == "Model" {
+                let ext = d.extents(&Space::Model);
+                let pg = cadcraft_doc::PageSetup { plot_area: "extents".into(), scale_to_fit: true, ..Default::default() };
+                (SheetSource::ModelWindow(ext), "A4".to_string(), false, pg)
+            } else if let Some(l) = d.layouts.iter().find(|l| l.name == name) {
+                let p = &l.page;
+                (SheetSource::Layout(name.clone()), p.paper.clone(), p.landscape, p.clone())
+            } else {
+                continue;
+            };
+            sheets.push(MultiPlotSheet {
+                enabled: true,
+                source,
+                paper,
+                landscape,
+                device: "CADCraft PDF".to_string(),
+                margins_mm: page.margins_mm,
+                scale: page.scale,
+                center: page.center,
+                plot_area: page.plot_area.clone(),
+                plot_style_table: page.plot_style_table.clone(),
+                show_plot_styles: page.show_plot_styles,
+                plot_transparency: page.plot_transparency,
+                preview_texture: None,
+            });
+        }
+        MultiPlotState {
+            generation,
+            sheets,
+            frame_height: 297.0,
+            unit: 1.0,
+            output_path: String::new(),
+            exact_match: true,
+            aspect_tolerance: 0.0,
+            min_size_mm: 50.0,
+            max_size_mm: 2000.0,
+            show_preview_modal: false,
+            preview_modal_sheet: None,
+        }
+    });
+
     let choices = MultiPlotPageChoices::new(ctx, d);
-    let (mut action, mut cancel, mut ok, mut find_frames, mut preview_all) = (None, false, false, false, false);
-    
+    let (action, mut cancel, mut ok, mut find_frames, mut preview_all) = (None, false, false, false, false);
+
     egui::Window::new("Multi-Plot (배치 플롯)").open(open).collapsible(false).resizable(true).default_width(700.0).show(ctx, |ui| {
         // Toolbar
         ui.horizontal(|ui| {
@@ -1055,10 +1010,14 @@ fn multi_plot(app: &mut CadApp, ctx: &egui::Context, open: &mut bool) -> Action 
             }
             if ui.button("레이아웃 추가").on_hover_text("기존 레이아웃을 시트로 추가").clicked() {
                 // Add all layouts not already in list
-                let existing: std::collections::HashSet<_> = st.sheets.iter().filter_map(|s| match &s.source {
-                    SheetSource::Layout(name) => Some(name.clone()),
-                    _ => None,
-                }).collect();
+                let existing: std::collections::HashSet<_> = st
+                    .sheets
+                    .iter()
+                    .filter_map(|s| match &s.source {
+                        SheetSource::Layout(name) => Some(name.clone()),
+                        _ => None,
+                    })
+                    .collect();
                 for l in &d.layouts {
                     if !existing.contains(&l.name) {
                         let p = &l.page;
@@ -1089,7 +1048,7 @@ fn multi_plot(app: &mut CadApp, ctx: &egui::Context, open: &mut bool) -> Action 
             }
         });
         ui.separator();
-        
+
         // Frame detection settings
         ui.horizontal(|ui| {
             ui.label("도곽 높이(mm):");
@@ -1108,7 +1067,7 @@ fn multi_plot(app: &mut CadApp, ctx: &egui::Context, open: &mut bool) -> Action 
             }
         });
         ui.separator();
-        
+
         // Sheet list
         egui::ScrollArea::vertical().max_height(300.0).show(ui, |ui| {
             egui::Grid::new("multiplot_sheets").num_columns(6).spacing([10.0, 4.0]).striped(true).min_row_height(50.0).show(ui, |ui| {
@@ -1119,30 +1078,34 @@ fn multi_plot(app: &mut CadApp, ctx: &egui::Context, open: &mut bool) -> Action 
                 ui.strong("장치");
                 ui.strong("미리보기");
                 ui.end_row();
-                
+
                 let mut to_remove = None;
                 for (i, sheet) in st.sheets.iter_mut().enumerate() {
                     ui.checkbox(&mut sheet.enabled, "");
-                    
-                    let (label, can_edit) = match &sheet.source {
+
+                    let (label, _can_edit) = match &sheet.source {
                         SheetSource::Layout(name) => (format!("📄 {}", name), true),
-                        SheetSource::ModelWindow(b) => (format!("🖼 Model: Window ({:.0},{:.0})-({:.0},{:.0})", b.min.x, b.min.y, b.max.x, b.max.y), true),
-                        SheetSource::ModelFrame(b) => (format!("📐 Model: Frame ({:.0},{:.0})-({:.0},{:.0})", b.min.x, b.min.y, b.max.x, b.max.y), true),
+                        SheetSource::ModelWindow(b) => {
+                            (format!("🖼 Model: Window ({:.0},{:.0})-({:.0},{:.0})", b.min.x, b.min.y, b.max.x, b.max.y), true)
+                        }
+                        SheetSource::ModelFrame(b) => {
+                            (format!("📐 Model: Frame ({:.0},{:.0})-({:.0},{:.0})", b.min.x, b.min.y, b.max.x, b.max.y), true)
+                        }
                     };
                     ui.label(label);
-                    
+
                     // Paper combo
                     let mut paper_name = sheet.paper.clone();
                     egui::ComboBox::from_id_salt(("mp_paper", i)).selected_text(&paper_name).width(120.0).show_ui(ui, |ui| {
                         for p in &choices.papers {
-                            ui.selectable_value(&mut paper_name, p.name.clone(), &p.name);
+                            ui.selectable_value(&mut paper_name, p.clone(), p);
                         }
                     });
                     if paper_name != sheet.paper {
                         sheet.paper = paper_name;
                         sheet.preview_texture = None;
                     }
-                    
+
                     // Landscape
                     let mut land = sheet.landscape;
                     let label = if land { "가로" } else { "세로" };
@@ -1150,7 +1113,7 @@ fn multi_plot(app: &mut CadApp, ctx: &egui::Context, open: &mut bool) -> Action 
                         sheet.landscape = land;
                         sheet.preview_texture = None;
                     }
-                    
+
                     // Device combo
                     let mut dev_name = sheet.device.clone();
                     egui::ComboBox::from_id_salt(("mp_device", i)).selected_text(&dev_name).width(130.0).show_ui(ui, |ui| {
@@ -1162,19 +1125,18 @@ fn multi_plot(app: &mut CadApp, ctx: &egui::Context, open: &mut bool) -> Action 
                         sheet.device = dev_name;
                         sheet.preview_texture = None;
                     }
-                    
+
                     // Preview - click to generate and show full preview modal
-                    if ui.button("미리보기").on_hover_text("클릭하여 큰 미리보기 열기 (ESC로 닫기)").clicked() {
-                        if let Some(params) = multiplot_sheet_params(&sheet) {
-                            if let Ok(png) = generate_preview(app, &params, 800.0) {
-                                let tex = ctx.load_texture(format!("mp_preview_{}", i), png, Default::default());
-                                sheet.preview_texture = Some(tex);
-                                st.show_preview_modal = true;
-                                st.preview_modal_sheet = Some(i);
-                            }
-                        }
+                    if ui.button("미리보기").on_hover_text("클릭하여 큰 미리보기 열기 (ESC로 닫기)").clicked()
+                        && let Some(params) = multiplot_sheet_params(sheet)
+                        && let Ok(png) = generate_preview(app, &params, 800.0)
+                    {
+                        let tex = ctx.load_texture(format!("mp_preview_{}", i), png, Default::default());
+                        sheet.preview_texture = Some(tex);
+                        st.show_preview_modal = true;
+                        st.preview_modal_sheet = Some(i);
                     }
-                    
+
                     // Remove button
                     if ui.small_button("✕").on_hover_text("제거").clicked() {
                         to_remove = Some(i);
@@ -1187,7 +1149,7 @@ fn multi_plot(app: &mut CadApp, ctx: &egui::Context, open: &mut bool) -> Action 
             });
         });
         ui.separator();
-        
+
         // Output path
         ui.horizontal(|ui| {
             ui.label("출력 파일:");
@@ -1196,15 +1158,14 @@ fn multi_plot(app: &mut CadApp, ctx: &egui::Context, open: &mut bool) -> Action 
             if path != st.output_path {
                 st.output_path = path;
             }
-            if ui.button("📁").on_hover_text("파일 선택").clicked() {
-                if let Some(pick) = app.services.pick_save.as_ref() {
-                    if let Some(p) = pick("MultiPlot.pdf") {
-                        st.output_path = p;
-                    }
-                }
+            if ui.button("📁").on_hover_text("파일 선택").clicked()
+                && let Some(pick) = app.services.pick_save.as_ref()
+                && let Some(p) = pick("MultiPlot.pdf")
+            {
+                st.output_path = p;
             }
         });
-        
+
         ui.separator();
         ui.horizontal(|ui| {
             ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
@@ -1213,15 +1174,17 @@ fn multi_plot(app: &mut CadApp, ctx: &egui::Context, open: &mut bool) -> Action 
             });
         });
     });
-    
+
     // Handle actions
     if cancel {
         *open = false;
     }
-    
+
     if find_frames {
         // Use PDFBOOK's frame_books logic - limit drawing scope to avoid borrow conflicts
-        let drawing = app.session.doc().unwrap();
+        let Ok(drawing) = app.session.doc() else {
+            return None;
+        };
         let opts = cadcraft_engine::cmd::FrameFindOptionsInternal {
             frame_height: if st.exact_match { Some(st.frame_height) } else { None },
             height_tolerance: if st.exact_match { 0.0005 } else { 10.0 },
@@ -1257,27 +1220,25 @@ fn multi_plot(app: &mut CadApp, ctx: &egui::Context, open: &mut bool) -> Action 
         }
         app.session.echo(format!("{}개 시트 추가됨", books.iter().map(|b| b.len()).sum::<usize>()));
     }
-    
+
     if preview_all {
         for (i, sheet) in st.sheets.iter_mut().enumerate() {
-            if let Some(params) = multiplot_sheet_params(sheet) {
-                if let Ok(png) = generate_preview(app, &params, 200.0) {
-                    let tex = ctx.load_texture(format!("mp_preview_{}", i), png, Default::default());
-                    sheet.preview_texture = Some(tex);
-                }
+            if let Some(params) = multiplot_sheet_params(sheet)
+                && let Ok(png) = generate_preview(app, &params, 200.0)
+            {
+                let tex = ctx.load_texture(format!("mp_preview_{}", i), png, Default::default());
+                sheet.preview_texture = Some(tex);
             }
         }
     }
-    
+
     if ok {
         let enabled_sheets: Vec<_> = st.sheets.iter().filter(|s| s.enabled).collect();
         if enabled_sheets.is_empty() {
             app.session.echo("출력할 시트가 없습니다 (체크된 시트 없음)");
-        } else if let Some(path) = if st.output_path.is_empty() { 
-            app.services.pick_save.as_ref().and_then(|p| p("MultiPlot.pdf")) 
-        } else { 
-            Some(st.output_path.clone()) 
-        } {
+        } else if let Some(path) =
+            if st.output_path.is_empty() { app.services.pick_save.as_ref().and_then(|p| p("MultiPlot.pdf")) } else { Some(st.output_path.clone()) }
+        {
             // Build PLOT command with all sheets - all sheets in one PDF, one page per sheet
             let mut params = json!({
                 "layouts": enabled_sheets.iter().map(|s| match &s.source {
@@ -1287,7 +1248,7 @@ fn multi_plot(app: &mut CadApp, ctx: &egui::Context, open: &mut bool) -> Action 
                 }).collect::<Vec<_>>(),
                 "path": path,
             });
-            
+
             // Use the first sheet's device/paper settings for the overall PDF
             if let Some(first_sheet) = enabled_sheets.first() {
                 let dev = cadcraft_engine::cmd::plotters::find_device(&first_sheet.device);
@@ -1297,7 +1258,7 @@ fn multi_plot(app: &mut CadApp, ctx: &egui::Context, open: &mut bool) -> Action 
                 params["paper"] = json!(first_sheet.paper);
                 params["landscape"] = json!(first_sheet.landscape);
             }
-            
+
             match app.run("plot", params) {
                 Ok(r) => {
                     if let Some(p) = r.get("path").and_then(Value::as_str) {
@@ -1313,40 +1274,39 @@ fn multi_plot(app: &mut CadApp, ctx: &egui::Context, open: &mut bool) -> Action 
             }
         }
     }
-    
+
     // Preview modal dialog
     let mut show_preview_modal = st.show_preview_modal;
-    let mut preview_sheet = st.preview_modal_sheet;
-    if show_preview_modal {
-        if let Some(sheet_idx) = preview_sheet {
-            if let Some(sheet) = st.sheets.get(sheet_idx).cloned() {
-                let mut should_close = false;
-                egui::Window::new("미리보기 확대")
-                    .open(&mut show_preview_modal)
-                    .collapsible(false)
-                    .resizable(true)
-                    .default_size(egui::Vec2::new(800.0, 600.0))
-                    .show(ctx, |ui| {
-                        if let Some(tex) = &sheet.preview_texture {
-                            let available = ui.available_size();
-                            let img_size = egui::Vec2::new(tex.size()[0] as f32, tex.size()[1] as f32);
-                            let scale = (available.x / img_size.x).min(available.y / img_size.y).min(1.0);
-                            let display_size = img_size * scale;
-                            ui.add(egui::Image::new((tex.id(), display_size)));
-                        } else {
-                            ui.label("미리보기가 없습니다. 미리보기 버튼을 눌러 생성하세요.");
-                        }
-                        ui.separator();
-                        ui.horizontal(|ui| {
-                            if ui.button("닫기").clicked() {
-                                should_close = true;
-                            }
-                        });
-                    });
-                if should_close {
-                    show_preview_modal = false;
+    let preview_sheet = st.preview_modal_sheet;
+    if show_preview_modal
+        && let Some(sheet_idx) = preview_sheet
+        && let Some(sheet) = st.sheets.get(sheet_idx).cloned()
+    {
+        let mut should_close = false;
+        egui::Window::new("미리보기 확대")
+            .open(&mut show_preview_modal)
+            .collapsible(false)
+            .resizable(true)
+            .default_size(egui::Vec2::new(800.0, 600.0))
+            .show(ctx, |ui| {
+                if let Some(tex) = &sheet.preview_texture {
+                    let available = ui.available_size();
+                    let img_size = egui::Vec2::new(tex.size()[0] as f32, tex.size()[1] as f32);
+                    let scale = (available.x / img_size.x).min(available.y / img_size.y).min(1.0);
+                    let display_size = img_size * scale;
+                    ui.add(egui::Image::new((tex.id(), display_size)));
+                } else {
+                    ui.label("미리보기가 없습니다. 미리보기 버튼을 눌러 생성하세요.");
                 }
-            }
+                ui.separator();
+                ui.horizontal(|ui| {
+                    if ui.button("닫기").clicked() {
+                        should_close = true;
+                    }
+                });
+            });
+        if should_close {
+            show_preview_modal = false;
         }
     }
     // ESC key closes the modal
@@ -1355,7 +1315,7 @@ fn multi_plot(app: &mut CadApp, ctx: &egui::Context, open: &mut bool) -> Action 
     }
     st.show_preview_modal = show_preview_modal;
     st.preview_modal_sheet = preview_sheet;
-    
+
     set_temp(ctx, MULTIPLOT_STATE_KEY, st);
     action
 }
@@ -1364,15 +1324,11 @@ fn multi_plot(app: &mut CadApp, ctx: &egui::Context, open: &mut bool) -> Action 
 fn multiplot_sheet_params(sheet: &MultiPlotSheet) -> Option<Value> {
     let (space, window, paper_name, landscape) = match &sheet.source {
         SheetSource::Layout(name) => {
-            let paper = cadcraft_render::paper_size(&sheet.paper).unwrap_or_else(|| cadcraft_render::paper_size("A4").unwrap());
+            let paper = cadcraft_render::paper_size(&sheet.paper).or_else(|| cadcraft_render::paper_size("A4"))?;
             (Space::Paper(name.clone()), None, paper.name.to_string(), sheet.landscape)
         }
-        SheetSource::ModelWindow(b) => {
-            (Space::Model, Some(*b), sheet.paper.clone(), sheet.landscape)
-        }
-        SheetSource::ModelFrame(b) => {
-            (Space::Model, Some(*b), sheet.paper.clone(), sheet.landscape)
-        }
+        SheetSource::ModelWindow(b) => (Space::Model, Some(*b), sheet.paper.clone(), sheet.landscape),
+        SheetSource::ModelFrame(b) => (Space::Model, Some(*b), sheet.paper.clone(), sheet.landscape),
     };
     let dev = cadcraft_engine::cmd::plotters::find_device(&sheet.device);
     let output = dev.as_ref().map(|d| d.output.as_str()).unwrap_or("pdf");
@@ -1417,11 +1373,17 @@ fn generate_preview(app: &CadApp, params: &Value, max_px: f64) -> Result<egui::C
         "plotArea": params.get("plotArea"),
     });
     let hook = io().and_then(|h| h.plot).ok_or("plotting not available")?;
-    let bytes = hook(app.session.doc().unwrap(), &match params.get("layout").and_then(Value::as_str) {
-        Some("Model") => Space::Model,
-        Some(n) => Space::Paper(n.to_string()),
-        None => Space::Model,
-    }, &p).map_err(|e| e.to_string())?;
+    let doc = app.session.doc().map_err(|e| e.to_string())?;
+    let bytes = hook(
+        doc,
+        &match params.get("layout").and_then(Value::as_str) {
+            Some("Model") => Space::Model,
+            Some(n) => Space::Paper(n.to_string()),
+            None => Space::Model,
+        },
+        &p,
+    )
+    .map_err(|e| e.to_string())?;
     let img = image::load_from_memory(&bytes).map_err(|e| e.to_string())?.to_rgba8();
     let (w, h) = img.dimensions();
     Ok(egui::ColorImage::from_rgba_unmultiplied([w as usize, h as usize], &img))
@@ -1686,7 +1648,10 @@ fn plot(app: &mut CadApp, ctx: &egui::Context, open: &mut bool) -> Action {
         let hook = io().and_then(|h| h.plot).ok_or_else(|| "plotting not available".to_string());
         let hook_fn = match hook {
             Ok(f) => f,
-            Err(e) => { app.session.echo(format!("플로팅 기능 없음: {}", e)); return action; }
+            Err(e) => {
+                app.session.echo(format!("플로팅 기능 없음: {}", e));
+                return action;
+            }
         };
         match app.session.doc() {
             Ok(doc) => {
@@ -1698,7 +1663,8 @@ fn plot(app: &mut CadApp, ctx: &egui::Context, open: &mut bool) -> Action {
                     Ok(pdf_bytes) => {
                         let pdf_vec: Vec<u8> = pdf_bytes.to_vec();
                         // Get selected printer from device (if it's a system printer) or use default
-                        let printer_name = if st.page.device != "CADCraft PDF" && st.page.device != "CADCraft PNG" && st.page.device != "CADCraft SVG" {
+                        let printer_name = if st.page.device != "CADCraft PDF" && st.page.device != "CADCraft PNG" && st.page.device != "CADCraft SVG"
+                        {
                             Some(st.page.device.as_str())
                         } else {
                             None
@@ -1737,7 +1703,10 @@ fn plot(app: &mut CadApp, ctx: &egui::Context, open: &mut bool) -> Action {
                 app.session.echo(msg);
             }
             // `run` already echoed the error; keep the dialog open to fix the settings.
-            Err(_) => { *open = true; should_close = false; }
+            Err(_) => {
+                *open = true;
+                should_close = false;
+            }
         }
     }
     if should_close {
