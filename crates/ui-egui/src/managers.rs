@@ -1000,7 +1000,7 @@ fn multi_plot(app: &mut CadApp, ctx: &egui::Context, open: &mut bool) -> Action 
     });
 
     let choices = MultiPlotPageChoices::new(ctx, d);
-    let (action, mut cancel, mut ok, mut find_frames, mut preview_all) = (None, false, false, false, false);
+    let (action, mut cancel, mut ok, mut find_frames, mut preview_all, mut save_each, mut print_each) = (None, false, false, false, false, false, false);
 
     egui::Window::new("Multi-Plot (배치 플롯)").open(open).collapsible(false).resizable(true).default_width(700.0).show(ctx, |ui| {
         // Toolbar
@@ -1170,7 +1170,9 @@ fn multi_plot(app: &mut CadApp, ctx: &egui::Context, open: &mut bool) -> Action 
         ui.horizontal(|ui| {
             ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
                 cancel = ui.button("닫기").clicked();
-                ok = ui.button("PDF 저장").clicked();
+                save_each = ui.button("개별 PDF 저장").on_hover_text("각 시트를 별도 PDF 파일로 저장").clicked();
+                print_each = ui.button("개별 프린터 출력").on_hover_text("각 시트를 시스템 프린터로 개별 출력").clicked();
+                ok = ui.button("PDF 저장 (병합)").on_hover_text("모든 시트를 한 PDF로 병합 저장").clicked();
             });
         });
     });
@@ -1272,6 +1274,117 @@ fn multi_plot(app: &mut CadApp, ctx: &egui::Context, open: &mut bool) -> Action 
                     app.session.echo(format!("PDF 저장 실패: {}", e));
                 }
             }
+        }
+    }
+
+    // Individual PDF save - each sheet as separate file
+    if save_each {
+        let enabled_sheets: Vec<_> = st.sheets.iter().filter(|s| s.enabled).cloned().collect();
+        if enabled_sheets.is_empty() {
+            app.session.echo("출력할 시트가 없습니다 (체크된 시트 없음)");
+        } else {
+            let base_path = if st.output_path.is_empty() {
+                app.services.pick_save.as_ref().and_then(|p| p("MultiPlot.pdf"))
+            } else {
+                Some(st.output_path.clone())
+            };
+            if let Some(base) = base_path {
+                let base_stem = std::path::Path::new(&base).file_stem().and_then(|s| s.to_str()).unwrap_or("MultiPlot");
+                let base_dir = std::path::Path::new(&base).parent().map(|p| p.to_path_buf()).unwrap_or_default();
+                let mut saved = 0;
+                let mut failed = 0;
+                for sheet in &enabled_sheets {
+                    let sheet_name = match &sheet.source {
+                        SheetSource::Layout(name) => name.clone(),
+                        SheetSource::ModelWindow(_) => "Model".to_string(),
+                        SheetSource::ModelFrame(_) => "Model".to_string(),
+                    };
+                    let safe_name = sheet_name.replace(['/', '\\', ':', '*', '?', '"', '<', '>', '|'], "_");
+                    let sheet_path = base_dir.join(format!("{}_{}.pdf", base_stem, safe_name));
+                    if let Some(mut params) = multiplot_sheet_params(sheet) {
+                        // Pass the individual path for this sheet
+                        params["path"] = json!(sheet_path.to_string_lossy().to_string());
+                        match app.run("plot", params) {
+                            Ok(_) => saved += 1,
+                            Err(e) => {
+                                app.session.echo(format!("{} 저장 실패: {}", safe_name, e));
+                                failed += 1;
+                            }
+                        }
+                    } else {
+                        failed += 1;
+                    }
+                }
+                app.session.echo(format!("개별 PDF 저장 완료: {}개 성공, {}개 실패", saved, failed));
+                *open = false;
+            }
+        }
+    }
+
+    // Individual printer output - each sheet as separate print job
+    if print_each {
+        let enabled_sheets: Vec<_> = st.sheets.iter().filter(|s| s.enabled).cloned().collect();
+        if enabled_sheets.is_empty() {
+            app.session.echo("출력할 시트가 없습니다 (체크된 시트 없음)");
+        } else {
+            let hook = io().and_then(|h| h.plot).ok_or_else(|| "plotting not available".to_string());
+            let hook_fn = match hook {
+                Ok(f) => f,
+                Err(e) => {
+                    app.session.echo(format!("플로팅 기능 없음: {}", e));
+                    return action;
+                }
+            };
+            // Collect results first to avoid borrow conflicts
+            let mut results: Vec<(String, Result<(), String>)> = Vec::new();
+            if let Ok(doc) = app.session.doc() {
+                for sheet in enabled_sheets {
+                    let space = match &sheet.source {
+                        SheetSource::Layout(name) => Space::Paper(name.clone()),
+                        SheetSource::ModelWindow(_) => Space::Model,
+                        SheetSource::ModelFrame(_) => Space::Model,
+                    };
+                    let sheet_label = match &sheet.source {
+                        SheetSource::Layout(name) => name.clone(),
+                        SheetSource::ModelWindow(_) => "Model".to_string(),
+                        SheetSource::ModelFrame(_) => "Model".to_string(),
+                    };
+                    if let Some(params) = multiplot_sheet_params(&sheet) {
+                        match hook_fn(&doc, &space, &params) {
+                            Ok(pdf_bytes) => {
+                                let printer_name = if sheet.device != "CADCraft PDF" && sheet.device != "CADCraft PNG" && sheet.device != "CADCraft SVG" {
+                                    Some(sheet.device.as_str())
+                                } else {
+                                    None
+                                };
+                                match print_pdf_to_system_printer(&pdf_bytes.to_vec(), printer_name) {
+                                    Ok(_) => results.push((sheet_label, Ok(()))),
+                                    Err(e) => results.push((sheet_label, Err(format!("프린터 출력 실패: {}", e)))),
+                                }
+                            }
+                            Err(e) => results.push((sheet_label, Err(format!("PDF 생성 실패: {}", e)))),
+                        }
+                    } else {
+                        results.push((sheet_label, Err("파라미터 생성 실패".into())));
+                    }
+                }
+            } else {
+                app.session.echo("도면 없음");
+            }
+            // Now report results
+            let mut printed = 0;
+            let mut failed = 0;
+            for (label, res) in results {
+                match res {
+                    Ok(_) => printed += 1,
+                    Err(e) => {
+                        app.session.echo(format!("{} 실패: {}", label, e));
+                        failed += 1;
+                    }
+                }
+            }
+            app.session.echo(format!("개별 프린터 출력 전송됨: {}개 성공, {}개 실패", printed, failed));
+            *open = false;
         }
     }
 
