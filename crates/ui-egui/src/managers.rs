@@ -1243,37 +1243,43 @@ fn multi_plot(app: &mut CadApp, ctx: &egui::Context, open: &mut bool) -> Action 
         } else if let Some(path) =
             if st.output_path.is_empty() { app.services.pick_save.as_ref().and_then(|p| p("MultiPlot.pdf")) } else { Some(st.output_path.clone()) }
         {
-            // Build PLOT command with all sheets - all sheets in one PDF, one page per sheet
-            let mut params = json!({
-                "layouts": enabled_sheets.iter().map(|s| match &s.source {
-                    SheetSource::Layout(name) => name.clone(),
-                    SheetSource::ModelWindow(_) => "Model".to_string(),
-                    SheetSource::ModelFrame(_) => "Model".to_string(),
-                }).collect::<Vec<_>>(),
-                "path": path,
-            });
+            // Check if all sheets are layouts (merged PDF only works for layouts)
+            let all_layouts = enabled_sheets.iter().all(|s| matches!(s.source, SheetSource::Layout(_)));
+            if !all_layouts {
+                app.session.echo("병합 PDF는 레이아웃만 가능합니다. 도곽/모델 윈도우 시트가 포함된 경우 '개별 PDF 저장'을 사용하세요.");
+            } else {
+                // Build PLOT command with all sheets - all sheets in one PDF, one page per sheet
+                let mut params = json!({
+                    "layouts": enabled_sheets.iter().map(|s| match &s.source {
+                        SheetSource::Layout(name) => name.clone(),
+                        SheetSource::ModelWindow(_) => "Model".to_string(),
+                        SheetSource::ModelFrame(_) => "Model".to_string(),
+                    }).collect::<Vec<_>>(),
+                    "path": path,
+                });
 
-            // Use the first sheet's device/paper settings for the overall PDF
-            if let Some(first_sheet) = enabled_sheets.first() {
-                let dev = cadcraft_engine::cmd::plotters::find_device(&first_sheet.device);
-                if let Some(dev) = dev {
-                    params["device"] = json!(dev.name);
-                }
-                params["paper"] = json!(first_sheet.paper);
-                params["landscape"] = json!(first_sheet.landscape);
-            }
-
-            match app.run("plot", params) {
-                Ok(r) => {
-                    if let Some(p) = r.get("path").and_then(Value::as_str) {
-                        app.session.echo(format!("다중 페이지 PDF 저장됨: {}", p));
-                    } else {
-                        app.session.echo(format!("다중 페이지 PDF 저장됨 ({} bytes)", r.get("bytes").and_then(Value::as_u64).unwrap_or(0)));
+                // Use the first sheet's device/paper settings for the overall PDF
+                if let Some(first_sheet) = enabled_sheets.first() {
+                    let dev = cadcraft_engine::cmd::plotters::find_device(&first_sheet.device);
+                    if let Some(dev) = dev {
+                        params["device"] = json!(dev.name);
                     }
-                    *open = false;
+                    params["paper"] = json!(first_sheet.paper);
+                    params["landscape"] = json!(first_sheet.landscape);
                 }
-                Err(e) => {
-                    app.session.echo(format!("PDF 저장 실패: {}", e));
+
+                match app.run("plot", params) {
+                    Ok(r) => {
+                        if let Some(p) = r.get("path").and_then(Value::as_str) {
+                            app.session.echo(format!("다중 페이지 PDF 저장됨: {}", p));
+                        } else {
+                            app.session.echo(format!("다중 페이지 PDF 저장됨 ({} bytes)", r.get("bytes").and_then(Value::as_u64).unwrap_or(0)));
+                        }
+                        *open = false;
+                    }
+                    Err(e) => {
+                        app.session.echo(format!("PDF 저장 실패: {}", e));
+                    }
                 }
             }
         }
@@ -1295,11 +1301,11 @@ fn multi_plot(app: &mut CadApp, ctx: &egui::Context, open: &mut bool) -> Action 
                 let base_dir = std::path::Path::new(&base).parent().map(|p| p.to_path_buf()).unwrap_or_default();
                 let mut saved = 0;
                 let mut failed = 0;
-                for sheet in &enabled_sheets {
+                for (idx, sheet) in enabled_sheets.iter().enumerate() {
                     let sheet_name = match &sheet.source {
                         SheetSource::Layout(name) => name.clone(),
-                        SheetSource::ModelWindow(_) => "Model".to_string(),
-                        SheetSource::ModelFrame(_) => "Model".to_string(),
+                        SheetSource::ModelWindow(_) => format!("Model_{}", idx + 1),
+                        SheetSource::ModelFrame(_) => format!("Model_{}", idx + 1),
                     };
                     let safe_name = sheet_name.replace(['/', '\\', ':', '*', '?', '"', '<', '>', '|'], "_");
                     let sheet_path = base_dir.join(format!("{}_{}.pdf", base_stem, safe_name));
