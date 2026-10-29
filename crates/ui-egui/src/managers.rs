@@ -7,6 +7,8 @@
 
 use std::process::Command;
 use std::sync::atomic::{AtomicU32, Ordering};
+use std::thread;
+use std::time::Duration;
 
 use cadcraft_doc::{Drawing, Space};
 use cadcraft_engine::cmd::file::io;
@@ -1358,7 +1360,11 @@ fn multi_plot(app: &mut CadApp, ctx: &egui::Context, open: &mut bool) -> Action 
                                     None
                                 };
                                 match print_pdf_to_system_printer(&pdf_bytes.to_vec(), printer_name) {
-                                    Ok(_) => results.push((sheet_label, Ok(()))),
+                                    Ok(_) => {
+                                        results.push((sheet_label, Ok(())));
+                                        // Small delay so print spooler registers each as separate job
+                                        thread::sleep(Duration::from_millis(300));
+                                    }
                                     Err(e) => results.push((sheet_label, Err(format!("프린터 출력 실패: {}", e)))),
                                 }
                             }
