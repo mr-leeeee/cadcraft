@@ -8,6 +8,7 @@
 #![deny(clippy::unwrap_used, clippy::expect_used, clippy::panic, clippy::unimplemented, clippy::todo, clippy::unreachable)]
 #![forbid(unsafe_code)]
 
+pub mod ai_chat;
 pub mod animation;
 pub mod autosave;
 pub mod bedit;
@@ -23,6 +24,9 @@ pub mod dialogs;
 pub mod docking;
 pub mod hatchdlg;
 mod mtext_editor;
+pub mod llm;
+pub mod mcp_client;
+pub mod nl;
 pub mod spacemouse;
 // The External References palette.
 pub mod xrefs;
@@ -243,6 +247,8 @@ pub struct CadApp {
     pub hatch_dlg: Option<hatchdlg::HatchDlgState>,
     /// The Edit Block Definition dialog ([`bedit`]).
     pub bedit: bedit::State,
+    /// AI Assistant chat modal for MCP interaction.
+    pub ai_chat: ai_chat::AiChatModal,
 }
 
 impl CadApp {
@@ -281,6 +287,7 @@ impl CadApp {
             gpu_notice: None,
             hatch_dlg: None,
             bedit: bedit::State::default(),
+            ai_chat: ai_chat::AiChatModal::new(),
         }
     }
 
@@ -302,6 +309,13 @@ impl CadApp {
 
     pub fn with_control(mut self, rx: Receiver<ControlRequest>) -> Self {
         self.control_rx = Some(rx);
+        self
+    }
+
+    /// Tell the AI assistant which port this window's control server listens on, so its default
+    /// connection draws into this window instead of a headless process.
+    pub fn with_control_port(mut self, port: u16) -> Self {
+        self.ai_chat.set_control_port(port);
         self
     }
 
@@ -641,6 +655,8 @@ impl CadApp {
         closing::prompt(self, ui.ctx());
         autosave::show(self, ui.ctx());
         autosave::gpu_notice(self, ui.ctx());
+        // AI Assistant chat modal
+        self.ai_chat.show(ui.ctx());
         self.frame_ms = now_ms() - t0;
     }
 

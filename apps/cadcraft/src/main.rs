@@ -348,7 +348,7 @@ fn main() -> eframe::Result {
             }
             if let Some(port) = control_port {
                 let rx = control_server::start(port, cc.egui_ctx.clone());
-                app = app.with_control(rx);
+                app = app.with_control(rx).with_control_port(port);
             }
             if sample {
                 let _ = app.run("ui.sample", serde_json::json!({}));

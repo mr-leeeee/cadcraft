@@ -12,6 +12,14 @@ pub fn tool_definitions(has_ui: bool) -> Value {
             "inputSchema": {"type": "object", "properties": {"text": {"type": "string"}}, "required": ["text"]}}),
         json!({"name": "execute", "description": "Run any command with JSON parameters (no prompts or dialogs). Use list_commands to find ids and parameter docs. Examples: line {points:[[0,0],[10,0]]}, circle {center:[0,0], radius:5}, layer.new {name:\"Walls\", color:\"red\", current:true}, move {handles:[\"10A\"], delta:[5,0]}, zoom {mode:\"extents\"}.",
             "inputSchema": {"type": "object", "properties": {"command": {"type": "string"}, "params": {"type": "object"}}, "required": ["command"]}}),
+        json!({"name": "batch", "description": "Run multiple commands atomically with automatic rollback on failure. Each step: {command, params}. On error, completed steps are undone. Returns {completed, results, rolled_back, undone}.",
+            "inputSchema": {"type": "object", "properties": {"commands": {"type": "array", "items": {"type": "object", "properties": {"command": {"type": "string"}, "params": {"type": "object"}}, "required": ["command"]}}, "rollback": {"type": "boolean", "default": true}}, "required": ["commands"]}}),
+        json!({"name": "inspect_design", "description": "Complete design snapshot: entities with geometry, layers, blocks, layouts, viewports, selection, undo depth, and named views. One call for full context.",
+            "inputSchema": {"type": "object", "properties": {"entities": {"type": "boolean", "default": true}, "layers": {"type": "boolean", "default": true}, "blocks": {"type": "boolean", "default": true}, "views": {"type": "boolean", "default": true}, "selection": {"type": "boolean", "default": true}}}}),
+        json!({"name": "measure", "description": "Measure distances, areas, perimeters, angles, and bounding boxes. Input: items array of {type: \"entity\", handle} or {type: \"point\", x, y}. Two items = distance between them. Returns per-item metrics and min/max/center distances.",
+            "inputSchema": {"type": "object", "properties": {"items": {"type": "array", "items": {"type": "object", "properties": {"type": {"type": "string", "enum": ["entity", "point"]}, "handle": {"type": "string"}, "x": {"type": "number"}, "y": {"type": "number"}}, "required": ["type"]}}}, "required": ["items"]}}),
+        json!({"name": "skill_reference", "description": "Read a bundled agent skill document. Skills: cadcraft-2d-drafting (reference.md), cadcraft-best-practices (layers.md, blocks.md, dims.md).",
+            "inputSchema": {"type": "object", "properties": {"skill": {"type": "string", "enum": ["cadcraft-2d-drafting", "cadcraft-best-practices"]}, "file": {"type": "string", "default": "reference.md"}}, "required": ["skill"]}}),
         json!({"name": "list_commands", "description": "List commands with ids, labels, menu paths, aliases and parameter docs. Optional filter: a substring of the command id, label or an alias.",
             "inputSchema": {"type": "object", "properties": {"filter": {"type": "string"}}}}),
         json!({"name": "inspect_drawing", "description": "Summary of the active drawing: entity counts, extents, layers, styles, blocks, layouts, selection, undo history and (optionally) entities with handles and geometry.",
@@ -116,6 +124,224 @@ pub fn call_tool(b: &mut dyn Backend, name: &str, args: &Value) -> Result<Value,
             "engine.execute",
             json!({"command": a.get("command").cloned().unwrap_or(Value::Null), "params": a.get("params").cloned().unwrap_or(json!({}))}),
         ),
+        "batch" => {
+            let cmds: Vec<Value> = a.get("commands").and_then(Value::as_array).map(|v| v.to_vec()).unwrap_or_default();
+            let rollback = a.get("rollback").and_then(Value::as_bool).unwrap_or(true);
+            // Execute each command, collect results, rollback on failure
+            let mut results = Vec::new();
+            let mut completed = 0;
+            let mut failed = false;
+            for (i, cmd) in cmds.iter().enumerate() {
+                let cmd_name = cmd.get("command").and_then(Value::as_str).unwrap_or("");
+                let params = cmd.get("params").cloned().unwrap_or(json!({}));
+                match b.call("engine.execute", json!({"command": cmd_name, "params": params})) {
+                    Ok(v) => {
+                        results.push(json!({"index": i, "command": cmd_name, "result": v}));
+                        completed += 1;
+                    }
+                    Err(e) => {
+                        failed = true;
+                        results.push(json!({"index": i, "command": cmd_name, "error": e.clone()}));
+                        break;
+                    }
+                }
+            }
+            let mut rolled_back = false;
+            let mut undone = Vec::new();
+            if failed && rollback {
+                // Undo completed steps in reverse order
+                for (i, cmd) in cmds.iter().take(completed).enumerate().rev() {
+                    let _cmd_name = cmd.get("command").and_then(Value::as_str).unwrap_or("");
+                    // Try to undo via engine.execute with "undo" command
+                    if let Ok(_) = b.call("engine.execute", json!({"command": "undo", "params": {}})) {
+                        undone.push(i);
+                    }
+                }
+                rolled_back = !undone.is_empty();
+            }
+            Ok(json!({"completed": completed, "results": results, "rolled_back": rolled_back, "undone": undone}))
+        },
+        "inspect_design" => {
+            let mut result = json!({});
+            let entities = a.get("entities").and_then(Value::as_bool).unwrap_or(true);
+            let layers = a.get("layers").and_then(Value::as_bool).unwrap_or(true);
+            let blocks = a.get("blocks").and_then(Value::as_bool).unwrap_or(true);
+            let views = a.get("views").and_then(Value::as_bool).unwrap_or(true);
+            let selection = a.get("selection").and_then(Value::as_bool).unwrap_or(true);
+            
+            if entities {
+                if let Ok(v) = b.call("drawing.inspect", json!({"entities": true, "limit": 1000})) {
+                    result["entities"] = v;
+                }
+            }
+            if layers {
+                if let Ok(v) = b.call("engine.execute", json!({"command": "layer.list", "params": {}})) {
+                    result["layers"] = v;
+                }
+            }
+            if blocks {
+                if let Ok(v) = b.call("engine.execute", json!({"command": "block.list", "params": {}})) {
+                    result["blocks"] = v;
+                }
+            }
+            if views {
+                if let Ok(v) = b.call("engine.execute", json!({"command": "view.list", "params": {}})) {
+                    result["views"] = v;
+                }
+            }
+            if selection {
+                if let Ok(v) = b.call("engine.execute", json!({"command": "selection.get", "params": {}})) {
+                    result["selection"] = v;
+                }
+            }
+            // Add undo depth
+            if let Ok(v) = b.call("engine.execute", json!({"command": "undo.info", "params": {}})) {
+                result["undo"] = v;
+            }
+            Ok(result)
+        },
+        "measure" => {
+            let items: Vec<Value> = a.get("items").and_then(Value::as_array).map(|v| v.to_vec()).unwrap_or_default();
+            let mut results = Vec::new();
+            let mut positions = Vec::new();
+            
+            // First, collect all handles we need to look up
+            let handles: Vec<String> = items.iter()
+                .filter_map(|item| {
+                    if item.get("type").and_then(Value::as_str) == Some("entity") {
+                        item.get("handle").and_then(Value::as_str).map(String::from)
+                    } else {
+                        None
+                    }
+                })
+                .collect();
+            
+            // Fetch all entities once if we need any entity lookups
+            let all_entities = if !handles.is_empty() {
+                b.call("engine.execute", json!({"command": "entities", "params": {}}))
+                    .ok()
+                    .and_then(|v| v.get("entities").and_then(Value::as_array).cloned())
+                    .unwrap_or_default()
+            } else {
+                vec![]
+            };
+            
+            for item in items {
+                if let Some(t) = item.get("type").and_then(Value::as_str) {
+                    match t {
+                        "entity" => {
+                            if let Some(handle) = item.get("handle").and_then(Value::as_str) {
+                                // Find entity by handle in the fetched list
+                                let mut found = false;
+                                for ent in &all_entities {
+                                    if ent.get("handle").and_then(Value::as_str) == Some(handle) {
+                                        let mut info = ent.clone();
+                                        // Extract geometry info first to avoid borrow issues
+                                        let (kind, radius, area, perimeter, center) = if let Some(ent_obj) = info.get("entity").or_else(|| info.get("geometry")) {
+                                            let kind = ent_obj.get("type").and_then(Value::as_str).or_else(|| ent_obj.get("kind").and_then(Value::as_str)).unwrap_or("");
+                                            let radius = ent_obj.get("radius").and_then(Value::as_f64);
+                                            let area = ent_obj.get("area").and_then(Value::as_f64);
+                                            let perimeter = ent_obj.get("perimeter").and_then(Value::as_f64);
+                                            let center = ent_obj.get("center").and_then(Value::as_array).cloned();
+                                            (kind, radius, area, perimeter, center)
+                                        } else {
+                                            ("", None, None, None, None)
+                                        };
+                                        
+                                        // Add geometry-specific measurements
+                                        match kind {
+                                            "circle" | "Circle" | "arc" | "Arc" => {
+                                                if let Some(r) = radius {
+                                                    info["diameter"] = json!(r * 2.0);
+                                                    info["circumference"] = json!(2.0 * std::f64::consts::PI * r);
+                                                    info["area"] = json!(std::f64::consts::PI * r * r);
+                                                }
+                                            }
+                                            "lwPolyline" | "LwPolyline" | "Polyline" | "polyline" => {
+                                                if let Some(a) = area {
+                                                    info["area"] = json!(a.abs());
+                                                }
+                                                if let Some(p) = perimeter {
+                                                    info["perimeter"] = json!(p);
+                                                }
+                                            }
+                                            _ => {}
+                                        }
+                                        
+                                        // Extract position for distance calculation
+                                        if let Some(center) = center {
+                                            if center.len() >= 2 {
+                                                positions.push((center[0].as_f64().unwrap_or(0.0), center[1].as_f64().unwrap_or(0.0)));
+                                            }
+                                        }
+                                        
+                                        results.push(info);
+                                        found = true;
+                                        break;
+                                    }
+                                }
+                                if !found {
+                                    results.push(json!({"handle": handle, "error": "not found"}));
+                                }
+                            }
+                        }
+                        "point" => {
+                            if let (Some(x), Some(y)) = (item.get("x").and_then(Value::as_f64), item.get("y").and_then(Value::as_f64)) {
+                                positions.push((x, y));
+                                results.push(json!({"type": "point", "x": x, "y": y}));
+                            }
+                        }
+                        _ => {}
+                    }
+                }
+            }
+            
+            // Calculate distances between points
+            let mut distances = json!({});
+            if positions.len() >= 2 {
+                let mut min_dist: f64 = f64::INFINITY;
+                let mut max_dist: f64 = 0.0;
+                for i in 0..positions.len() {
+                    for j in i+1..positions.len() {
+                        let dx = positions[i].0 - positions[j].0;
+                        let dy = positions[i].1 - positions[j].1;
+                        let d = (dx*dx + dy*dy).sqrt();
+                        min_dist = min_dist.min(d);
+                        max_dist = max_dist.max(d);
+                    }
+                }
+                if min_dist != f64::INFINITY {
+                    distances["min"] = json!(min_dist);
+                    distances["max"] = json!(max_dist);
+                    // Center distance (average of centers)
+                    let cx: f64 = positions.iter().map(|p| p.0).sum::<f64>() / positions.len() as f64;
+                    let cy: f64 = positions.iter().map(|p| p.1).sum::<f64>() / positions.len() as f64;
+                    let mut center_dists = Vec::new();
+                    for (x, y) in &positions {
+                        let dx = *x - cx;
+                        let dy = *y - cy;
+                        center_dists.push((dx*dx + dy*dy).sqrt());
+                    }
+                    if !center_dists.is_empty() {
+                        distances["center_avg"] = json!(center_dists.iter().sum::<f64>() / center_dists.len() as f64);
+                    }
+                }
+            }
+            
+            Ok(json!({"items": results, "distances": distances}))
+        },
+        "skill_reference" => {
+            let skill = a.get("skill").and_then(Value::as_str).unwrap_or("");
+            let file = a.get("file").and_then(Value::as_str).unwrap_or("reference.md");
+            let content = match (skill, file) {
+                ("cadcraft-2d-drafting", "reference.md") => include_str!("../skills/cadcraft-2d-drafting/reference.md"),
+                ("cadcraft-best-practices", "layers.md") => include_str!("../skills/cadcraft-best-practices/layers.md"),
+                ("cadcraft-best-practices", "blocks.md") => include_str!("../skills/cadcraft-best-practices/blocks.md"),
+                ("cadcraft-best-practices", "dims.md") => include_str!("../skills/cadcraft-best-practices/dims.md"),
+                _ => "Skill or file not found. Available: cadcraft-2d-drafting (reference.md), cadcraft-best-practices (layers.md, blocks.md, dims.md)",
+            };
+            Ok(json!({"content": content}))
+        },
         "list_commands" => b.call("engine.commands", json!({})).map(|v| {
             let f = a.get("filter").and_then(Value::as_str).map(str::to_ascii_lowercase);
             match (v, f) {

@@ -24,6 +24,8 @@ serde = { workspace = true }
 serde_json = { workspace = true }
 log = { workspace = true }
 image = { workspace = true }
+chrono = { workspace = true }
+reqwest = { workspace = true, features = ["blocking", "json"] }
 
 [dev-dependencies]
 egui_kittest = { workspace = true, features = ["wgpu", "snapshot"] }

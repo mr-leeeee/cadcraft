@@ -63,6 +63,7 @@ pub const UI_COMMANDS: &[(&str, &str, &[&str], Option<&str>)] = &[
     ("ui.dialog.parameters", "Parameters Manager", &["Window", "Parameters Manager"], None),
     ("ui.dialog.dsettings", "Drafting Settings...", &[], None),
     ("ui.dialog.about", "About CADCraft", &["Help", "About CADCraft"], None),
+    ("ui.ai_chat", "AI Assistant (MCP)...", &["Tools", "AI Assistant (MCP)..."], Some("Cmd+K")),
     ("ui.dialog.commands", "Command Reference", &["Help", "CADCraft Help"], Some("F1")),
     ("ui.toggle.history", "Command History", &["Window", "Command History"], Some("F2")),
     ("ui.cmdline.lines", "Command Line History Lines", &[], None),
@@ -363,6 +364,10 @@ fn run_ui_command_inner(app: &mut CadApp, id: &str, params: &Value) -> Option<Re
             app.request_close_all();
             Ok(Value::Null)
         }
+        "ui.ai_chat" => {
+            app.ai_chat.is_open = true;
+            Ok(Value::Null)
+        }
         "layer" | "la" | "layers" if params.is_null() => {
             app.ui.dialog = Some("layers".into());
             Ok(Value::Null)
@@ -616,6 +621,7 @@ pub fn shortcuts(app: &mut CadApp, ctx: &egui::Context) {
         (sc(cmd, Key::Num3), "ui.toggle.toolsets"),
         (sc(cmd, Key::Num9), "ui.toggle.cmdline"),
         (sc(Modifiers::NONE, Key::F1), "ui.dialog.commands"),
+        (sc(Modifiers::COMMAND, Key::K), "ui.ai_chat"),
         (sc(Modifiers::NONE, Key::F2), "ui.toggle.history"),
         (sc(Modifiers::NONE, Key::F3), "osnap"),
         (sc(Modifiers::NONE, Key::F5), "isoplane"),
