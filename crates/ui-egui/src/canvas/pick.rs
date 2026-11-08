@@ -4,13 +4,14 @@ use super::{CadApp, Handle, Input, Vec2};
 /// each notch zooms by its whole step at once, as in standard CAD (#660). egui's smoothed delta
 /// spreads a notch over several frames, so quick notches lag behind the wheel. Units convert to
 /// points as egui does (a line is `line_scroll_speed` points, a page the view's height), and
-/// events egui turns into a pinch zoom (⌘/Ctrl) or a sideways scroll (⇧) are left out, as it does.
+/// events egui turns into a pinch zoom (⌘/Ctrl) are left out, as it does.
+/// Shift+Wheel is allowed for zoom (was previously consumed as horizontal scroll).
 pub(super) fn wheel_zoom_points(events: &[egui::Event], opts: &egui::InputOptions, page: f32) -> f32 {
     let points: f32 = events
         .iter()
         .filter_map(|e| match e {
             egui::Event::MouseWheel { unit, delta, modifiers, .. }
-                if !modifiers.matches_any(opts.zoom_modifier) && !modifiers.matches_any(opts.horizontal_scroll_modifier) =>
+                if !modifiers.matches_any(opts.zoom_modifier) =>
             {
                 let per = match unit {
                     egui::MouseWheelUnit::Point => 1.0,

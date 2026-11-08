@@ -282,7 +282,9 @@ fn navigate_canvas(app: &mut CadApp, ui: &mut egui::Ui, nav: &Navigation<'_>) ->
     });
     handle_scroll_zoom(app, ui, nav, inside);
     handle_button_navigation(app, nav, inside);
-    if nav.response.dragged_by(egui::PointerButton::Primary) && app.session.realtime_zoom_active() {
+    // Shift+left is a zoom modifier: don't start realtime zoom when shift is held
+    let shift_zoom_nav = nav.pointer.mods.shift && !nav.pointer.mods.ctrl && !nav.pointer.mods.alt;
+    if !shift_zoom_nav && nav.response.dragged_by(egui::PointerButton::Primary) && app.session.realtime_zoom_active() {
         let _ = app.session.realtime_zoom(f64::from(nav.response.drag_delta().y));
     }
     if p.pressed_primary
@@ -813,6 +815,12 @@ pub fn show(app: &mut CadApp, ui: &mut egui::Ui) {
     let navigation = Navigation { rect, tiles: &tiles, response: &resp, xf, pointer };
     let Some((inside, on_menu)) = navigate_canvas(app, ui, &navigation) else { return };
     let PointerInput { hover_pos, mods, middle_down, pressed_primary, pressed_secondary, dbl_primary, .. } = pointer;
+    // Shift+left over the drawing area is a zoom modifier: a drag sets a region (Zoom Window)
+    // and a double-click goes back (Zoom Previous). A plain Shift+click does nothing while
+    // a command runs — so the gesture can never cancel it — and otherwise keeps its usual
+    // idle meaning (deselect).
+    let shift_zoom = inside && mods.shift && !mods.ctrl && !mods.alt;
+    let _shift_click = shift_zoom && app.session.running.is_some();
     // Re-read the view after navigation.
     let view = app.session.state().map(|s| s.view()).unwrap_or(view);
     let scale = f64::from(rect.height()) / view.height.max(1e-12);
@@ -869,7 +877,11 @@ pub fn show(app: &mut CadApp, ui: &mut egui::Ui) {
         app.session.pending_window = None;
         app.canvas.drag_window = false;
     }
-    let pressed_primary = pressed_primary && !picked && !hatch_dialog && !idle_dbl;
+    // Shift+double-click → Zoom Previous
+    if shift_zoom && dbl_primary {
+        let _ = app.run("zoom.previous", serde_json::json!({}));
+    }
+    let pressed_primary = pressed_primary && !picked && !hatch_dialog && !idle_dbl && !shift_zoom;
     let key: CycleKey = (
         app.session.running.as_ref().map(|r| r.id.clone()),
         app.session.current_prompt().map(|p| p.message),
@@ -935,6 +947,31 @@ pub fn show(app: &mut CadApp, ui: &mut egui::Ui) {
         && crate::dyngrips::at(app, &xf, Some(origin)).is_none()
     {
         app.canvas.drag_window = app.session.begin_window(xf.to_world(origin));
+    }
+    // Shift+drag → Zoom Window (works with or without a command running)
+    if shift_zoom
+        && resp.drag_started_by(egui::PointerButton::Primary)
+        && !middle_down
+        && app.session.pending_window.is_none()
+        && let Some(origin) = ui.input(|i| i.pointer.press_origin())
+        && rect.contains(origin)
+        && grip_at(app, &xf, Some(origin)).is_none()
+        && crate::dyngrips::at(app, &xf, Some(origin)).is_none()
+    {
+        app.session.pending_window = Some(cadcraft_engine::PendingWindow { corner: xf.to_world(origin), during_command: true });
+    }
+    // Handle zoom window completion (during_command = true means it's a zoom window, not selection)
+    if shift_zoom
+        && app.session.pending_window.is_some_and(|pw| pw.during_command)
+        && resp.drag_stopped_by(egui::PointerButton::Primary)
+        && let Some(end) = ui.input(|i| i.pointer.interact_pos())
+    {
+        if let Some(pw) = app.session.pending_window.take() {
+            let min = pw.corner;
+            let max = xf.to_world(end);
+            // Use transparent zoom window command (mode="window" with p1/p2)
+            let _ = app.run("zoom", serde_json::json!({ "mode": "window", "p1": [min.x, min.y], "p2": [max.x, max.y] }));
+        }
     }
     if app.canvas.drag_window && resp.drag_stopped_by(egui::PointerButton::Primary) {
         app.canvas.drag_window = false;
