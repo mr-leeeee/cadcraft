@@ -55,11 +55,9 @@ fn collect(d: &Drawing, handles: &[Handle]) -> Geo {
             EntityKind::Circle(c) if c.center.is_finite() && c.radius.is_finite() => {
                 g.curves.push((GeomRef::whole(h), c.center.xy(), c.radius));
             }
-            EntityKind::Circle(_) => {}
             EntityKind::Point(p) if p.p.is_finite() => {
                 g.points.push((GeomRef::whole(h), p.p.xy()));
             }
-            EntityKind::Point(_) => {}
             EntityKind::LwPolyline(p) => {
                 let n = p.vertices.len();
                 if !(2..=4096).contains(&n) {
