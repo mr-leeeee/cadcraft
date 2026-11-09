@@ -44,7 +44,6 @@ fn same_content(a: &ListKey, b: &ListKey) -> bool {
     (a.0, a.1, a.4, a.5, a.6, a.7) == (b.0, b.1, b.4, b.5, b.6, b.7)
 }
 
-#[derive(Default)]
 pub struct CanvasState {
     pub list: Option<DisplayList>,
     key: ListKey,
@@ -124,12 +123,72 @@ pub struct CanvasState {
     /// A Shift+left-drag Zoom Window in progress: its two world corners (start, current). The
     /// gesture is transparent and never disturbs a running command.
     zoom_window: Option<(Vec2, Vec2)>,
+    /// When true, Shift+left-drag enables Zoom Window (drag) and Shift+double-click enables
+    /// Zoom Previous. When false, Shift+left-click has its usual meaning (deselect).
+    pub shift_zoom_enabled: bool,
     /// The right-click that opened the shortcut menu held Shift or Ctrl: it is the object snap
     /// menu ([`crate::context_menu`]).
     pub snap_menu: bool,
     /// Tab was pressed over a snap marker: show the next candidate ([`SnapCycle`]).
     pub snap_tab: bool,
     pub snap_cycle: Option<SnapCycle>,
+}
+
+impl Default for CanvasState {
+    fn default() -> Self {
+        Self {
+            list: None,
+            shift_zoom_enabled: true,
+            key: Default::default(),
+            window: None,
+            job: None,
+            list_gen: 0,
+            prim_index: Default::default(),
+            gpu: None,
+            gpu_device: None,
+            mesh_key: None,
+            mesh_slot: Default::default(),
+            mesh_origin: Default::default(),
+            drag_key: None,
+            drag_slot: Default::default(),
+            drag_origin: Default::default(),
+            hl_key: None,
+            hl_slot: Default::default(),
+            hl_origin: Default::default(),
+            hl_infinite: Default::default(),
+            vp_sel: Default::default(),
+            vp_hover: Default::default(),
+            vp: Default::default(),
+            infinite: Default::default(),
+            mesh_ms: 0.0,
+            rect: None,
+            xf: None,
+            hover: None,
+            snap: None,
+            cursor: None,
+            track: None,
+            pan_last: None,
+            scroll_pans: false,
+            hot_grips: Default::default(),
+            grip_dyn: Default::default(),
+            grip_editing: false,
+            grip_menu: None,
+            dyn_grips: Default::default(),
+            dyn_hot: None,
+            dyn_menu: None,
+            dyn_menu_fresh: false,
+            zoom_pending: false,
+            build_ms: 0.0,
+            draw_ms: 0.0,
+            hover_at: None,
+            param: Default::default(),
+            drag_window: false,
+            zoom_window: None,
+            snap_menu: false,
+            snap_tab: false,
+            snap_cycle: None,
+        }
+    }
 }
 
 impl CanvasState {
@@ -1332,7 +1391,7 @@ pub fn show(app: &mut CadApp, ui: &mut egui::Ui) {
     // drag sets a region (Zoom Window) and a double-click goes back (Zoom Previous). A plain
     // Shift+click does nothing while a command runs — so the gesture can never cancel it — and
     // otherwise keeps its usual idle meaning (deselect).
-    let shift_zoom = inside && mods.shift && !mods.ctrl && !mods.alt;
+    let shift_zoom = app.canvas.shift_zoom_enabled && inside && mods.shift && !mods.ctrl && !mods.alt;
     let shift_click = shift_zoom && app.session.running.is_some();
     // ZOOM Realtime: dragging up zooms in, down zooms out.
     if !shift_zoom && resp.dragged_by(egui::PointerButton::Primary) && app.session.realtime_zoom_active() {

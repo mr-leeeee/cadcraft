@@ -291,7 +291,8 @@ impl AiChatModal {
             );
             crate::control::record_widget(ui, &response, "AI chat input", "text", None);
 
-            let enter_pressed = response.lost_focus() && ui.input(|i| i.key_pressed(egui::Key::Enter));
+            // Check for Enter key directly (when input is focused, pressing Enter triggers send)
+            let enter_pressed = ui.input(|i| i.key_pressed(egui::Key::Enter)) && response.has_focus();
 
             if chat_button(ui, "Send") || enter_pressed {
                 if !self.input.trim().is_empty() {
@@ -312,11 +313,9 @@ impl AiChatModal {
 
         // DEBUG
         self.add_message("system", format!("DEBUG: received text='{}', lower='{}'", text, text.to_lowercase()));
-
-        // Short words for the most common actions.
         match text.to_lowercase().as_str() {
             "room" | "방" => {
-                self.add_message("system", "DEBUG: matched room/bang shortcut".to_string());
+                self.add_message("system", format!("DEBUG: matched room/bang shortcut for text='{}'", text));
                 self.send_room_template();
                 return;
             }

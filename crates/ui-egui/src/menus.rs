@@ -39,6 +39,7 @@ pub const UI_COMMANDS: &[(&str, &str, &[&str], Option<&str>)] = &[
     ("ui.toggle.cmdline", "Command Line", &["Window", "Command Line"], Some("Cmd+9")),
     ("ui.toggle.viewcube", "ViewCube", &["View", "ViewCube", "On"], None),
     ("ui.toggle.ucsicon", "UCS Icon", &["View", "UCS Icon", "On"], None),
+    ("ui.toggle.shiftzoom", "Shift+Zoom (Window/Previous)", &["View", "Zoom", "Shift+Zoom"], None),
     ("ui.theme.system", "Use System Setting", &["View", "Interface Theme", "Use System Setting"], None),
     ("ui.theme.light", "Light", &["View", "Interface Theme", "Light"], None),
     ("ui.theme.dark", "Dark", &["View", "Interface Theme", "Dark"], None),
@@ -241,6 +242,10 @@ fn run_ui_command_inner(app: &mut CadApp, id: &str, params: &Value) -> Option<Re
         }
         "ui.toggle.ucsicon" => {
             toggle(&mut app.ui.show_ucs_icon, params);
+            Ok(Value::Null)
+        }
+        "ui.toggle.shiftzoom" => {
+            toggle(&mut app.canvas.shift_zoom_enabled, params);
             Ok(Value::Null)
         }
         "ui.toggle.menubar" => {
@@ -622,6 +627,7 @@ pub fn shortcuts(app: &mut CadApp, ctx: &egui::Context) {
         (sc(cmd, Key::Num9), "ui.toggle.cmdline"),
         (sc(Modifiers::NONE, Key::F1), "ui.dialog.commands"),
         (sc(Modifiers::COMMAND, Key::K), "ui.ai_chat"),
+        (sc(Modifiers::NONE, Key::F4), "ui.toggle.shiftzoom"),
         (sc(Modifiers::NONE, Key::F2), "ui.toggle.history"),
         (sc(Modifiers::NONE, Key::F3), "osnap"),
         (sc(Modifiers::NONE, Key::F5), "isoplane"),
