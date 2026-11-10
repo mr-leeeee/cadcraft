@@ -930,6 +930,19 @@ pub fn show(app: &mut CadApp, ui: &mut egui::Ui) {
             app.session.echo(e.to_string());
         }
     }
+    // Shift+drag → Zoom Window (works with or without a command running)
+    // Check this BEFORE PICKDRAG so Shift+drag always takes priority for zoom window
+    if shift_zoom
+        && resp.drag_started_by(egui::PointerButton::Primary)
+        && !middle_down
+        && app.session.pending_window.is_none()
+        && let Some(origin) = ui.input(|i| i.pointer.press_origin())
+        && rect.contains(origin)
+        && grip_at(app, &xf, Some(origin)).is_none()
+        && crate::dyngrips::at(app, &xf, Some(origin)).is_none()
+    {
+        app.session.pending_window = Some(cadcraft_engine::PendingWindow { corner: xf.to_world(origin), during_command: true });
+    }
     // Press-and-drag selection window (PICKDRAG = 2; click-click still works): a drag
     // that starts while objects are being selected opens a window where the button went down,
     // and letting go closes it. Drags on grips and drags while drawing are left alone.
@@ -947,18 +960,6 @@ pub fn show(app: &mut CadApp, ui: &mut egui::Ui) {
         && crate::dyngrips::at(app, &xf, Some(origin)).is_none()
     {
         app.canvas.drag_window = app.session.begin_window(xf.to_world(origin));
-    }
-    // Shift+drag → Zoom Window (works with or without a command running)
-    if shift_zoom
-        && resp.drag_started_by(egui::PointerButton::Primary)
-        && !middle_down
-        && app.session.pending_window.is_none()
-        && let Some(origin) = ui.input(|i| i.pointer.press_origin())
-        && rect.contains(origin)
-        && grip_at(app, &xf, Some(origin)).is_none()
-        && crate::dyngrips::at(app, &xf, Some(origin)).is_none()
-    {
-        app.session.pending_window = Some(cadcraft_engine::PendingWindow { corner: xf.to_world(origin), during_command: true });
     }
     // Handle zoom window completion (during_command = true means it's a zoom window, not selection)
     if shift_zoom
