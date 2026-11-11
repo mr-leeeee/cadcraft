@@ -1,2 +1,0 @@
-   Compiling cadcraft v0.18.0 (C:\vibecode\cadcraft\apps\cadcraft)
-    Finished `release` profile [optimized] target(s) in 16m 33s

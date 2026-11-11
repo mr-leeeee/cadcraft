@@ -524,11 +524,15 @@ fn write_layout_objects(w: &mut W, plan: &ObjectWritePlan<'_>) {
         w.s(3, &l.name);
         w.s(350, layout_handles.get(i).cloned().unwrap_or_default());
     }
-    // Model space has no page setup of its own: write what PLOT does for it, the drawing extents
-    // fitted to the paper (plot type 1, scaled to fit). The default page's "layout" area is
-    // plot type 5, "Layout information" (DXF Reference, PLOTSETTINGS group 74), which means
-    // nothing for model space: another program's Plot dialog then shows no plot area or scale.
-    let model_page = PageSetup { plot_area: "extents".into(), scale_to_fit: true, ..PageSetup::default() };
+    // Model space page setup: write the saved model_page_setup if available (Apply to Model), else
+    // what PLOT does for it, the drawing extents fitted to the paper (plot type 1, scaled to fit).
+    // The default page's "layout" area is plot type 5, "Layout information" (DXF Reference,
+    // PLOTSETTINGS group 74), which means nothing for model space: another program's Plot dialog
+    // then shows no plot area or scale.
+    let model_page = d
+        .model_page_setup
+        .clone()
+        .unwrap_or_else(|| PageSetup { plot_area: "extents".into(), scale_to_fit: true, ..PageSetup::default() });
     layout_obj(
         w,
         LayoutWriteContext { drawing: d, dictionary: layout_dict },

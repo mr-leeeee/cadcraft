@@ -163,6 +163,12 @@ pub(super) fn setup_layouts(d: &mut Drawing, layout_objs: &mut [LayoutDef], rx: 
     layout_objs.sort_by_key(|l| l.1);
     for (name, order, br, page, limits) in layout_objs.iter() {
         if name.eq_ignore_ascii_case("Model") {
+            // The Model tab keeps its saved page setup (Apply to Model), so re-saving or plotting
+            // from another program shows the same plot area, scale and device.
+            d.model_page_setup = Some(page.clone());
+            if let Some(bname) = rx.brs.get(br) {
+                paper_block_for.insert(bname.to_ascii_uppercase(), name.clone());
+            }
             continue;
         }
         d.layouts.push(Layout { page: page.clone(), limits: *limits, ..Layout::new(name, *order) });
