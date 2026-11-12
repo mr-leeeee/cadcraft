@@ -754,7 +754,7 @@ fn device_choices(ctx: &egui::Context) -> std::sync::Arc<Vec<cadcraft_doc::Plott
 
 /// Enumerate system printers and return them as PlotterConfig objects.
 /// These appear in the printer/plotter dropdown for direct system printing.
-fn enumerate_system_printers() -> Vec<cadcraft_doc::PlotterConfig> {
+pub fn enumerate_system_printers() -> Vec<cadcraft_doc::PlotterConfig> {
     let mut printers = Vec::new();
 
     #[cfg(target_os = "windows")]
@@ -770,18 +770,26 @@ fn enumerate_system_printers() -> Vec<cadcraft_doc::PlotterConfig> {
 
             // First call to get required buffer size
             EnumPrintersW(flags, core::ptr::null_mut(), 2, core::ptr::null_mut(), 0, &mut needed, &mut returned);
+            eprintln!("[DEBUG] EnumPrintersW first call: needed={}, returned={}", needed, returned);
 
             if needed > 0 {
                 let mut buffer: Vec<u8> = vec![0; needed as usize];
-                if EnumPrintersW(flags, core::ptr::null_mut(), 2, buffer.as_mut_ptr() as *mut _, needed, &mut needed, &mut returned) != 0 {
+                let result = EnumPrintersW(flags, core::ptr::null_mut(), 2, buffer.as_mut_ptr() as *mut _, needed, &mut needed, &mut returned);
+                eprintln!("[DEBUG] EnumPrintersW second call: result={}, needed={}, returned={}", result, needed, returned);
+
+                if result != 0 {
                     let info_ptr = buffer.as_ptr() as *const PRINTER_INFO_2W;
                     for i in 0..returned as usize {
                         let info = &*info_ptr.add(i);
                         if !info.pPrinterName.is_null() {
-                            // Use OsString::from_wide (from OsStringExt trait)
-                            let name = OsString::from_wide(std::slice::from_raw_parts(info.pPrinterName, 256))
+                            // Read wide string until null terminator
+                            let mut len = 0;
+                            while *info.pPrinterName.add(len) != 0 {
+                                len += 1;
+                                if len > 1024 { break; } // Safety limit
+                            }
+                            let name = OsString::from_wide(std::slice::from_raw_parts(info.pPrinterName, len))
                                 .to_string_lossy()
-                                .trim_end_matches('\0')
                                 .to_string();
                             if !name.is_empty() {
                                 printers.push(system_printer_config(name));
