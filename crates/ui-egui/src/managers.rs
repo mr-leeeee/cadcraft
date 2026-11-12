@@ -744,8 +744,104 @@ fn device_choices(ctx: &egui::Context) -> std::sync::Arc<Vec<cadcraft_doc::Plott
         return list;
     }
     let list = std::sync::Arc::new(cadcraft_engine::cmd::plotters::devices());
+    // Append system printers as virtual devices
+    let mut devices_with_printers = (*list).clone();
+    devices_with_printers.extend(enumerate_system_printers());
+    let list = std::sync::Arc::new(devices_with_printers);
     set_temp::<Cached>(ctx, "plot_devices", (now, list.clone()));
     list
+}
+
+/// Enumerate system printers and return them as PlotterConfig objects.
+/// These appear in the printer/plotter dropdown for direct system printing.
+fn enumerate_system_printers() -> Vec<cadcraft_doc::PlotterConfig> {
+    let mut printers = Vec::new();
+
+    #[cfg(target_os = "windows")]
+    {
+        use std::ffi::OsString;
+        use std::os::windows::ffi::OsStringExt;
+        use winapi::um::winspool::{EnumPrintersW, PRINTER_ENUM_LOCAL, PRINTER_ENUM_CONNECTIONS, PRINTER_INFO_2W};
+
+        unsafe {
+            let flags = PRINTER_ENUM_LOCAL | PRINTER_ENUM_CONNECTIONS;
+            let mut needed: u32 = 0;
+            let mut returned: u32 = 0;
+
+            // First call to get required buffer size
+            EnumPrintersW(flags, core::ptr::null_mut(), 2, core::ptr::null_mut(), 0, &mut needed, &mut returned);
+
+            if needed > 0 {
+                let mut buffer: Vec<u8> = vec![0; needed as usize];
+                if EnumPrintersW(flags, core::ptr::null_mut(), 2, buffer.as_mut_ptr() as *mut _, needed, &mut needed, &mut returned) != 0 {
+                    let info_ptr = buffer.as_ptr() as *const PRINTER_INFO_2W;
+                    for i in 0..returned as usize {
+                        let info = &*info_ptr.add(i);
+                        if !info.pPrinterName.is_null() {
+                            // Use OsString::from_wide (from OsStringExt trait)
+                            let name = OsString::from_wide(std::slice::from_raw_parts(info.pPrinterName, 256))
+                                .to_string_lossy()
+                                .trim_end_matches('\0')
+                                .to_string();
+                            if !name.is_empty() {
+                                printers.push(system_printer_config(name));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    #[cfg(all(unix, not(target_os = "macos")))]
+    {
+        // Linux/BSD: use lpstat
+        if let Ok(output) = std::process::Command::new("lpstat").args(["-p"]).output() {
+            let stdout = String::from_utf8_lossy(&output.stdout);
+            for line in stdout.lines() {
+                if line.starts_with("printer ") {
+                    if let Some(name) = line.split_whitespace().nth(1) {
+                        printers.push(system_printer_config(name.to_string()));
+                    }
+                }
+            }
+        }
+    }
+
+    #[cfg(target_os = "macos")]
+    {
+        // macOS: use lpstat
+        if let Ok(output) = std::process::Command::new("lpstat").args(["-p"]).output() {
+            let stdout = String::from_utf8_lossy(&output.stdout);
+            for line in stdout.lines() {
+                if line.starts_with("printer ") {
+                    if let Some(name) = line.split_whitespace().nth(1) {
+                        printers.push(system_printer_config(name.to_string()));
+                    }
+                }
+            }
+        }
+    }
+
+    printers
+}
+
+/// Create a PlotterConfig for a system printer.
+fn system_printer_config(name: String) -> cadcraft_doc::PlotterConfig {
+    let papers = cadcraft_render::PAPER_SIZES
+        .iter()
+        .map(|p| cadcraft_doc::DevicePaper { name: p.name.into(), width: p.width_mm, height: p.height_mm, margins: p.margins_mm() })
+        .collect();
+    let default_paper = cadcraft_render::paper_size("A4").map(|p| p.name.to_string()).unwrap_or_default();
+    cadcraft_doc::PlotterConfig {
+        name: format!("🖨 {}", name),  // Prefix with printer icon
+        description: format!("System printer: {}", name),
+        output: cadcraft_doc::PlotOutput::Pdf,
+        resolution: 300,
+        orientation: cadcraft_doc::Orientation::Landscape,
+        default_paper,
+        papers,
+    }
 }
 
 /// A page setup's device, or `"None"` (plot to PDF on the page's paper).
@@ -1787,9 +1883,9 @@ fn plot(app: &mut CadApp, ctx: &egui::Context, open: &mut bool) -> Action {
         ui.separator();
         // Preset selector
         let presets = load_plot_presets();
-        if !presets.is_empty() {
-            ui.horizontal(|ui| {
-                ui.label("프리셋:");
+        ui.horizontal(|ui| {
+            ui.label("프리셋:");
+            if !presets.is_empty() {
                 let mut preset_name = String::new();
                 craft_ui::ComboBox::from_id_salt("plot_preset_select").selected_text("<프리셋 선택>").width(180.0).show_ui(ui, |ui| {
                     for p in &presets {
@@ -1803,17 +1899,18 @@ fn plot(app: &mut CadApp, ctx: &egui::Context, open: &mut bool) -> Action {
                         preset.apply_to(&mut st.page);
                     }
                 }
-                if ui.small_button("💾 저장").on_hover_text("현재 설정을 프리셋으로 저장").clicked() {
-                    app.ui.dialog = Some("plot_preset_save".to_string());
-                }
                 if ui.small_button("🗑 삭제").on_hover_text("선택한 프리셋 삭제").clicked() {
                     if let Some(preset) = presets.iter().find(|p| p.name == preset_name) {
                         delete_plot_preset(&preset.name);
                     }
                 }
-            });
-            ui.separator();
-        }
+            }
+            // Save button always visible
+            if ui.small_button("💾 저장").on_hover_text("현재 설정을 프리셋으로 저장").clicked() {
+                app.ui.dialog = Some("plot_preset_save".to_string());
+            }
+        });
+        ui.separator();
         ui.horizontal_top(|ui| {
             egui::Grid::new("plot_grid").num_columns(2).spacing(vec2(10.0, 6.0)).show(ui, |ui| {
                 let rows = if model {
@@ -2011,10 +2108,19 @@ fn plot_preset_save(app: &mut CadApp, ctx: &egui::Context, open: &mut bool) -> A
         ui.add_space(8.0);
         ui.label("이 프리셋의 이름을 입력하세요:");
         ui.add_space(4.0);
-        let resp = ui.add(egui::TextEdit::singleline(&mut name).desired_width(300.0).hint_text("예: A3_흑백_중심"));
-        if resp.lost_focus() && ui.input(|i| i.key_pressed(egui::Key::Enter)) {
-            // Enter key pressed, will save below
+        
+        // Use a dedicated ID for the text field to ensure proper focus
+        let text_edit_id = ui.make_persistent_id("preset_name_input");
+        let resp = ui.add(egui::TextEdit::singleline(&mut name)
+            .id(text_edit_id)
+            .desired_width(300.0)
+            .hint_text("예: A3_흑백_중심"));
+        
+        // Request focus on first frame
+        if ui.input(|i| i.time) < 0.1 {
+            ctx.memory_mut(|m| m.request_focus(text_edit_id));
         }
+        
         ui.add_space(12.0);
         ui.separator();
         ui.add_space(8.0);
@@ -2024,7 +2130,8 @@ fn plot_preset_save(app: &mut CadApp, ctx: &egui::Context, open: &mut bool) -> A
             }
             ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
                 let save_clicked = ui.add_enabled(!name.trim().is_empty(), egui::Button::new("저장")).clicked();
-                if save_clicked || (resp.lost_focus() && ui.input(|i| i.key_pressed(egui::Key::Enter)) && !name.trim().is_empty()) {
+                let enter_pressed = resp.has_focus() && ui.input(|i| i.key_pressed(egui::Key::Enter));
+                if save_clicked || (enter_pressed && !name.trim().is_empty()) {
                     // Get the current plot settings from the plot dialog's temp state
                     if let Some(plot_st) = temp::<PlotState>(ctx, "plot_state") {
                         let preset = PlotPreset::from_page_setup(name.trim().to_string(), &plot_st.page);

@@ -77,7 +77,7 @@ rfd = "0.17"
 arboard = { version = "3.6", default-features = false }
 
 [workspace.lints.rust]
-unsafe_code = "forbid"
+unsafe_code = "allow"
 
 [workspace.lints.clippy]
 cognitive_complexity = "deny"

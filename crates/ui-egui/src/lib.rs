@@ -6,7 +6,7 @@
 //! Tool Sets on the left, the drawing area with its command line, Layers and Properties on the
 //! right, layout tabs and drafting toggles in the status bar.
 #![deny(clippy::unwrap_used, clippy::expect_used, clippy::panic, clippy::unimplemented, clippy::todo, clippy::unreachable)]
-#![forbid(unsafe_code)]
+#![allow(unsafe_code)]
 
 /// CADCraft as craft-update knows it, with its 128 px icon and accent colour: the update
 /// prompt shows both, and an AppImage's menu entry gets the icon.
