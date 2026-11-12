@@ -32,6 +32,7 @@ pub fn show(app: &mut CadApp, ctx: &egui::Context) {
         "bedit" => crate::bedit::dialog(app, ctx, &mut open),
         "authoring" => crate::bedit::authoring_dialog(app, ctx, &mut open),
         "stylesmanager" => crate::plotstyles::dialog(app, ctx, &mut open),
+        "pdfbook" => pdfbook(app, ctx, &mut open),
         o if o == "options" || o.starts_with("options:") => crate::options::dialog(app, ctx, o, &mut open),
         o if o.starts_with("textedit:") => crate::textdlg::dialog(app, ctx, o, &mut open),
         other => crate::managers::dialog(app, ctx, other, &mut open),
@@ -443,6 +444,77 @@ fn language(app: &mut CadApp, ctx: &egui::Context, open: &mut bool) {
             }
         });
     });
+}
+
+/// PDFBook (Multi-Plot) dialog: create a PDF book from model space frames (closed polylines).
+fn pdfbook(app: &mut CadApp, ctx: &egui::Context, open: &mut bool) {
+    let mut path: String = String::new();
+    let mut frame_height: f64 = 297.0; // A4 height in mm
+    let mut unit: f64 = 1.0;
+
+    // Use a local variable for window open state to avoid borrowing conflicts
+    let mut window_open = *open;
+    let mut should_close = false;
+    egui::Window::new(crate::tl!("Multi-Plot (PDFBook)..."))
+        .id(egui::Id::unique("pdfbook"))
+        .open(&mut window_open)
+        .default_size(vec2(480.0, 420.0))
+        .resizable(true)
+        .show(ctx, |ui| {
+            ui.heading(crate::tl!("Multi-Plot (PDFBook)"));
+            ui.add_space(4.0);
+            ui.label(crate::tl!("Create a PDF book from closed polylines in model space."));
+            ui.add_space(4.0);
+
+            ui.heading(crate::tl!("Settings"));
+            ui.add_space(4.0);
+            ui.horizontal(|ui| {
+                ui.label(crate::tl!("Frame Height (mm):"));
+                ui.add(egui::DragValue::new(&mut frame_height).speed(1.0).range(1.0..=1000.0).suffix(" mm"));
+            });
+            ui.horizontal(|ui| {
+                ui.label(crate::tl!("Unit:"));
+                ui.add(egui::DragValue::new(&mut unit).speed(0.1).range(0.01..=100.0).suffix("x"));
+            });
+
+            ui.add_space(8.0);
+            ui.separator();
+            ui.add_space(4.0);
+
+            ui.heading(crate::tl!("Output"));
+            ui.horizontal(|ui| {
+                ui.label(crate::tl!("Output Folder:"));
+                let mut path_buf = path.clone();
+                if ui.text_edit_singleline(&mut path_buf).changed() {
+                    path = path_buf;
+                }
+            });
+
+            ui.add_space(8.0);
+
+            ui.horizontal(|ui| {
+                if ui.button(crate::tl!("Cancel")).clicked() {
+                    should_close = true;
+                }
+                if ui.button(crate::tl!("Create PDFBook")).clicked() {
+                    if path.trim().is_empty() {
+                        app.session.echo(crate::tl!("Output folder not specified.").to_string());
+                    } else {
+                        let params = serde_json::json!({
+                            "frameHeight": frame_height,
+                            "unit": unit,
+                            "path": path,
+                        });
+                        let _ = app.run("pdfbook", params);
+                        should_close = true;
+                    }
+                }
+            });
+        });
+    if should_close {
+        window_open = false;
+    }
+    *open = window_open;
 }
 
 #[cfg(test)]

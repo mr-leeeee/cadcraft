@@ -947,7 +947,10 @@ fn plot(app: &mut CadApp, ctx: &egui::Context, open: &mut bool) -> Action {
     set_temp(ctx, PLOT_NOW, false);
     let (mut cancel, mut action, mut pick, mut preview) = (false, None, false, false);
     let center = ctx.content_rect().center();
-    egui::Window::new("Plot").open(open).collapsible(false).resizable(false).pivot(egui::Align2::CENTER_CENTER).default_pos(center).show(ctx, |ui| {
+    // Use a local variable for window open state to avoid borrowing conflicts
+    let mut window_open = *open;
+    let mut should_close = false;
+    egui::Window::new("Plot").open(&mut window_open).collapsible(false).resizable(false).pivot(egui::Align2::CENTER_CENTER).default_pos(center).show(ctx, |ui| {
         egui::Grid::new("plot_target").num_columns(2).spacing(vec2(10.0, 6.0)).show(ui, |ui| {
             ui.label("Layout");
             craft_ui::ComboBox::from_id_salt("plot_layout").selected_text(st.target.as_str()).width(190.0).show_ui(ui, |ui| {
@@ -1012,23 +1015,31 @@ fn plot(app: &mut CadApp, ctx: &egui::Context, open: &mut bool) -> Action {
                 ));
             }
             preview = ui.button("Preview").on_hover_text("The sheet as these settings plot it").clicked();
+            if ui.button("Multi-Plot...").on_hover_text("Create a PDF book from closed polylines in model space (PDFBook)").clicked() {
+                app.ui.dialog = Some("pdfbook".to_string());
+                should_close = true;
+            }
             ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
                 cancel = ui.button("Cancel").clicked();
                 ok |= ui.button("OK").clicked();
             });
         });
     });
+    if should_close {
+        window_open = false;
+    }
     // The output file type follows the device.
     let ext = choices.devices.iter().find(|dv| dv.name.eq_ignore_ascii_case(&st.page.device)).map_or("pdf", |dv| dv.output.as_str());
     set_temp(ctx, "plot_state", st.clone());
     if cancel {
-        *open = false;
+        window_open = false;
     }
     if pick {
         // The dialog comes back with these settings and the picked window (`plot_window_resume`).
         set_temp(ctx, PICKING_WINDOW, true);
-        *open = false;
+        window_open = false;
         app.start("plotwindow");
+        *open = window_open;
         return action;
     }
     if preview {
@@ -1061,6 +1072,7 @@ fn plot(app: &mut CadApp, ctx: &egui::Context, open: &mut bool) -> Action {
             run_plot(app, params, &target);
         }
     }
+    *open = window_open;
     action
 }
 

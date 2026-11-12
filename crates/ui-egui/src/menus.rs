@@ -138,6 +138,7 @@ pub const UI_COMMANDS: &[(&str, &str, &[&str], Option<&str>)] = &[
     ("ui.language", "Language", &[], None),
     ("ui.noop", "", &[], None),
     ("ui.quit", "Quit CADCraft", &[], Some("Cmd+Q")),
+    ("ui.toggle.shiftzoom", "Shift+Zoom", &["View", "Zoom", "Shift+Zoom"], Some("F4")),
 ];
 
 pub fn is_ui_command(id: &str) -> bool {
@@ -310,6 +311,10 @@ fn run_ui_toggle_command(app: &mut CadApp, id: &str, params: &Value) -> Option<R
         }
         "ui.toggle.menubar" => {
             toggle(&mut app.ui.in_window_menu, params);
+            Ok(Value::Null)
+        }
+        "ui.toggle.shiftzoom" => {
+            toggle(&mut app.canvas.shift_zoom_enabled, params);
             Ok(Value::Null)
         }
         "ui.toggle.history" | "textscr" => {
@@ -907,6 +912,7 @@ pub(crate) fn builtin_shortcuts() -> Vec<(egui::KeyboardShortcut, &'static str)>
         (sc(Modifiers::NONE, Key::F1), "ui.dialog.commands"),
         (sc(Modifiers::NONE, Key::F2), "ui.toggle.history"),
         (sc(Modifiers::NONE, Key::F3), "osnap"),
+        (sc(Modifiers::NONE, Key::F4), "ui.toggle.shiftzoom"),
         (sc(Modifiers::NONE, Key::F5), "isoplane"),
         (sc(cmd, Key::E), "isoplane"),
         (sc(Modifiers::NONE, Key::F7), "grid"),

@@ -98,7 +98,6 @@ fn same_content(a: &ListKey, b: &ListKey) -> bool {
     (a.0, a.1, a.4, a.5, a.6, a.7) == (b.0, b.1, b.4, b.5, b.6, b.7)
 }
 
-#[derive(Default)]
 pub struct CanvasState {
     pub list: Option<DisplayList>,
     /// The font set the list was drawn with ([`cadcraft_fonts::ttf::generation`] and
@@ -180,6 +179,12 @@ pub struct CanvasState {
     pub param: crate::parametric::Cache,
     /// A selection window opened by a press-and-drag, to close where the button is let go.
     drag_window: bool,
+    /// A Shift+left-drag Zoom Window in progress: its two world corners (start, current). The
+    /// gesture is transparent and never disturbs a running command.
+    zoom_window: Option<(Vec2, Vec2)>,
+    /// When true, Shift+left-drag enables Zoom Window (drag) and Shift+double-click enables
+    /// Zoom Previous. When false, Shift+left-click has its usual meaning (deselect).
+    pub shift_zoom_enabled: bool,
     /// The right-click that opened the shortcut menu held Shift or Ctrl: it is the object snap
     /// menu ([`crate::context_menu`]).
     pub snap_menu: bool,
@@ -196,6 +201,70 @@ pub struct CanvasState {
     hover_cycle: Option<(Pos2, Vec<Handle>, usize)>,
     /// What the cycling list and the Shift+Space highlight were made for (see [`CycleKey`]).
     cycle_key: Option<CycleKey>,
+}
+
+impl Default for CanvasState {
+    fn default() -> Self {
+        Self {
+            list: None,
+            shift_zoom_enabled: true,
+            font_generation: 0,
+            key: Default::default(),
+            window: None,
+            job: None,
+            list_gen: 0,
+            prim_index: Default::default(),
+            gpu: None,
+            gpu_device: None,
+            mesh_key: None,
+            mesh_slot: Default::default(),
+            mesh_origin: Default::default(),
+            drag_key: None,
+            drag_slot: Default::default(),
+            drag_origin: Default::default(),
+            hl_key: None,
+            hl_slot: Default::default(),
+            hl_origin: Default::default(),
+            hl_infinite: Default::default(),
+            vp_sel: Default::default(),
+            vp_hover: Default::default(),
+            vp: Default::default(),
+            only: Default::default(),
+            infinite: Default::default(),
+            mesh_ms: 0.0,
+            rect: None,
+            xf: None,
+            hover: None,
+            snap: None,
+            cursor: None,
+            track: None,
+            pan_last: None,
+            scroll_pans: false,
+            hot_grips: Default::default(),
+            grip_dyn: Default::default(),
+            grip_editing: false,
+            grip_menu: None,
+            dyn_grips: Default::default(),
+            dyn_hot: None,
+            dyn_menu: None,
+            dyn_menu_fresh: false,
+            zoom_pending: false,
+            build_ms: 0.0,
+            draw_ms: 0.0,
+            hover_at: None,
+            param: Default::default(),
+            drag_window: false,
+            zoom_window: None,
+            snap_menu: false,
+            snap_tab: false,
+            snap_cycle: None,
+            cycle: Default::default(),
+            cycle_badge: false,
+            cycle_badge_at: None,
+            hover_cycle: None,
+            cycle_key: None,
+        }
+    }
 }
 
 /// The command, prompt, drawing (and its revision) and view that the objects under the cursor
@@ -813,6 +882,30 @@ pub fn show(app: &mut CadApp, ui: &mut egui::Ui) {
     let navigation = Navigation { rect, tiles: &tiles, response: &resp, xf, pointer };
     let Some((inside, on_menu)) = navigate_canvas(app, ui, &navigation) else { return };
     let PointerInput { hover_pos, mods, middle_down, pressed_primary, pressed_secondary, dbl_primary, .. } = pointer;
+    
+    // Shift+Zoom handling: Shift+left-drag = Zoom Window, Shift+double-click = Zoom Previous
+    let shift_zoom = app.canvas.shift_zoom_enabled && inside && mods.shift && !mods.ctrl && !mods.alt;
+    if shift_zoom && dbl_primary {
+        let _ = app.run("zoom.previous", serde_json::json!({}));
+    }
+    if shift_zoom
+        && resp.drag_started_by(egui::PointerButton::Primary)
+        && let Some(origin) = ui.input(|i| i.pointer.press_origin())
+        && rect.contains(origin)
+    {
+        app.canvas.zoom_window = Some((xf.to_world(origin), xf.to_world(origin)));
+    }
+    if let (Some((start, _)), Some(hp)) = (app.canvas.zoom_window, hover_pos) {
+        app.canvas.zoom_window = Some((start, xf.to_world(hp)));
+    }
+    if resp.drag_stopped_by(egui::PointerButton::Primary)
+        && let Some((start, end)) = app.canvas.zoom_window.take()
+        && (start.x - end.x).abs() > 1e-9
+        && (start.y - end.y).abs() > 1e-9
+    {
+        let _ = app.run("zoom.window", serde_json::json!({"p1": [start.x, start.y], "p2": [end.x, end.y]}));
+    }
+    
     // Re-read the view after navigation.
     let view = app.session.state().map(|s| s.view()).unwrap_or(view);
     let scale = f64::from(rect.height()) / view.height.max(1e-12);
@@ -1169,6 +1262,14 @@ fn paint_canvas(frame: CanvasPaint<'_>) {
             pts.push(corners[0]);
             painter.add(Shape::line(pts, st));
         }
+    }
+    // The Shift+left-drag Zoom Window rubber band.
+    if let Some((a, b)) = app.canvas.zoom_window {
+        let r = Rect::from_two_pos(xf.to_screen(a), xf.to_screen(b));
+        if let Some(fill) = selection_area_fill(&app.session.settings, false) {
+            painter.rect_filled(r, 0.0, fill);
+        }
+        painter.rect_stroke(r, 0.0, Stroke::new(1.0, t.window_stroke), egui::StrokeKind::Middle);
     }
     paint_pointer_overlay(
         &mut CanvasPaint {
