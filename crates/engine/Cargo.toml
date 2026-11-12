@@ -24,6 +24,9 @@ log = { workspace = true }
 # R-tree spatial index for picking, window selection and object snaps (MIT OR Apache-2.0).
 rstar = { version = "0.13", default-features = false }
 
+[target.'cfg(target_os = "windows")'.dependencies]
+winapi = { version = "0.3", features = ["winspool", "winnt"] }
+
 [target.'cfg(unix)'.dependencies]
 libc = "0.2"
 

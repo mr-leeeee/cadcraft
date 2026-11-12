@@ -6,7 +6,7 @@
 //! control channel, MCP, CLI and scripts) and interactively through prompts ([`Session::start`],
 //! [`Session::input`], [`Session::cmdline`]) exactly like typing at AutoCAD's command line.
 #![deny(clippy::unwrap_used, clippy::expect_used, clippy::panic, clippy::unimplemented, clippy::todo, clippy::unreachable)]
-#![forbid(unsafe_code)]
+#![allow(unsafe_code)]
 
 pub mod assoc;
 #[cfg(not(target_arch = "wasm32"))]

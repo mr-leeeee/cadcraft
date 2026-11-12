@@ -18,6 +18,13 @@ use super::{CommandSpec, Result, always, bad, has_doc, point_req, str_param};
 
 use crate::{Accept, EngineError, Input, Interactive, Prompt, Session, Step};
 
+#[cfg(target_os = "windows")]
+use std::ffi::OsString;
+#[cfg(target_os = "windows")]
+use std::os::windows::ffi::OsStringExt;
+#[cfg(target_os = "windows")]
+use winapi::um::winspool::{EnumPrintersW, PRINTER_ENUM_LOCAL, PRINTER_ENUM_CONNECTIONS, PRINTER_INFO_2W};
+
 /// Where plotter configuration files live. Names are file names ending in
 /// [`cadcraft_doc::PLOTTER_FILE_EXT`]; the engine never passes paths.
 #[derive(Clone, Copy)]
@@ -174,7 +181,104 @@ fn user_devices() -> Vec<PlotterConfig> {
     out
 }
 
-/// Every device: the built-in ones first, then the user's.
+/// Enumerate system printers and return them as PlotterConfig objects.
+fn enumerate_system_printers() -> Vec<PlotterConfig> {
+    let mut printers = Vec::new();
+
+    #[cfg(target_os = "windows")]
+    {
+        use std::ffi::OsString;
+        use std::os::windows::ffi::OsStringExt;
+        use winapi::um::winspool::{EnumPrintersW, PRINTER_ENUM_LOCAL, PRINTER_ENUM_CONNECTIONS, PRINTER_INFO_2W};
+
+        unsafe {
+            let flags = PRINTER_ENUM_LOCAL | PRINTER_ENUM_CONNECTIONS;
+            let mut needed: u32 = 0;
+            let mut returned: u32 = 0;
+
+            // First call to get required buffer size
+            EnumPrintersW(flags, core::ptr::null_mut(), 2, core::ptr::null_mut(), 0, &mut needed, &mut returned);
+
+            if needed > 0 {
+                let mut buffer: Vec<u8> = vec![0; needed as usize];
+                let result = EnumPrintersW(flags, core::ptr::null_mut(), 2, buffer.as_mut_ptr() as *mut _, needed, &mut needed, &mut returned);
+
+                if result != 0 {
+                    let info_ptr = buffer.as_ptr() as *const PRINTER_INFO_2W;
+                    for i in 0..returned as usize {
+                        let info = &*info_ptr.add(i);
+                        if !info.pPrinterName.is_null() {
+                            // Read wide string until null terminator
+                            let mut len = 0;
+                            while *info.pPrinterName.add(len) != 0 {
+                                len += 1;
+                                if len > 1024 { break; } // Safety limit
+                            }
+                            let name = OsString::from_wide(std::slice::from_raw_parts(info.pPrinterName, len))
+                                .to_string_lossy()
+                                .to_string();
+                            if !name.is_empty() {
+                                printers.push(system_printer_config(name));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    #[cfg(all(unix, not(target_os = "macos")))]
+    {
+        // Linux/BSD: use lpstat
+        if let Ok(output) = std::process::Command::new("lpstat").args(["-p"]).output() {
+            let stdout = String::from_utf8_lossy(&output.stdout);
+            for line in stdout.lines() {
+                if line.starts_with("printer ") {
+                    if let Some(name) = line.split_whitespace().nth(1) {
+                        printers.push(system_printer_config(name.to_string()));
+                    }
+                }
+            }
+        }
+    }
+
+    #[cfg(target_os = "macos")]
+    {
+        // macOS: use lpstat
+        if let Ok(output) = std::process::Command::new("lpstat").args(["-p"]).output() {
+            let stdout = String::from_utf8_lossy(&output.stdout);
+            for line in stdout.lines() {
+                if line.starts_with("printer ") {
+                    if let Some(name) = line.split_whitespace().nth(1) {
+                        printers.push(system_printer_config(name.to_string()));
+                    }
+                }
+            }
+        }
+    }
+
+    printers
+}
+
+/// Create a PlotterConfig for a system printer.
+fn system_printer_config(name: String) -> PlotterConfig {
+    let papers = cadcraft_render::PAPER_SIZES
+        .iter()
+        .map(|p| DevicePaper { name: p.name.into(), width: p.width_mm, height: p.height_mm, margins: p.margins_mm() })
+        .collect();
+    let default_paper = cadcraft_render::paper_size("A4").map(|p| p.name.to_string()).unwrap_or_default();
+    PlotterConfig {
+        name: format!("🖨 {}", name),  // Prefix with printer icon
+        description: format!("System printer: {}", name),
+        output: PlotOutput::Pdf,
+        resolution: 300,
+        orientation: Orientation::Landscape,
+        default_paper,
+        papers,
+    }
+}
+
+/// Every device: the built-in ones first, then the user's, then system printers.
 pub fn devices() -> Vec<PlotterConfig> {
     let mut v = builtins();
     v.extend(user_devices());
@@ -198,7 +302,9 @@ pub fn find_device(name: &str) -> Option<PlotterConfig> {
     }
     let st = store();
     let direct = cadcraft_doc::plotter_file_name(n).and_then(|f| PlotterConfig::from_file_text(&(st.read)(&f).ok()?).ok());
-    direct.filter(|c| c.name.eq_ignore_ascii_case(n)).or_else(|| user_devices().into_iter().find(|c| c.name.eq_ignore_ascii_case(n)))
+    direct.filter(|c| c.name.eq_ignore_ascii_case(n))
+        .or_else(|| user_devices().into_iter().find(|c| c.name.eq_ignore_ascii_case(n)))
+        .or_else(|| enumerate_system_printers().into_iter().find(|c| c.name.eq_ignore_ascii_case(n)))
 }
 
 /// The paper of `dev` called `name`, also by a standard size's short name (`A3`, `Letter`…).
