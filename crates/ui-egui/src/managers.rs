@@ -6,23 +6,134 @@
 //! the command. The dialogs read the drawing and change it only through the same commands
 //! (`app.run`), so every change is undoable and scriptable.
 
+use std::fs;
+use std::path::PathBuf;
 use std::process::Command;
 use std::sync::atomic::{AtomicU32, Ordering};
 use std::thread;
 use std::time::Duration;
 
-use cadcraft_doc::{Drawing, Space};
+use cadcraft_doc::{Drawing, PageSetup, Space};
 use cadcraft_engine::cmd::file::io;
 use cadcraft_engine::cmd::plotters::devices;
 use cadcraft_geom::Bounds2;
 use cadcraft_render::paper::PAPER_SIZES;
 use egui::{RichText, Sense, Stroke, vec2};
+use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
 
 use crate::parametric::expr_field;
 use crate::theme::Tokens;
 use crate::{CadApp, Pick};
 use cadcraft_engine::cmd::frame_books_with_options;
+
+/// Plot preset: a named collection of plot settings for quick reuse.
+#[derive(Clone, Serialize, Deserialize, Debug)]
+struct PlotPreset {
+    name: String,
+    device: String,
+    paper: String,
+    width_mm: f64,
+    height_mm: f64,
+    margins_mm: [f64; 4],
+    landscape: bool,
+    plot_area: String,
+    scale_to_fit: bool,
+    scale: f64,
+    plot_style_table: String,
+    center: bool,
+    lineweights: bool,
+    show_plot_styles: bool,
+    plot_transparency: bool,
+    paper_mm: bool,
+}
+
+impl PlotPreset {
+    /// Create a preset from a PageSetup.
+    fn from_page_setup(name: String, page: &PageSetup) -> Self {
+        Self {
+            name,
+            device: page.device.clone(),
+            paper: page.paper.clone(),
+            width_mm: page.width_mm,
+            height_mm: page.height_mm,
+            margins_mm: page.margins_mm,
+            landscape: page.landscape,
+            plot_area: page.plot_area.clone(),
+            scale_to_fit: page.scale_to_fit,
+            scale: page.scale,
+            plot_style_table: page.plot_style_table.clone(),
+            center: page.center,
+            lineweights: page.lineweights,
+            show_plot_styles: page.show_plot_styles,
+            plot_transparency: page.plot_transparency,
+            paper_mm: page.paper_mm,
+        }
+    }
+
+    /// Apply this preset to a PageSetup.
+    fn apply_to(&self, page: &mut PageSetup) {
+        page.device = self.device.clone();
+        page.paper = self.paper.clone();
+        page.width_mm = self.width_mm;
+        page.height_mm = self.height_mm;
+        page.margins_mm = self.margins_mm;
+        page.landscape = self.landscape;
+        page.plot_area = self.plot_area.clone();
+        page.scale_to_fit = self.scale_to_fit;
+        page.scale = self.scale;
+        page.plot_style_table = self.plot_style_table.clone();
+        page.center = self.center;
+        page.lineweights = self.lineweights;
+        page.show_plot_styles = self.show_plot_styles;
+        page.plot_transparency = self.plot_transparency;
+        page.paper_mm = self.paper_mm;
+    }
+}
+
+/// Get the path to the plot presets JSON file.
+fn plot_presets_path() -> PathBuf {
+    let mut path = dirs::config_dir().unwrap_or_else(|| PathBuf::from("."));
+    path.push("cadcraft");
+    fs::create_dir_all(&path).ok();
+    path.push("plot_presets.json");
+    path
+}
+
+/// Load all plot presets from disk.
+fn load_plot_presets() -> Vec<PlotPreset> {
+    let path = plot_presets_path();
+    if !path.exists() {
+        return Vec::new();
+    }
+    let content = fs::read_to_string(&path).unwrap_or_default();
+    serde_json::from_str(&content).unwrap_or_default()
+}
+
+/// Save all plot presets to disk.
+fn save_plot_presets(presets: &[PlotPreset]) {
+    let path = plot_presets_path();
+    let content = serde_json::to_string_pretty(presets).unwrap_or_default();
+    let _ = fs::write(&path, content);
+}
+
+/// Add or update a preset by name.
+fn upsert_plot_preset(preset: PlotPreset) {
+    let mut presets = load_plot_presets();
+    if let Some(existing) = presets.iter_mut().find(|p| p.name == preset.name) {
+        *existing = preset;
+    } else {
+        presets.push(preset);
+    }
+    save_plot_presets(&presets);
+}
+
+/// Delete a preset by name.
+fn delete_plot_preset(name: &str) {
+    let mut presets = load_plot_presets();
+    presets.retain(|p| p.name != name);
+    save_plot_presets(&presets);
+}
 
 /// Print PDF bytes to system printer (stage 1: delegate to OS print command).
 fn print_pdf_to_system_printer(pdf_bytes: &[u8], printer: Option<&str>) -> Result<(), String> {
@@ -131,6 +242,7 @@ pub fn dialog(app: &mut CadApp, ctx: &egui::Context, name: &str, open: &mut bool
         "csettings" => constraint_settings(app, ctx, open),
         "namedvports" => named_vports::dialog(app, ctx, open),
         "plot" => plot(app, ctx, open),
+        "plot_preset_save" => plot_preset_save(app, ctx, open),
         "multiplot" => multi_plot(app, ctx, open),
         _ => {
             *open = false;
@@ -1673,6 +1785,35 @@ fn plot(app: &mut CadApp, ctx: &egui::Context, open: &mut bool) -> Action {
             ui.end_row();
         });
         ui.separator();
+        // Preset selector
+        let presets = load_plot_presets();
+        if !presets.is_empty() {
+            ui.horizontal(|ui| {
+                ui.label("프리셋:");
+                let mut preset_name = String::new();
+                craft_ui::ComboBox::from_id_salt("plot_preset_select").selected_text("<프리셋 선택>").width(180.0).show_ui(ui, |ui| {
+                    for p in &presets {
+                        if ui.selectable_label(false, &p.name).clicked() {
+                            preset_name = p.name.clone();
+                        }
+                    }
+                });
+                if !preset_name.is_empty() {
+                    if let Some(preset) = presets.iter().find(|p| p.name == preset_name) {
+                        preset.apply_to(&mut st.page);
+                    }
+                }
+                if ui.small_button("💾 저장").on_hover_text("현재 설정을 프리셋으로 저장").clicked() {
+                    app.ui.dialog = Some("plot_preset_save".to_string());
+                }
+                if ui.small_button("🗑 삭제").on_hover_text("선택한 프리셋 삭제").clicked() {
+                    if let Some(preset) = presets.iter().find(|p| p.name == preset_name) {
+                        delete_plot_preset(&preset.name);
+                    }
+                }
+            });
+            ui.separator();
+        }
         ui.horizontal_top(|ui| {
             egui::Grid::new("plot_grid").num_columns(2).spacing(vec2(10.0, 6.0)).show(ui, |ui| {
                 let rows = if model {
@@ -1857,6 +1998,49 @@ fn run_plot(app: &mut CadApp, params: Value, target: &str) {
         // `run` already echoed the error; keep the dialog open to fix the settings.
         Err(_) => app.ui.dialog = Some("plot".into()),
     }
+}
+
+/// Dialog to save current plot settings as a preset.
+fn plot_preset_save(app: &mut CadApp, ctx: &egui::Context, open: &mut bool) -> Action {
+    let _t = Tokens::get();
+    let mut name = String::new();
+    let mut should_close = false;
+
+    egui::Window::new("프리셋 저장").open(open).collapsible(false).resizable(false).default_width(360.0).show(ctx, |ui| {
+        ui.heading("출력 프리셋 저장");
+        ui.add_space(8.0);
+        ui.label("이 프리셋의 이름을 입력하세요:");
+        ui.add_space(4.0);
+        let resp = ui.add(egui::TextEdit::singleline(&mut name).desired_width(300.0).hint_text("예: A3_흑백_중심"));
+        if resp.lost_focus() && ui.input(|i| i.key_pressed(egui::Key::Enter)) {
+            // Enter key pressed, will save below
+        }
+        ui.add_space(12.0);
+        ui.separator();
+        ui.add_space(8.0);
+        ui.horizontal(|ui| {
+            if ui.button("취소").clicked() {
+                should_close = true;
+            }
+            ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                let save_clicked = ui.add_enabled(!name.trim().is_empty(), egui::Button::new("저장")).clicked();
+                if save_clicked || (resp.lost_focus() && ui.input(|i| i.key_pressed(egui::Key::Enter)) && !name.trim().is_empty()) {
+                    // Get the current plot settings from the plot dialog's temp state
+                    if let Some(plot_st) = temp::<PlotState>(ctx, "plot_state") {
+                        let preset = PlotPreset::from_page_setup(name.trim().to_string(), &plot_st.page);
+                        upsert_plot_preset(preset);
+                        app.session.echo(format!("프리셋 '{}' 저장됨", name.trim()));
+                    }
+                    should_close = true;
+                }
+            });
+        });
+    });
+
+    if should_close {
+        *open = false;
+    }
+    None
 }
 
 /// The sheet in the chosen orientation with its printable area, and its size.
