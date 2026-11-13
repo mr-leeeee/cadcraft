@@ -142,18 +142,28 @@ fn print_pdf_to_system_printer(pdf_bytes: &[u8], printer: Option<&str>) -> Resul
 
     #[cfg(target_os = "windows")]
     {
-        // Windows: Use ShellExecute via rundll32 with "printto" verb for a chosen printer.
-        // Extract raw printer name (strip "🖨 " prefix if present)
+        // Windows: Use PowerShell Start-Process with -Verb PrintTo
+        // This is much more reliable than rundll32 shell32.dll,ShellExecuteW
         let raw_printer = printer.map(|p| p.strip_prefix("🖨 ").unwrap_or(p)).unwrap_or("");
         
-        let mut cmd = Command::new("rundll32.exe");
-        cmd.args(["shell32.dll,ShellExecuteW"]);
-        if !raw_printer.is_empty() {
-            // Use printto with printer name - need to quote the printer name if it has spaces
-            cmd.args(["0", "printto", tmp.to_str().unwrap(), raw_printer, "", "SW_HIDE"]);
+        let ps_script = if raw_printer.is_empty() {
+            // Print to default printer
+            format!(
+                r#"Start-Process -FilePath "{}" -Verb Print -WindowStyle Hidden"#,
+                tmp.to_str().unwrap().replace('\\', "\\\\")
+            )
         } else {
-            cmd.args(["0", "print", tmp.to_str().unwrap(), "", "", "SW_HIDE"]);
-        }
+            // Print to specific printer - escape quotes in printer name
+            let escaped_printer = raw_printer.replace('"', "`\"");
+            format!(
+                r#"Start-Process -FilePath "{}" -Verb PrintTo -ArgumentList "\"{}\"" -WindowStyle Hidden"#,
+                tmp.to_str().unwrap().replace('\\', "\\\\"),
+                escaped_printer
+            )
+        };
+        
+        let mut cmd = Command::new("powershell.exe");
+        cmd.args(["-NoProfile", "-Command", &ps_script]);
         cmd.spawn().map_err(|e| format!("spawn print command: {e}"))?;
     }
     #[cfg(target_os = "macos")]
