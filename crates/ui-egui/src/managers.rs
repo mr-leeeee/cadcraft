@@ -149,14 +149,14 @@ fn print_pdf_to_system_printer(pdf_bytes: &[u8], printer: Option<&str>) -> Resul
         let ps_script = if raw_printer.is_empty() {
             // Print to default printer
             format!(
-                r#"Start-Process -FilePath "{}" -Verb Print -WindowStyle Hidden"#,
+                r#"Start-Process -FilePath "{}" -Verb Print -WindowStyle Hidden -Wait"#,
                 tmp.to_str().unwrap().replace('\\', "\\\\")
             )
         } else {
             // Print to specific printer - escape quotes in printer name
             let escaped_printer = raw_printer.replace('"', "`\"");
             format!(
-                r#"Start-Process -FilePath "{}" -Verb PrintTo -ArgumentList "\"{}\"" -WindowStyle Hidden"#,
+                r#"Start-Process -FilePath "{}" -Verb PrintTo -ArgumentList "\"{}\"" -WindowStyle Hidden -Wait"#,
                 tmp.to_str().unwrap().replace('\\', "\\\\"),
                 escaped_printer
             )
@@ -164,7 +164,12 @@ fn print_pdf_to_system_printer(pdf_bytes: &[u8], printer: Option<&str>) -> Resul
         
         let mut cmd = Command::new("powershell.exe");
         cmd.args(["-NoProfile", "-Command", &ps_script]);
-        cmd.spawn().map_err(|e| format!("spawn print command: {e}"))?;
+        // Use output() instead of spawn() to capture stderr and wait for completion
+        let output = cmd.output().map_err(|e| format!("spawn print command: {e}"))?;
+        if !output.status.success() {
+            let stderr = String::from_utf8_lossy(&output.stderr);
+            return Err(format!("Print failed: {}", stderr.trim()));
+        }
     }
     #[cfg(target_os = "macos")]
     {
@@ -175,7 +180,7 @@ fn print_pdf_to_system_printer(pdf_bytes: &[u8], printer: Option<&str>) -> Resul
             let raw = p.strip_prefix("🖨 ").unwrap_or(p);
             cmd.arg("-P").arg(raw);
         }
-        cmd.arg(&tmp).spawn().map_err(|e| format!("spawn lpr: {e}"))?;
+        cmd.arg(&tmp).output().map_err(|e| format!("spawn lpr: {e}"))?;
     }
     #[cfg(all(unix, not(target_os = "macos")))]
     {
@@ -185,7 +190,7 @@ fn print_pdf_to_system_printer(pdf_bytes: &[u8], printer: Option<&str>) -> Resul
             let raw = p.strip_prefix("🖨 ").unwrap_or(p);
             cmd.arg("-P").arg(raw);
         }
-        cmd.arg(&tmp).spawn().map_err(|e| format!("spawn lpr: {e}"))?;
+        cmd.arg(&tmp).output().map_err(|e| format!("spawn lpr: {e}"))?;
     }
     #[cfg(target_arch = "wasm32")]
     {
