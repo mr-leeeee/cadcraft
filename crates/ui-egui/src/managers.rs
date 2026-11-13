@@ -142,35 +142,40 @@ fn print_pdf_to_system_printer(pdf_bytes: &[u8], printer: Option<&str>) -> Resul
 
     #[cfg(target_os = "windows")]
     {
-        // Windows: Use PowerShell Start-Process with -Verb PrintTo
-        // Use single-quoted strings in PowerShell for safe literal arguments
+        // Windows: Use rundll32 ShellExecuteW for reliable printing
+        // This is the standard Windows way to print files
         let raw_printer = printer.map(|p| p.strip_prefix("🖨 ").unwrap_or(p)).unwrap_or("");
         
-        // Escape single quotes for PowerShell single-quoted strings: ' -> ''
-        let escape_for_ps = |s: &str| s.replace('\'', "''");
-        
-        // In PowerShell single-quoted strings, backslashes are literal - no need to escape them
         let tmp_path = tmp.to_str().unwrap();
-        let escaped_tmp = escape_for_ps(tmp_path);
-        let escaped_printer = escape_for_ps(&raw_printer);
         
-        let ps_script = if raw_printer.is_empty() {
-            // Print to default printer
-            format!(
-                r#"Start-Process -FilePath '{}' -Verb Print -WindowStyle Hidden -Wait"#,
-                escaped_tmp
-            )
+        let mut cmd = Command::new("rundll32.exe");
+        if !raw_printer.is_empty() {
+            // Print to specific printer using "printto" verb
+            // Arguments: shell32.dll,ShellExecuteW 0 "printto" "file" "printer" "" "SW_HIDE"
+            cmd.args([
+                "shell32.dll,ShellExecuteW",
+                "0",
+                "printto",
+                tmp_path,
+                &raw_printer,
+                "",
+                "SW_HIDE"
+            ]);
         } else {
-            // Print to specific printer - use single-quoted args for safety
-            format!(
-                r#"Start-Process -FilePath '{}' -Verb PrintTo -ArgumentList '{}' -WindowStyle Hidden -Wait"#,
-                escaped_tmp, escaped_printer
-            )
-        };
+            // Print to default printer using "print" verb
+            // Arguments: shell32.dll,ShellExecuteW 0 "print" "file" "" "" "SW_HIDE"
+            cmd.args([
+                "shell32.dll,ShellExecuteW",
+                "0",
+                "print",
+                tmp_path,
+                "",
+                "",
+                "SW_HIDE"
+            ]);
+        }
         
-        let mut cmd = Command::new("powershell.exe");
-        cmd.args(["-NoProfile", "-Command", &ps_script]);
-        // Use output() instead of spawn() to capture stderr and wait for completion
+        // Use output() to wait for completion and capture any error
         let output = cmd.output().map_err(|e| format!("spawn print command: {e}"))?;
         if !output.status.success() {
             let stderr = String::from_utf8_lossy(&output.stderr);
