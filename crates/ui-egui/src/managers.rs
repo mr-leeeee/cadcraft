@@ -175,12 +175,8 @@ fn print_pdf_to_system_printer(pdf_bytes: &[u8], printer: Option<&str>) -> Resul
             ]);
         }
         
-        // Use output() to wait for completion and capture any error
-        let output = cmd.output().map_err(|e| format!("spawn print command: {e}"))?;
-        if !output.status.success() {
-            let stderr = String::from_utf8_lossy(&output.stderr);
-            return Err(format!("Print failed: {}", stderr.trim()));
-        }
+        // Use spawn() only - rundll32 is async and returns non-zero even on success
+        cmd.spawn().map_err(|e| format!("spawn print command: {e}"))?;
     }
     #[cfg(target_os = "macos")]
     {
