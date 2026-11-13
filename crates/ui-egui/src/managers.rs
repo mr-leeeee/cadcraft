@@ -142,13 +142,17 @@ fn print_pdf_to_system_printer(pdf_bytes: &[u8], printer: Option<&str>) -> Resul
 
     #[cfg(target_os = "windows")]
     {
-        // Windows: ShellExecute through rundll32, "printto" for a chosen printer.
+        // Windows: Use ShellExecute via rundll32 with "printto" verb for a chosen printer.
+        // Extract raw printer name (strip "🖨 " prefix if present)
+        let raw_printer = printer.map(|p| p.strip_prefix("🖨 ").unwrap_or(p)).unwrap_or("");
+        
         let mut cmd = Command::new("rundll32.exe");
         cmd.args(["shell32.dll,ShellExecuteW"]);
-        if let Some(p) = printer {
-            cmd.args(["0", "printto"]).arg(&tmp).arg(p).args(["", "SW_HIDE"]);
+        if !raw_printer.is_empty() {
+            // Use printto with printer name - need to quote the printer name if it has spaces
+            cmd.args(["0", "printto", tmp.to_str().unwrap(), raw_printer, "", "SW_HIDE"]);
         } else {
-            cmd.args(["0", "print"]).arg(&tmp).args(["", "", "SW_HIDE"]);
+            cmd.args(["0", "print", tmp.to_str().unwrap(), "", "", "SW_HIDE"]);
         }
         cmd.spawn().map_err(|e| format!("spawn print command: {e}"))?;
     }
@@ -157,7 +161,9 @@ fn print_pdf_to_system_printer(pdf_bytes: &[u8], printer: Option<&str>) -> Resul
         // macOS: lpr (CUPS)
         let mut cmd = Command::new("lpr");
         if let Some(p) = printer {
-            cmd.arg("-P").arg(p);
+            // Strip "🖨 " prefix if present
+            let raw = p.strip_prefix("🖨 ").unwrap_or(p);
+            cmd.arg("-P").arg(raw);
         }
         cmd.arg(&tmp).spawn().map_err(|e| format!("spawn lpr: {e}"))?;
     }
@@ -166,17 +172,19 @@ fn print_pdf_to_system_printer(pdf_bytes: &[u8], printer: Option<&str>) -> Resul
         // Linux/BSD: lpr (CUPS)
         let mut cmd = Command::new("lpr");
         if let Some(p) = printer {
-            cmd.arg("-P").arg(p);
+            let raw = p.strip_prefix("🖨 ").unwrap_or(p);
+            cmd.arg("-P").arg(raw);
         }
         cmd.arg(&tmp).spawn().map_err(|e| format!("spawn lpr: {e}"))?;
     }
     #[cfg(target_arch = "wasm32")]
     {
-        // Web: not implemented here (host would handle via window.print)
         return Err("system printing not available on web".into());
     }
-    // Note: temp file cleanup is best-effort; OS will clean on reboot
-    let _ = std::fs::remove_file(&tmp);
+    // Don't delete temp file immediately - let the print spooler read it first.
+    // The OS will clean up temp files on reboot, or we could use a background task.
+    // For now, we skip immediate deletion to avoid race condition with print spooler.
+    // let _ = std::fs::remove_file(&tmp);
     Ok(())
 }
 
