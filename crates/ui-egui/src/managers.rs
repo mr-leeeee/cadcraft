@@ -149,8 +149,9 @@ fn print_pdf_to_system_printer(pdf_bytes: &[u8], printer: Option<&str>) -> Resul
         // Escape single quotes for PowerShell single-quoted strings: ' -> ''
         let escape_for_ps = |s: &str| s.replace('\'', "''");
         
-        let tmp_path = tmp.to_str().unwrap().replace('\\', "\\\\");
-        let escaped_tmp = escape_for_ps(&tmp_path);
+        // In PowerShell single-quoted strings, backslashes are literal - no need to escape them
+        let tmp_path = tmp.to_str().unwrap();
+        let escaped_tmp = escape_for_ps(tmp_path);
         let escaped_printer = escape_for_ps(&raw_printer);
         
         let ps_script = if raw_printer.is_empty() {
