@@ -142,30 +142,28 @@ fn print_pdf_to_system_printer(pdf_bytes: &[u8], printer: Option<&str>) -> Resul
 
     #[cfg(target_os = "windows")]
     {
-        // Windows: Use printui.dll,PrintUIEntry for reliable printing
-        // This is the standard Windows programmatic printing API
+        // Windows: Use printui.dll,PrintUIEntry with proper quoting
+        // /k = print and close, /n "printer" = printer name, /t "file" = file to print
         let raw_printer = printer.map(|p| p.strip_prefix("🖨 ").unwrap_or(p)).unwrap_or("");
         
         let tmp_path = tmp.to_str().unwrap();
         
         let mut cmd = Command::new("rundll32.exe");
         if !raw_printer.is_empty() {
-            // Print to specific printer
-            // /k = print file and close, /n = printer name, /t = file to print
+            // Print to specific printer - quote file path and printer name
             cmd.args([
                 "printui.dll,PrintUIEntry",
                 "/k",
-                "/n", &raw_printer,
-                "/t", tmp_path,
+                "/n", &format!("\"{}\"", raw_printer),
+                "/t", &format!("\"{}\"", tmp_path),
             ]);
         } else {
             // Print to default printer
-            // /y = use default printer
             cmd.args([
                 "printui.dll,PrintUIEntry",
                 "/k",
                 "/y",
-                "/t", tmp_path,
+                "/t", &format!("\"{}\"", tmp_path),
             ]);
         }
         
