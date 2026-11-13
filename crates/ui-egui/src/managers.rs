@@ -142,40 +142,34 @@ fn print_pdf_to_system_printer(pdf_bytes: &[u8], printer: Option<&str>) -> Resul
 
     #[cfg(target_os = "windows")]
     {
-        // Windows: Use rundll32 ShellExecuteW for reliable printing
-        // This is the standard Windows way to print files
+        // Windows: Use printui.dll,PrintUIEntry for reliable printing
+        // This is the standard Windows programmatic printing API
         let raw_printer = printer.map(|p| p.strip_prefix("🖨 ").unwrap_or(p)).unwrap_or("");
         
         let tmp_path = tmp.to_str().unwrap();
         
         let mut cmd = Command::new("rundll32.exe");
         if !raw_printer.is_empty() {
-            // Print to specific printer using "printto" verb
-            // Arguments: shell32.dll,ShellExecuteW 0 "printto" "file" "printer" "" "SW_HIDE"
+            // Print to specific printer
+            // /k = print file and close, /n = printer name, /t = file to print
             cmd.args([
-                "shell32.dll,ShellExecuteW",
-                "0",
-                "printto",
-                tmp_path,
-                &raw_printer,
-                "",
-                "SW_HIDE"
+                "printui.dll,PrintUIEntry",
+                "/k",
+                "/n", &raw_printer,
+                "/t", tmp_path,
             ]);
         } else {
-            // Print to default printer using "print" verb
-            // Arguments: shell32.dll,ShellExecuteW 0 "print" "file" "" "" "SW_HIDE"
+            // Print to default printer
+            // /y = use default printer
             cmd.args([
-                "shell32.dll,ShellExecuteW",
-                "0",
-                "print",
-                tmp_path,
-                "",
-                "",
-                "SW_HIDE"
+                "printui.dll,PrintUIEntry",
+                "/k",
+                "/y",
+                "/t", tmp_path,
             ]);
         }
         
-        // Use spawn() only - rundll32 is async and returns non-zero even on success
+        // Use spawn() - PrintUIEntry handles the print job asynchronously
         cmd.spawn().map_err(|e| format!("spawn print command: {e}"))?;
     }
     #[cfg(target_os = "macos")]
