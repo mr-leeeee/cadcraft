@@ -143,22 +143,27 @@ fn print_pdf_to_system_printer(pdf_bytes: &[u8], printer: Option<&str>) -> Resul
     #[cfg(target_os = "windows")]
     {
         // Windows: Use PowerShell Start-Process with -Verb PrintTo
-        // This is much more reliable than rundll32 shell32.dll,ShellExecuteW
+        // Use single-quoted strings in PowerShell for safe literal arguments
         let raw_printer = printer.map(|p| p.strip_prefix("🖨 ").unwrap_or(p)).unwrap_or("");
+        
+        // Escape single quotes for PowerShell single-quoted strings: ' -> ''
+        let escape_for_ps = |s: &str| s.replace('\'', "''");
+        
+        let tmp_path = tmp.to_str().unwrap().replace('\\', "\\\\");
+        let escaped_tmp = escape_for_ps(&tmp_path);
+        let escaped_printer = escape_for_ps(&raw_printer);
         
         let ps_script = if raw_printer.is_empty() {
             // Print to default printer
             format!(
-                r#"Start-Process -FilePath "{}" -Verb Print -WindowStyle Hidden -Wait"#,
-                tmp.to_str().unwrap().replace('\\', "\\\\")
+                r#"Start-Process -FilePath '{}' -Verb Print -WindowStyle Hidden -Wait"#,
+                escaped_tmp
             )
         } else {
-            // Print to specific printer - escape quotes in printer name
-            let escaped_printer = raw_printer.replace('"', "`\"");
+            // Print to specific printer - use single-quoted args for safety
             format!(
-                r#"Start-Process -FilePath "{}" -Verb PrintTo -ArgumentList "\"{}\"" -WindowStyle Hidden -Wait"#,
-                tmp.to_str().unwrap().replace('\\', "\\\\"),
-                escaped_printer
+                r#"Start-Process -FilePath '{}' -Verb PrintTo -ArgumentList '{}' -WindowStyle Hidden -Wait"#,
+                escaped_tmp, escaped_printer
             )
         };
         
