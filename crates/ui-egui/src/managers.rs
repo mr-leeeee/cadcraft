@@ -142,36 +142,34 @@ fn print_pdf_to_system_printer(pdf_bytes: &[u8], printer: Option<&str>) -> Resul
 
     #[cfg(target_os = "windows")]
     {
-        // Windows: Use cmd /c start /wait with "print" verb
-        // This uses Windows file association to print the file properly
+        // Windows: Use rundll32 ShellExecuteW with printto/print verb
+        // This uses Windows ShellExecute API directly
         let raw_printer = printer.map(|p| p.strip_prefix("🖨 ").unwrap_or(p)).unwrap_or("");
         
         let tmp_path = tmp.to_str().unwrap();
         
-        let mut cmd = Command::new("cmd.exe");
+        let mut cmd = Command::new("rundll32.exe");
         if !raw_printer.is_empty() {
-            // Print to specific printer using rundll32 with proper quoting
-            // Use cmd /c to properly handle quotes
-            let printer_arg = format!("\"/n,{}\"", raw_printer.replace('"', "\\\""));
-            let file_arg = format!("\"/t,\"{}\"", tmp_path.replace('\\', "\\\\"));
+            // Print to specific printer using printto verb
             cmd.args([
-                "/c", "start", "/wait", "",
-                "rundll32.exe",
-                "printui.dll,PrintUIEntry",
-                "/k",
-                &printer_arg,
-                &file_arg,
+                "shell32.dll,ShellExecuteW",
+                "0",
+                "printto",
+                tmp_path,
+                &raw_printer,
+                "",
+                "SW_HIDE"
             ]);
         } else {
-            // Print to default printer
-            let file_arg = format!("\"/t,\"{}\"", tmp_path.replace('\\', "\\\\"));
+            // Print to default printer using print verb
             cmd.args([
-                "/c", "start", "/wait", "",
-                "rundll32.exe",
-                "printui.dll,PrintUIEntry",
-                "/k",
-                "/y",
-                &file_arg,
+                "shell32.dll,ShellExecuteW",
+                "0",
+                "print",
+                tmp_path,
+                "",
+                "",
+                "SW_HIDE"
             ]);
         }
         
