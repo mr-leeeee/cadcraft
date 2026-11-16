@@ -142,32 +142,39 @@ fn print_pdf_to_system_printer(pdf_bytes: &[u8], printer: Option<&str>) -> Resul
 
     #[cfg(target_os = "windows")]
     {
-        // Windows: Use printui.dll,PrintUIEntry
-        // /k = print and close, /n "printer" = printer name (no quotes), /t "file" = file to print (quoted)
+        // Windows: Use cmd /c start /wait with "print" verb
+        // This uses Windows file association to print the file properly
         let raw_printer = printer.map(|p| p.strip_prefix("🖨 ").unwrap_or(p)).unwrap_or("");
         
         let tmp_path = tmp.to_str().unwrap();
         
-        let mut cmd = Command::new("rundll32.exe");
+        let mut cmd = Command::new("cmd.exe");
         if !raw_printer.is_empty() {
-            // Print to specific printer - printer name NO quotes, file path WITH quotes
+            // Print to specific printer using rundll32 with proper quoting
+            // Use cmd /c to properly handle quotes
+            let printer_arg = format!("\"/n,{}\"", raw_printer.replace('"', "\\\""));
+            let file_arg = format!("\"/t,\"{}\"", tmp_path.replace('\\', "\\\\"));
             cmd.args([
+                "/c", "start", "/wait", "",
+                "rundll32.exe",
                 "printui.dll,PrintUIEntry",
                 "/k",
-                "/n", raw_printer,
-                "/t", &format!("\"{}\"", tmp_path),
+                &printer_arg,
+                &file_arg,
             ]);
         } else {
             // Print to default printer
+            let file_arg = format!("\"/t,\"{}\"", tmp_path.replace('\\', "\\\\"));
             cmd.args([
+                "/c", "start", "/wait", "",
+                "rundll32.exe",
                 "printui.dll,PrintUIEntry",
                 "/k",
                 "/y",
-                "/t", &format!("\"{}\"", tmp_path),
+                &file_arg,
             ]);
         }
         
-        // Use spawn() - PrintUIEntry handles the print job asynchronously
         cmd.spawn().map_err(|e| format!("spawn print command: {e}"))?;
     }
     #[cfg(target_os = "macos")]
