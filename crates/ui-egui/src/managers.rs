@@ -142,34 +142,26 @@ fn print_pdf_to_system_printer(pdf_bytes: &[u8], printer: Option<&str>) -> Resul
 
     #[cfg(target_os = "windows")]
     {
-        // Windows: Use rundll32 ShellExecuteW with printto/print verb
-        // This uses Windows ShellExecute API directly
+        // Windows: Use cmd /c print command
+        // /d:"printer" specifies the printer, file path is the file to print
         let raw_printer = printer.map(|p| p.strip_prefix("🖨 ").unwrap_or(p)).unwrap_or("");
         
         let tmp_path = tmp.to_str().unwrap();
         
-        let mut cmd = Command::new("rundll32.exe");
+        let mut cmd = Command::new("cmd.exe");
         if !raw_printer.is_empty() {
-            // Print to specific printer using printto verb
+            // Print to specific printer
+            // /d:"printer" specifies the printer device
             cmd.args([
-                "shell32.dll,ShellExecuteW",
-                "0",
-                "printto",
-                tmp_path,
-                &raw_printer,
-                "",
-                "SW_HIDE"
+                "/c", "print", "/d:",
+                &format!("\"{}\"", raw_printer),
+                &format!("\"{}\"", tmp_path),
             ]);
         } else {
-            // Print to default printer using print verb
+            // Print to default printer
             cmd.args([
-                "shell32.dll,ShellExecuteW",
-                "0",
-                "print",
-                tmp_path,
-                "",
-                "",
-                "SW_HIDE"
+                "/c", "print",
+                &format!("\"{}\"", tmp_path),
             ]);
         }
         
