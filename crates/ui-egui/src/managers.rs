@@ -142,27 +142,26 @@ fn print_pdf_to_system_printer(pdf_bytes: &[u8], printer: Option<&str>) -> Resul
 
     #[cfg(target_os = "windows")]
     {
-        // Windows: Use cmd /c print command
-        // /d:"printer" specifies the printer, file path is the file to print
+        // Windows: Use cmd /c rundll32 ShellExecuteW with proper quoting
         let raw_printer = printer.map(|p| p.strip_prefix("🖨 ").unwrap_or(p)).unwrap_or("");
         
         let tmp_path = tmp.to_str().unwrap();
         
         let mut cmd = Command::new("cmd.exe");
         if !raw_printer.is_empty() {
-            // Print to specific printer
-            // /d:"printer" specifies the printer device
-            cmd.args([
-                "/c", "print", "/d:",
-                &format!("\"{}\"", raw_printer),
-                &format!("\"{}\"", tmp_path),
-            ]);
+            // Print to specific printer using printto verb
+            let args = format!(
+                "/c rundll32.exe shell32.dll,ShellExecuteW 0 printto \"{}\" \"{}\" \"\" SW_HIDE",
+                tmp_path, raw_printer
+            );
+            cmd.args(["/c", &args]);
         } else {
             // Print to default printer
-            cmd.args([
-                "/c", "print",
-                &format!("\"{}\"", tmp_path),
-            ]);
+            let args = format!(
+                "/c rundll32.exe shell32.dll,ShellExecuteW 0 print \"{}\" \"\" \"\" SW_HIDE",
+                tmp_path
+            );
+            cmd.args(["/c", &args]);
         }
         
         cmd.spawn().map_err(|e| format!("spawn print command: {e}"))?;
