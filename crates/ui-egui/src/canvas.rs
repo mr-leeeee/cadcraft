@@ -966,13 +966,12 @@ pub fn show(app: &mut CadApp, ui: &mut egui::Ui) {
         && app.session.pending_window.is_some_and(|pw| pw.during_command)
         && resp.drag_stopped_by(egui::PointerButton::Primary)
         && let Some(end) = ui.input(|i| i.pointer.interact_pos())
+        && let Some(pw) = app.session.pending_window.take()
     {
-        if let Some(pw) = app.session.pending_window.take() {
-            let min = pw.corner;
-            let max = xf.to_world(end);
-            // Use transparent zoom window command (mode="window" with p1/p2)
-            let _ = app.run("zoom", serde_json::json!({ "mode": "window", "p1": [min.x, min.y], "p2": [max.x, max.y] }));
-        }
+        let min = pw.corner;
+        let max = xf.to_world(end);
+        // Use transparent zoom window command (mode="window" with p1/p2)
+        let _ = app.run("zoom", serde_json::json!({ "mode": "window", "p1": [min.x, min.y], "p2": [max.x, max.y] }));
     }
     if app.canvas.drag_window && resp.drag_stopped_by(egui::PointerButton::Primary) {
         app.canvas.drag_window = false;

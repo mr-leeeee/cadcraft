@@ -298,7 +298,7 @@ pub(crate) fn plot_options(s: &Session, p: &Value, cmd: &str) -> Result<Value> {
     // refuse it, as EXPORT does, unless `output` or a device says what to write.
     if cmd == "plot"
         && by_path.is_none()
-        && !p.get("output").and_then(Value::as_str).is_some_and(|o| PlotOutput::parse(o).is_some())
+        && p.get("output").and_then(Value::as_str).is_none_or(|o| PlotOutput::parse(o).is_none())
         && !(dev.is_some() && given.is_some_and(|n| !n.is_empty()))
         && let Some(path) = str_param(p, "path")
     {

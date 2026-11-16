@@ -236,15 +236,15 @@ impl LeaderM {
 }
 
 /// The dimension settings LEADER draws with, from the current dimension style and DIMSCALE.
-struct Sizes {
+pub(super) struct Sizes {
     arrow: f64,
     gap: f64,
-    text: f64,
+    pub(super) text: f64,
     above: bool,
     text_style: String,
 }
 
-fn sizes(s: &Session) -> Sizes {
+pub(super) fn sizes(s: &Session) -> Sizes {
     // The current style with the drawing's DIM* overrides (what SETVAR DIMTXT… sets).
     let st = s.doc().ok().and_then(|d| d.dim_style(&style(s)).map(|st| st.with_overrides(&d.dim_overrides()))).unwrap_or_default();
     let k = if st.scale > 0.0 { st.scale } else { 1.0 };

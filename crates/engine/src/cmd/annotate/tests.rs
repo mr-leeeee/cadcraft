@@ -575,3 +575,74 @@ fn linetype_rename_updates_references() {
     assert!(s.execute("rename", &json!({ "table": "linetype", "from": "ByLayer", "to": "X" })).is_err());
     assert_eq!(s.doc().unwrap().entity(by_layer).unwrap().common.linetype, "ByLayer");
 }
+
+fn partno_handles(v: &Value) -> Vec<Handle> {
+    v["handles"].as_array().unwrap().iter().map(|x| Handle::parse_hex(x.as_str().unwrap()).unwrap()).collect()
+}
+
+fn partno_text(s: &Session, h: Handle) -> String {
+    match &s.doc().unwrap().entity(h).unwrap().kind {
+        EntityKind::Text(t) => t.value.clone(),
+        other => panic!("not text: {other:?}"),
+    }
+}
+
+#[test]
+fn partno_places_a_numbered_balloon_and_advances_the_counter() {
+    let mut s = Session::new();
+    let v = s.execute("partno", &json!({ "arrow": [0.0, 0.0], "balloon": [10.0, 0.0] })).unwrap();
+    let hs = partno_handles(&v);
+    assert_eq!(hs.len(), 3, "leader, circle and text");
+    let (l, c, t) = match (
+        &s.doc().unwrap().entity(hs[0]).unwrap().kind,
+        &s.doc().unwrap().entity(hs[1]).unwrap().kind,
+        &s.doc().unwrap().entity(hs[2]).unwrap().kind,
+    ) {
+        (EntityKind::Leader(l), EntityKind::Circle(c), EntityKind::Text(t)) => (l.clone(), c.clone(), t.clone()),
+        other => panic!("not a balloon: {other:?}"),
+    };
+    assert!(near(l.vertices[0].xy(), Vec2::new(0.0, 0.0)));
+    // The leader runs from the arrow to the circle's edge, not its centre.
+    assert!(near(l.vertices[1].xy(), Vec2::new(10.0 - c.radius, 0.0)));
+    assert!(near(c.center.xy(), Vec2::new(10.0, 0.0)));
+    assert!(c.radius > 0.0);
+    assert_eq!(t.value, "1");
+    assert!(near(t.insert.xy(), Vec2::new(10.0, 0.0)));
+    assert_eq!((t.halign, t.valign), (cadcraft_doc::HAlign::Center, cadcraft_doc::VAlign::Middle));
+    // The next balloon is 2; a given number jumps and continues from it.
+    assert_eq!(s.last_used.partno_next, 2);
+    let v = s.execute("partno", &json!({ "arrow": [0.0, 5.0], "balloon": [10.0, 5.0] })).unwrap();
+    let t = partno_handles(&v);
+    assert_eq!(partno_text(&s, t[2]), "2");
+    assert_eq!(s.last_used.partno_next, 3);
+    let v = s.execute("partno", &json!({ "arrow": [0.0, 10.0], "balloon": [10.0, 10.0], "number": 9 })).unwrap();
+    let t = partno_handles(&v);
+    assert_eq!(partno_text(&s, t[2]), "9");
+    assert_eq!(s.last_used.partno_next, 10);
+}
+
+#[test]
+fn partno_repeats_and_takes_a_typed_number() {
+    let mut s = Session::new();
+    s.start("partno").unwrap();
+    s.input(Input::Point(Vec2::new(0.0, 0.0))).unwrap();
+    s.input(Input::Point(Vec2::new(10.0, 0.0))).unwrap();
+    // A typed whole number is the next balloon's number.
+    s.input(Input::Text("7".into())).unwrap();
+    s.input(Input::Point(Vec2::new(0.0, 5.0))).unwrap();
+    s.input(Input::Point(Vec2::new(10.0, 5.0))).unwrap();
+    s.input(Input::Enter).unwrap();
+    let texts: Vec<&str> = s
+        .doc()
+        .unwrap()
+        .model
+        .iter()
+        .filter_map(|e| match &e.kind {
+            EntityKind::Text(t) => Some(t.value.as_str()),
+            _ => None,
+        })
+        .collect();
+    assert_eq!(texts, ["1", "7"]);
+    assert_eq!(s.doc().unwrap().model.len(), 6, "two balloons of three entities");
+    assert_eq!(s.last_used.partno_next, 8);
+}

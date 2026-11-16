@@ -6,7 +6,7 @@ use serde_json::{Value, json};
 use crate::CadApp;
 
 /// The top-level menus, in order.
-pub const MENUS: &[&str] = &["File", "Edit", "View", "Insert", "Format", "Tools", "Draw", "Dimension", "Modify", "Window", "Help"];
+pub const MENUS: &[&str] = &["File", "Edit", "View", "Insert", "Format", "Tools", "Draw", "Dimension", "Modify", "Util", "Window", "Help"];
 
 /// The reference menu tree (feature names, four spaces per level): the order every menu lists
 /// its items in. The same file is `cargo xtask parity`'s oracle.

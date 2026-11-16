@@ -6,7 +6,7 @@ use cadcraft_geom::{PolyVertex, Vec2};
 use serde_json::{Value, json};
 
 use super::helpers::{line, lwpoly, rect_vertices};
-use super::*;
+use super::{CommandSpec, bad, f64_req, machines, point_req, size_param};
 use crate::{Accept, Input, Interactive, Prompt, Result, Session, Step};
 
 /// The 60° inclusive thread flank: the half-angle's tangent, so a flank drops a radial depth `h`

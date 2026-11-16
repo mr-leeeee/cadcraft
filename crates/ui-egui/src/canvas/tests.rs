@@ -141,8 +141,8 @@ fn wheel(unit: egui::MouseWheelUnit, dy: f32, modifiers: egui::Modifiers) -> egu
     egui::Event::MouseWheel { unit, delta: vec2(0.0, dy), phase: egui::TouchPhase::Move, source: egui::MouseWheelSource::Unknown, modifiers }
 }
 
-/// Wheel events convert to points as egui does; ⌘/Ctrl (egui's pinch zoom) and ⇧ (a sideways
-/// scroll) don't zoom here, and every notch of the frame counts (#660).
+/// Wheel events convert to points as egui does; ⌘/Ctrl (egui's pinch zoom) don't zoom here, ⇧
+/// zooms too (this fork's Shift+Wheel zoom), and every notch of the frame counts (#660).
 #[test]
 fn wheel_zoom_reads_every_notch_of_the_frame() {
     use egui::{Modifiers, MouseWheelUnit as U};
@@ -156,7 +156,8 @@ fn wheel_zoom_reads_every_notch_of_the_frame() {
     let three = [wheel(U::Line, 1.0, none), wheel(U::Line, 1.0, none), wheel(U::Line, 1.0, none)];
     assert_eq!(wheel_zoom_points(&three, &o, 500.0), 3.0 * o.line_scroll_speed);
     assert_eq!(wheel_zoom_points(&[wheel(U::Line, 1.0, Modifiers::COMMAND)], &o, 500.0), 0.0);
-    assert_eq!(wheel_zoom_points(&[wheel(U::Line, 1.0, Modifiers::SHIFT)], &o, 500.0), 0.0);
+    // Shift+Wheel zooms in this fork (it is not a sideways scroll here).
+    assert_eq!(wheel_zoom_points(&[wheel(U::Line, 1.0, Modifiers::SHIFT)], &o, 500.0), o.line_scroll_speed);
     assert_eq!(wheel_zoom_points(&[wheel(U::Line, f32::NAN, none)], &o, 500.0), 0.0);
     assert_eq!(wheel_zoom_points(&[egui::Event::PointerGone], &o, 500.0), 0.0);
 }

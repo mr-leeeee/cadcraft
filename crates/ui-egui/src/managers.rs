@@ -949,6 +949,78 @@ static MULTIPLOT_GEN: AtomicU32 = AtomicU32::new(0);
 
 const MULTIPLOT_STATE_KEY: &str = "multiplot_state";
 
+/// A sheet that plots `l`'s layout with its own page setup.
+fn layout_sheet(l: &cadcraft_doc::Layout) -> MultiPlotSheet {
+    let p = &l.page;
+    MultiPlotSheet {
+        enabled: true,
+        source: SheetSource::Layout(l.name.clone()),
+        paper: p.paper.clone(),
+        landscape: p.landscape,
+        device: "CADCraft PDF".to_string(),
+        margins_mm: p.margins_mm,
+        scale: p.scale,
+        center: p.center,
+        plot_area: p.plot_area.clone(),
+        plot_style_table: p.plot_style_table.clone(),
+        show_plot_styles: p.show_plot_styles,
+        plot_transparency: p.plot_transparency,
+        preview_texture: None,
+    }
+}
+
+/// What MULTIPLOT starts with: Model (extents) and every layout, in tab order.
+fn default_multi_plot_state(generation: u32, d: &Drawing) -> MultiPlotState {
+    let mut layouts: Vec<&cadcraft_doc::Layout> = d.layouts.iter().collect();
+    layouts.sort_by_key(|l| l.tab_order);
+    let mut sheets = Vec::with_capacity(layouts.len() + 1);
+    let ext = d.extents(&Space::Model);
+    let page = cadcraft_doc::PageSetup { plot_area: "extents".into(), scale_to_fit: true, ..Default::default() };
+    sheets.push(MultiPlotSheet {
+        enabled: true,
+        source: SheetSource::ModelWindow(ext),
+        paper: "A4".to_string(),
+        landscape: false,
+        device: "CADCraft PDF".to_string(),
+        margins_mm: page.margins_mm,
+        scale: page.scale,
+        center: page.center,
+        plot_area: page.plot_area.clone(),
+        plot_style_table: page.plot_style_table.clone(),
+        show_plot_styles: page.show_plot_styles,
+        plot_transparency: page.plot_transparency,
+        preview_texture: None,
+    });
+    sheets.extend(layouts.into_iter().map(layout_sheet));
+    MultiPlotState {
+        generation,
+        sheets,
+        frame_height: 297.0,
+        unit: 1.0,
+        output_path: String::new(),
+        exact_match: true,
+        aspect_tolerance: 0.0,
+        min_size_mm: 50.0,
+        max_size_mm: 2000.0,
+        show_preview_modal: false,
+        preview_modal_sheet: None,
+    }
+}
+
+/// Adds every layout that is not on the list yet.
+fn add_missing_layouts(st: &mut MultiPlotState, d: &Drawing) {
+    let existing: std::collections::HashSet<&str> = st
+        .sheets
+        .iter()
+        .filter_map(|s| match &s.source {
+            SheetSource::Layout(name) => Some(name.as_str()),
+            _ => None,
+        })
+        .collect();
+    let missing: Vec<MultiPlotSheet> = d.layouts.iter().filter(|l| !existing.contains(l.name.as_str())).map(layout_sheet).collect();
+    st.sheets.extend(missing);
+}
+
 /// The Multi-Plot dialog: manage multiple sheets, preview, and batch plot.
 fn multi_plot(app: &mut CadApp, ctx: &egui::Context, open: &mut bool) -> Action {
     let _t = Tokens::get();
@@ -957,57 +1029,13 @@ fn multi_plot(app: &mut CadApp, ctx: &egui::Context, open: &mut bool) -> Action 
         return None;
     };
     let generation = MULTIPLOT_GEN.load(Ordering::Relaxed);
-    let mut st = temp::<MultiPlotState>(ctx, MULTIPLOT_STATE_KEY).filter(|s| s.generation == generation).unwrap_or_else(|| {
-        let mut sheets = Vec::new();
-        // Default: all layouts + Model (extents)
-        let mut targets: Vec<String> = vec!["Model".to_string()];
-        let mut layouts: Vec<(u32, String)> = d.layouts.iter().map(|l| (l.tab_order, l.name.clone())).collect();
-        layouts.sort_by_key(|l| l.0);
-        targets.extend(layouts.into_iter().map(|l| l.1));
-        for name in targets {
-            let (source, paper, landscape, page) = if name == "Model" {
-                let ext = d.extents(&Space::Model);
-                let pg = cadcraft_doc::PageSetup { plot_area: "extents".into(), scale_to_fit: true, ..Default::default() };
-                (SheetSource::ModelWindow(ext), "A4".to_string(), false, pg)
-            } else if let Some(l) = d.layouts.iter().find(|l| l.name == name) {
-                let p = &l.page;
-                (SheetSource::Layout(name.clone()), p.paper.clone(), p.landscape, p.clone())
-            } else {
-                continue;
-            };
-            sheets.push(MultiPlotSheet {
-                enabled: true,
-                source,
-                paper,
-                landscape,
-                device: "CADCraft PDF".to_string(),
-                margins_mm: page.margins_mm,
-                scale: page.scale,
-                center: page.center,
-                plot_area: page.plot_area.clone(),
-                plot_style_table: page.plot_style_table.clone(),
-                show_plot_styles: page.show_plot_styles,
-                plot_transparency: page.plot_transparency,
-                preview_texture: None,
-            });
-        }
-        MultiPlotState {
-            generation,
-            sheets,
-            frame_height: 297.0,
-            unit: 1.0,
-            output_path: String::new(),
-            exact_match: true,
-            aspect_tolerance: 0.0,
-            min_size_mm: 50.0,
-            max_size_mm: 2000.0,
-            show_preview_modal: false,
-            preview_modal_sheet: None,
-        }
-    });
+    let mut st = temp::<MultiPlotState>(ctx, MULTIPLOT_STATE_KEY)
+        .filter(|s| s.generation == generation)
+        .unwrap_or_else(|| default_multi_plot_state(generation, d));
 
     let choices = MultiPlotPageChoices::new(ctx, d);
-    let (action, mut cancel, mut ok, mut find_frames, mut preview_all, mut save_each, mut print_each) = (None, false, false, false, false, false, false);
+    let (action, mut cancel, mut ok, mut find_frames, mut preview_all, mut save_each, mut print_each) =
+        (None, false, false, false, false, false, false);
 
     egui::Window::new("Multi-Plot (배치 플롯)").open(open).collapsible(false).resizable(true).default_width(700.0).show(ctx, |ui| {
         // Toolbar
@@ -1016,35 +1044,7 @@ fn multi_plot(app: &mut CadApp, ctx: &egui::Context, open: &mut bool) -> Action 
                 find_frames = true;
             }
             if ui.button("레이아웃 추가").on_hover_text("기존 레이아웃을 시트로 추가").clicked() {
-                // Add all layouts not already in list
-                let existing: std::collections::HashSet<_> = st
-                    .sheets
-                    .iter()
-                    .filter_map(|s| match &s.source {
-                        SheetSource::Layout(name) => Some(name.clone()),
-                        _ => None,
-                    })
-                    .collect();
-                for l in &d.layouts {
-                    if !existing.contains(&l.name) {
-                        let p = &l.page;
-                        st.sheets.push(MultiPlotSheet {
-                            enabled: true,
-                            source: SheetSource::Layout(l.name.clone()),
-                            paper: p.paper.clone(),
-                            landscape: p.landscape,
-                            device: "CADCraft PDF".to_string(),
-                            margins_mm: p.margins_mm,
-                            scale: p.scale,
-                            center: p.center,
-                            plot_area: p.plot_area.clone(),
-                            plot_style_table: p.plot_style_table.clone(),
-                            show_plot_styles: p.show_plot_styles,
-                            plot_transparency: p.plot_transparency,
-                            preview_texture: None,
-                        });
-                    }
-                }
+                add_missing_layouts(&mut st, d);
             }
             if ui.button("모두 지우기").clicked() {
                 st.sheets.clear();
@@ -1103,7 +1103,7 @@ fn multi_plot(app: &mut CadApp, ctx: &egui::Context, open: &mut bool) -> Action 
 
                     // Paper combo
                     let mut paper_name = sheet.paper.clone();
-                    egui::ComboBox::from_id_salt(("mp_paper", i)).selected_text(&paper_name).width(120.0).show_ui(ui, |ui| {
+                    craft_ui::ComboBox::from_id_salt(("mp_paper", i)).selected_text(&paper_name).width(120.0).show_ui(ui, |ui| {
                         for p in &choices.papers {
                             ui.selectable_value(&mut paper_name, p.clone(), p);
                         }
@@ -1123,7 +1123,7 @@ fn multi_plot(app: &mut CadApp, ctx: &egui::Context, open: &mut bool) -> Action 
 
                     // Device combo
                     let mut dev_name = sheet.device.clone();
-                    egui::ComboBox::from_id_salt(("mp_device", i)).selected_text(&dev_name).width(130.0).show_ui(ui, |ui| {
+                    craft_ui::ComboBox::from_id_salt(("mp_device", i)).selected_text(&dev_name).width(130.0).show_ui(ui, |ui| {
                         for dev in &choices.devices {
                             ui.selectable_value(&mut dev_name, dev.name.clone(), &dev.name);
                         }
@@ -1190,219 +1190,23 @@ fn multi_plot(app: &mut CadApp, ctx: &egui::Context, open: &mut bool) -> Action 
     }
 
     if find_frames {
-        // Use PDFBOOK's frame_books logic - limit drawing scope to avoid borrow conflicts
-        let Ok(drawing) = app.session.doc() else {
-            return None;
-        };
-        let opts = cadcraft_engine::cmd::FrameFindOptionsInternal {
-            frame_height: if st.exact_match { Some(st.frame_height) } else { None },
-            height_tolerance: if st.exact_match { 0.0005 } else { 10.0 },
-            min_size_mm: st.min_size_mm,
-            max_size_mm: st.max_size_mm,
-            find_all_rectangles: !st.exact_match,
-            aspect_tolerance: st.aspect_tolerance,
-            unit: st.unit,
-        };
-        let (books, skipped) = frame_books_with_options(drawing, opts);
-        for frames in &books {
-            for f in frames {
-                let pg = cadcraft_doc::PageSetup { plot_area: "window".into(), scale_to_fit: true, ..Default::default() };
-                st.sheets.push(MultiPlotSheet {
-                    enabled: true,
-                    source: SheetSource::ModelFrame(f.window),
-                    paper: f.paper.to_string(),
-                    landscape: f.landscape,
-                    device: "CADCraft PDF".to_string(),
-                    margins_mm: pg.margins_mm,
-                    scale: pg.scale,
-                    center: pg.center,
-                    plot_area: pg.plot_area.clone(),
-                    plot_style_table: pg.plot_style_table.clone(),
-                    show_plot_styles: pg.show_plot_styles,
-                    plot_transparency: pg.plot_transparency,
-                    preview_texture: None,
-                });
-            }
-        }
-        if skipped > 0 {
-            app.session.echo(format!("{}개 도곽은 크기/비율 불일치로 건너뜀", skipped));
-        }
-        app.session.echo(format!("{}개 시트 추가됨", books.iter().map(|b| b.len()).sum::<usize>()));
+        multi_plot_find_frames(app, &mut st);
     }
 
     if preview_all {
-        for (i, sheet) in st.sheets.iter_mut().enumerate() {
-            if let Some(params) = multiplot_sheet_params(sheet)
-                && let Ok(png) = generate_preview(app, &params, 200.0)
-            {
-                let tex = ctx.load_texture(format!("mp_preview_{}", i), png, Default::default());
-                sheet.preview_texture = Some(tex);
-            }
-        }
+        multi_plot_preview_all(app, ctx, &mut st);
     }
 
-    if ok {
-        let enabled_sheets: Vec<_> = st.sheets.iter().filter(|s| s.enabled).collect();
-        if enabled_sheets.is_empty() {
-            app.session.echo("출력할 시트가 없습니다 (체크된 시트 없음)");
-        } else if let Some(path) =
-            if st.output_path.is_empty() { app.services.pick_save.as_ref().and_then(|p| p("MultiPlot.pdf")) } else { Some(st.output_path.clone()) }
-        {
-            // Check if all sheets are layouts (merged PDF only works for layouts)
-            let all_layouts = enabled_sheets.iter().all(|s| matches!(s.source, SheetSource::Layout(_)));
-            if !all_layouts {
-                app.session.echo("병합 PDF는 레이아웃만 가능합니다. 도곽/모델 윈도우 시트가 포함된 경우 '개별 PDF 저장'을 사용하세요.");
-            } else {
-                // Build PLOT command with all sheets - all sheets in one PDF, one page per sheet
-                let mut params = json!({
-                    "layouts": enabled_sheets.iter().map(|s| match &s.source {
-                        SheetSource::Layout(name) => name.clone(),
-                        SheetSource::ModelWindow(_) => "Model".to_string(),
-                        SheetSource::ModelFrame(_) => "Model".to_string(),
-                    }).collect::<Vec<_>>(),
-                    "path": path,
-                });
-
-                // Use the first sheet's device/paper settings for the overall PDF
-                if let Some(first_sheet) = enabled_sheets.first() {
-                    let dev = cadcraft_engine::cmd::plotters::find_device(&first_sheet.device);
-                    if let Some(dev) = dev {
-                        params["device"] = json!(dev.name);
-                    }
-                    params["paper"] = json!(first_sheet.paper);
-                    params["landscape"] = json!(first_sheet.landscape);
-                }
-
-                match app.run("plot", params) {
-                    Ok(r) => {
-                        if let Some(p) = r.get("path").and_then(Value::as_str) {
-                            app.session.echo(format!("다중 페이지 PDF 저장됨: {}", p));
-                        } else {
-                            app.session.echo(format!("다중 페이지 PDF 저장됨 ({} bytes)", r.get("bytes").and_then(Value::as_u64).unwrap_or(0)));
-                        }
-                        *open = false;
-                    }
-                    Err(e) => {
-                        app.session.echo(format!("PDF 저장 실패: {}", e));
-                    }
-                }
-            }
-        }
+    if ok && multi_plot_merge(app, &st) {
+        *open = false;
     }
 
-    // Individual PDF save - each sheet as separate file
-    if save_each {
-        let enabled_sheets: Vec<_> = st.sheets.iter().filter(|s| s.enabled).cloned().collect();
-        if enabled_sheets.is_empty() {
-            app.session.echo("출력할 시트가 없습니다 (체크된 시트 없음)");
-        } else {
-            let base_path = if st.output_path.is_empty() {
-                app.services.pick_save.as_ref().and_then(|p| p("MultiPlot.pdf"))
-            } else {
-                Some(st.output_path.clone())
-            };
-            if let Some(base) = base_path {
-                let base_stem = std::path::Path::new(&base).file_stem().and_then(|s| s.to_str()).unwrap_or("MultiPlot");
-                let base_dir = std::path::Path::new(&base).parent().map(|p| p.to_path_buf()).unwrap_or_default();
-                let mut saved = 0;
-                let mut failed = 0;
-                for (idx, sheet) in enabled_sheets.iter().enumerate() {
-                    let sheet_name = match &sheet.source {
-                        SheetSource::Layout(name) => name.clone(),
-                        SheetSource::ModelWindow(_) => format!("Model_{}", idx + 1),
-                        SheetSource::ModelFrame(_) => format!("Model_{}", idx + 1),
-                    };
-                    let safe_name = sheet_name.replace(['/', '\\', ':', '*', '?', '"', '<', '>', '|'], "_");
-                    let sheet_path = base_dir.join(format!("{}_{}.pdf", base_stem, safe_name));
-                    if let Some(mut params) = multiplot_sheet_params(sheet) {
-                        // Pass the individual path for this sheet
-                        params["path"] = json!(sheet_path.to_string_lossy().to_string());
-                        match app.run("plot", params) {
-                            Ok(_) => saved += 1,
-                            Err(e) => {
-                                app.session.echo(format!("{} 저장 실패: {}", safe_name, e));
-                                failed += 1;
-                            }
-                        }
-                    } else {
-                        failed += 1;
-                    }
-                }
-                app.session.echo(format!("개별 PDF 저장 완료: {}개 성공, {}개 실패", saved, failed));
-                *open = false;
-            }
-        }
+    if save_each && multi_plot_save_each(app, &st) {
+        *open = false;
     }
 
-    // Individual printer output - each sheet as separate print job
-    if print_each {
-        let enabled_sheets: Vec<_> = st.sheets.iter().filter(|s| s.enabled).cloned().collect();
-        if enabled_sheets.is_empty() {
-            app.session.echo("출력할 시트가 없습니다 (체크된 시트 없음)");
-        } else {
-            let hook = io().and_then(|h| h.plot).ok_or_else(|| "plotting not available".to_string());
-            let hook_fn = match hook {
-                Ok(f) => f,
-                Err(e) => {
-                    app.session.echo(format!("플로팅 기능 없음: {}", e));
-                    return action;
-                }
-            };
-            // Collect results first to avoid borrow conflicts
-            let mut results: Vec<(String, Result<(), String>)> = Vec::new();
-            if let Ok(doc) = app.session.doc() {
-                for sheet in enabled_sheets {
-                    let space = match &sheet.source {
-                        SheetSource::Layout(name) => Space::Paper(name.clone()),
-                        SheetSource::ModelWindow(_) => Space::Model,
-                        SheetSource::ModelFrame(_) => Space::Model,
-                    };
-                    let sheet_label = match &sheet.source {
-                        SheetSource::Layout(name) => name.clone(),
-                        SheetSource::ModelWindow(_) => "Model".to_string(),
-                        SheetSource::ModelFrame(_) => "Model".to_string(),
-                    };
-                    if let Some(params) = multiplot_sheet_params(&sheet) {
-                        match hook_fn(&doc, &space, &params) {
-                            Ok(pdf_bytes) => {
-                                let printer_name = if sheet.device != "CADCraft PDF" && sheet.device != "CADCraft PNG" && sheet.device != "CADCraft SVG" {
-                                    Some(sheet.device.as_str())
-                                } else {
-                                    None
-                                };
-                                match print_pdf_to_system_printer(&pdf_bytes.to_vec(), printer_name) {
-                                    Ok(_) => {
-                                        results.push((sheet_label, Ok(())));
-                                        // Small delay so print spooler registers each as separate job
-                                        thread::sleep(Duration::from_millis(300));
-                                    }
-                                    Err(e) => results.push((sheet_label, Err(format!("프린터 출력 실패: {}", e)))),
-                                }
-                            }
-                            Err(e) => results.push((sheet_label, Err(format!("PDF 생성 실패: {}", e)))),
-                        }
-                    } else {
-                        results.push((sheet_label, Err("파라미터 생성 실패".into())));
-                    }
-                }
-            } else {
-                app.session.echo("도면 없음");
-            }
-            // Now report results
-            let mut printed = 0;
-            let mut failed = 0;
-            for (label, res) in results {
-                match res {
-                    Ok(_) => printed += 1,
-                    Err(e) => {
-                        app.session.echo(format!("{} 실패: {}", label, e));
-                        failed += 1;
-                    }
-                }
-            }
-            app.session.echo(format!("개별 프린터 출력 전송됨: {}개 성공, {}개 실패", printed, failed));
-            *open = false;
-        }
+    if print_each && multi_plot_print_each(app, &st) {
+        *open = false;
     }
 
     // Preview modal dialog
@@ -1448,6 +1252,220 @@ fn multi_plot(app: &mut CadApp, ctx: &egui::Context, open: &mut bool) -> Action 
 
     set_temp(ctx, MULTIPLOT_STATE_KEY, st);
     action
+}
+
+/// Adds a sheet for every 도곽 (closed polyline frame) found in model space.
+fn multi_plot_find_frames(app: &mut CadApp, st: &mut MultiPlotState) {
+    // Use PDFBOOK's frame_books logic - limit drawing scope to avoid borrow conflicts
+    let Ok(drawing) = app.session.doc() else {
+        return;
+    };
+    let opts = cadcraft_engine::cmd::FrameFindOptionsInternal {
+        frame_height: if st.exact_match { Some(st.frame_height) } else { None },
+        height_tolerance: if st.exact_match { 0.0005 } else { 10.0 },
+        min_size_mm: st.min_size_mm,
+        max_size_mm: st.max_size_mm,
+        find_all_rectangles: !st.exact_match,
+        aspect_tolerance: st.aspect_tolerance,
+        unit: st.unit,
+    };
+    let (books, skipped) = frame_books_with_options(drawing, opts);
+    let page = cadcraft_doc::PageSetup { plot_area: "window".into(), scale_to_fit: true, ..Default::default() };
+    for f in books.iter().flatten() {
+        st.sheets.push(MultiPlotSheet {
+            enabled: true,
+            source: SheetSource::ModelFrame(f.window),
+            paper: f.paper.to_string(),
+            landscape: f.landscape,
+            device: "CADCraft PDF".to_string(),
+            margins_mm: page.margins_mm,
+            scale: page.scale,
+            center: page.center,
+            plot_area: page.plot_area.clone(),
+            plot_style_table: page.plot_style_table.clone(),
+            show_plot_styles: page.show_plot_styles,
+            plot_transparency: page.plot_transparency,
+            preview_texture: None,
+        });
+    }
+    if skipped > 0 {
+        app.session.echo(format!("{}개 도곽은 크기/비율 불일치로 건너뜀", skipped));
+    }
+    app.session.echo(format!("{}개 시트 추가됨", books.iter().map(|b| b.len()).sum::<usize>()));
+}
+
+/// Generates a small preview for every sheet.
+fn multi_plot_preview_all(app: &mut CadApp, ctx: &egui::Context, st: &mut MultiPlotState) {
+    for (i, sheet) in st.sheets.iter_mut().enumerate() {
+        if let Some(params) = multiplot_sheet_params(sheet)
+            && let Ok(png) = generate_preview(app, &params, 200.0)
+        {
+            let tex = ctx.load_texture(format!("mp_preview_{}", i), png, Default::default());
+            sheet.preview_texture = Some(tex);
+        }
+    }
+}
+
+/// Merges every enabled sheet into one PDF (layouts only); true when the dialog closes.
+fn multi_plot_merge(app: &mut CadApp, st: &MultiPlotState) -> bool {
+    let enabled_sheets: Vec<_> = st.sheets.iter().filter(|s| s.enabled).collect();
+    if enabled_sheets.is_empty() {
+        app.session.echo("출력할 시트가 없습니다 (체크된 시트 없음)");
+        return false;
+    }
+    let Some(path) =
+        (if st.output_path.is_empty() { app.services.pick_save.as_ref().and_then(|p| p("MultiPlot.pdf")) } else { Some(st.output_path.clone()) })
+    else {
+        return false;
+    };
+    // Check if all sheets are layouts (merged PDF only works for layouts)
+    if !enabled_sheets.iter().all(|s| matches!(s.source, SheetSource::Layout(_))) {
+        app.session.echo("병합 PDF는 레이아웃만 가능합니다. 도곽/모델 윈도우 시트가 포함된 경우 '개별 PDF 저장'을 사용하세요.");
+        return false;
+    }
+    // Build PLOT command with all sheets - all sheets in one PDF, one page per sheet
+    let mut params = json!({
+        "layouts": enabled_sheets.iter().map(|s| match &s.source {
+            SheetSource::Layout(name) => name.clone(),
+            SheetSource::ModelWindow(_) => "Model".to_string(),
+            SheetSource::ModelFrame(_) => "Model".to_string(),
+        }).collect::<Vec<_>>(),
+        "path": path,
+    });
+    // Use the first sheet's device/paper settings for the overall PDF
+    if let Some(first_sheet) = enabled_sheets.first() {
+        if let Some(dev) = cadcraft_engine::cmd::plotters::find_device(&first_sheet.device) {
+            params["device"] = json!(dev.name);
+        }
+        params["paper"] = json!(first_sheet.paper);
+        params["landscape"] = json!(first_sheet.landscape);
+    }
+    match app.run("plot", params) {
+        Ok(r) => {
+            if let Some(p) = r.get("path").and_then(Value::as_str) {
+                app.session.echo(format!("다중 페이지 PDF 저장됨: {}", p));
+            } else {
+                app.session.echo(format!("다중 페이지 PDF 저장됨 ({} bytes)", r.get("bytes").and_then(Value::as_u64).unwrap_or(0)));
+            }
+            true
+        }
+        Err(e) => {
+            app.session.echo(format!("PDF 저장 실패: {}", e));
+            false
+        }
+    }
+}
+
+/// Saves every enabled sheet as its own PDF; true when the dialog closes.
+fn multi_plot_save_each(app: &mut CadApp, st: &MultiPlotState) -> bool {
+    let enabled_sheets: Vec<_> = st.sheets.iter().filter(|s| s.enabled).cloned().collect();
+    if enabled_sheets.is_empty() {
+        app.session.echo("출력할 시트가 없습니다 (체크된 시트 없음)");
+        return false;
+    }
+    let base_path =
+        if st.output_path.is_empty() { app.services.pick_save.as_ref().and_then(|p| p("MultiPlot.pdf")) } else { Some(st.output_path.clone()) };
+    let Some(base) = base_path else {
+        return false;
+    };
+    let base_stem = std::path::Path::new(&base).file_stem().and_then(|s| s.to_str()).unwrap_or("MultiPlot");
+    let base_dir = std::path::Path::new(&base).parent().map(|p| p.to_path_buf()).unwrap_or_default();
+    let (mut saved, mut failed) = (0, 0);
+    for (idx, sheet) in enabled_sheets.iter().enumerate() {
+        let sheet_name = match &sheet.source {
+            SheetSource::Layout(name) => name.clone(),
+            SheetSource::ModelWindow(_) => format!("Model_{}", idx + 1),
+            SheetSource::ModelFrame(_) => format!("Model_{}", idx + 1),
+        };
+        let safe_name = sheet_name.replace(['/', '\\', ':', '*', '?', '"', '<', '>', '|'], "_");
+        let sheet_path = base_dir.join(format!("{}_{}.pdf", base_stem, safe_name));
+        if let Some(mut params) = multiplot_sheet_params(sheet) {
+            // Pass the individual path for this sheet
+            params["path"] = json!(sheet_path.to_string_lossy().to_string());
+            match app.run("plot", params) {
+                Ok(_) => saved += 1,
+                Err(e) => {
+                    app.session.echo(format!("{} 저장 실패: {}", safe_name, e));
+                    failed += 1;
+                }
+            }
+        } else {
+            failed += 1;
+        }
+    }
+    app.session.echo(format!("개별 PDF 저장 완료: {}개 성공, {}개 실패", saved, failed));
+    true
+}
+
+/// Sends every enabled sheet to a printer as its own job; true when the dialog closes.
+fn multi_plot_print_each(app: &mut CadApp, st: &MultiPlotState) -> bool {
+    let enabled_sheets: Vec<_> = st.sheets.iter().filter(|s| s.enabled).cloned().collect();
+    if enabled_sheets.is_empty() {
+        app.session.echo("출력할 시트가 없습니다 (체크된 시트 없음)");
+        return false;
+    }
+    let hook = io().and_then(|h| h.plot).ok_or_else(|| "plotting not available".to_string());
+    let hook_fn = match hook {
+        Ok(f) => f,
+        Err(e) => {
+            app.session.echo(format!("플로팅 기능 없음: {}", e));
+            return false;
+        }
+    };
+    // Collect results first to avoid borrow conflicts
+    let mut results: Vec<(String, Result<(), String>)> = Vec::new();
+    if let Ok(doc) = app.session.doc() {
+        for sheet in enabled_sheets {
+            let space = match &sheet.source {
+                SheetSource::Layout(name) => Space::Paper(name.clone()),
+                SheetSource::ModelWindow(_) => Space::Model,
+                SheetSource::ModelFrame(_) => Space::Model,
+            };
+            let sheet_label = match &sheet.source {
+                SheetSource::Layout(name) => name.clone(),
+                SheetSource::ModelWindow(_) => "Model".to_string(),
+                SheetSource::ModelFrame(_) => "Model".to_string(),
+            };
+            if let Some(params) = multiplot_sheet_params(&sheet) {
+                match hook_fn(doc, &space, &params) {
+                    Ok(pdf_bytes) => {
+                        let printer_name = if sheet.device != "CADCraft PDF" && sheet.device != "CADCraft PNG" && sheet.device != "CADCraft SVG" {
+                            Some(sheet.device.as_str())
+                        } else {
+                            None
+                        };
+                        match print_pdf_to_system_printer(&pdf_bytes.to_vec(), printer_name) {
+                            Ok(_) => {
+                                results.push((sheet_label, Ok(())));
+                                // Small delay so print spooler registers each as separate job
+                                thread::sleep(Duration::from_millis(300));
+                            }
+                            Err(e) => results.push((sheet_label, Err(format!("프린터 출력 실패: {}", e)))),
+                        }
+                    }
+                    Err(e) => results.push((sheet_label, Err(format!("PDF 생성 실패: {}", e)))),
+                }
+            } else {
+                results.push((sheet_label, Err("파라미터 생성 실패".into())));
+            }
+        }
+    } else {
+        app.session.echo("도면 없음");
+        return false;
+    }
+    // Now report results
+    let (mut printed, mut failed) = (0, 0);
+    for (label, res) in results {
+        match res {
+            Ok(_) => printed += 1,
+            Err(e) => {
+                app.session.echo(format!("{} 실패: {}", label, e));
+                failed += 1;
+            }
+        }
+    }
+    app.session.echo(format!("개별 프린터 출력 전송됨: {}개 성공, {}개 실패", printed, failed));
+    true
 }
 
 /// Build plot parameters for a single sheet in multi-plot.

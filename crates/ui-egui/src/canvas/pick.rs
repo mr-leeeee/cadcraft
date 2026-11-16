@@ -10,9 +10,7 @@ pub(super) fn wheel_zoom_points(events: &[egui::Event], opts: &egui::InputOption
     let points: f32 = events
         .iter()
         .filter_map(|e| match e {
-            egui::Event::MouseWheel { unit, delta, modifiers, .. }
-                if !modifiers.matches_any(opts.zoom_modifier) =>
-            {
+            egui::Event::MouseWheel { unit, delta, modifiers, .. } if !modifiers.matches_any(opts.zoom_modifier) => {
                 let per = match unit {
                     egui::MouseWheelUnit::Point => 1.0,
                     egui::MouseWheelUnit::Line => opts.line_scroll_speed,

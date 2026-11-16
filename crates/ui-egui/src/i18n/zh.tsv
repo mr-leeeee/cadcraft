@@ -1302,6 +1302,12 @@
 	Top right	右上
 	Top left	左上
 	Color 1	颜色 1
+menu	Util	实用工具
+	Util	实用工具
+	Part Number	零件编号
+	Model Page Setup	模型页面设置
+	Multi-Plot...	多图打印...
+	Thread	螺纹
 	Color 2	颜色 2
 	Shape	形状
 	Inverted	反向

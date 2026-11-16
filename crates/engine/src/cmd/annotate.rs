@@ -19,6 +19,7 @@ mod edit;
 mod leader;
 mod linear;
 mod mleader;
+mod partno;
 mod radial;
 
 use angular::{AngularM, ArcLenM, run_angular, run_arclen};
@@ -93,6 +94,11 @@ pub fn specs() -> Vec<CommandSpec> {
             .alias(&["lead"])
             .params("{points: [[x,y]...], text?}")
             .interactive(|_| Ok(Box::new(leader::LeaderM::default()))),
+        CommandSpec::new("partno", "Part Number", partno::run)
+            .menu(&["Util", "Part Number"])
+            .alias(&["pn"])
+            .params("{arrow, balloon, number?} (a numbered balloon with an arrow-tipped leader; `number` defaults to the session's next)")
+            .interactive(|s| Ok(Box::new(partno::PartNoM::new(s)))),
         CommandSpec::new("dimstyle.update", "Update", run_update)
             .menu(&["Dimension", "Update"])
             .params("{handles?}")
