@@ -142,29 +142,36 @@ fn print_pdf_to_system_printer(pdf_bytes: &[u8], printer: Option<&str>) -> Resul
 
     #[cfg(target_os = "windows")]
     {
-        // Windows: Use cmd /c rundll32 ShellExecuteW with proper quoting
+        // Windows: Use PowerShell Start-Process with -Verb PrintTo
+        // Most reliable method for PDF printing via file association
         let raw_printer = printer.map(|p| p.strip_prefix("🖨 ").unwrap_or(p)).unwrap_or("");
         
         let tmp_path = tmp.to_str().unwrap();
         
-        let mut cmd = Command::new("cmd.exe");
-        if !raw_printer.is_empty() {
-            // Print to specific printer using printto verb
-            let args = format!(
-                "/c rundll32.exe shell32.dll,ShellExecuteW 0 printto \"{}\" \"{}\" \"\" SW_HIDE",
-                tmp_path, raw_printer
-            );
-            cmd.args(["/c", &args]);
-        } else {
+        let ps_script = if raw_printer.is_empty() {
             // Print to default printer
-            let args = format!(
-                "/c rundll32.exe shell32.dll,ShellExecuteW 0 print \"{}\" \"\" \"\" SW_HIDE",
-                tmp_path
-            );
-            cmd.args(["/c", &args]);
-        }
+            format!(
+                r#"Start-Process -FilePath "{}" -Verb Print -WindowStyle Hidden -Wait"#,
+                tmp_path.replace('\\', "\\\\").replace('\'', "''")
+            )
+        } else {
+            // Print to specific printer
+            format!(
+                r#"Start-Process -FilePath "{}" -Verb PrintTo -ArgumentList "\"{}\"" -WindowStyle Hidden -Wait"#,
+                tmp_path.replace('\\', "\\\\").replace('\'', "''"),
+                raw_printer.replace('\'', "''")
+            )
+        };
         
-        cmd.spawn().map_err(|e| format!("spawn print command: {e}"))?;
+        let mut cmd = Command::new("powershell.exe");
+        cmd.args(["-NoProfile", "-Command", &ps_script]);
+        
+        // Use output() to wait for completion and capture stderr
+        let output = cmd.output().map_err(|e| format!("spawn print command: {e}"))?;
+        if !output.status.success() {
+            let stderr = String::from_utf8_lossy(&output.stderr);
+            return Err(format!("Print failed: {}", stderr.trim()));
+        }
     }
     #[cfg(target_os = "macos")]
     {
