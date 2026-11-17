@@ -143,22 +143,28 @@ fn print_pdf_to_system_printer(pdf_bytes: &[u8], printer: Option<&str>) -> Resul
     #[cfg(target_os = "windows")]
     {
         // Windows: Use PowerShell Start-Process with -Verb PrintTo
-        // Use separate arguments for -ArgumentList to avoid quoting issues
+        // Use absolute path and verify file exists
         let raw_printer = printer.map(|p| p.strip_prefix("🖨 ").unwrap_or(p)).unwrap_or("");
         
         let tmp_path = tmp.to_str().unwrap();
         
+        // Ensure file exists and get absolute path
+        let abs_path = std::fs::canonicalize(&tmp).unwrap_or_else(|_| tmp.clone());
+        let abs_path_str = abs_path.to_str().unwrap();
+        
         let ps_script = if raw_printer.is_empty() {
             // Print to default printer
             format!(
-                r#"Start-Process -FilePath '{}' -Verb Print -WindowStyle Hidden -Wait"#,
-                tmp_path.replace('\'', "''")
+                r#"if (Test-Path '{}') {{ Start-Process -FilePath '{}' -Verb Print -WindowStyle Hidden -Wait }} else {{ Write-Error 'File not found' }}"#,
+                abs_path_str.replace('\'', "''"),
+                abs_path_str.replace('\'', "''")
             )
         } else {
-            // Print to specific printer - pass printer name as separate argument
+            // Print to specific printer
             format!(
-                r#"Start-Process -FilePath '{}' -Verb PrintTo -ArgumentList '{}' -WindowStyle Hidden -Wait"#,
-                tmp_path.replace('\'', "''"),
+                r#"if (Test-Path '{}') {{ Start-Process -FilePath '{}' -Verb PrintTo -ArgumentList '{}' -WindowStyle Hidden -Wait }} else {{ Write-Error 'File not found' }}"#,
+                abs_path_str.replace('\'', "''"),
+                abs_path_str.replace('\'', "''"),
                 raw_printer.replace('\'', "''")
             )
         };
