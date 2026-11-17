@@ -143,7 +143,7 @@ fn print_pdf_to_system_printer(pdf_bytes: &[u8], printer: Option<&str>) -> Resul
     #[cfg(target_os = "windows")]
     {
         // Windows: Use PowerShell Start-Process with -Verb PrintTo
-        // Most reliable method for PDF printing via file association
+        // Use separate arguments for -ArgumentList to avoid quoting issues
         let raw_printer = printer.map(|p| p.strip_prefix("🖨 ").unwrap_or(p)).unwrap_or("");
         
         let tmp_path = tmp.to_str().unwrap();
@@ -151,14 +151,14 @@ fn print_pdf_to_system_printer(pdf_bytes: &[u8], printer: Option<&str>) -> Resul
         let ps_script = if raw_printer.is_empty() {
             // Print to default printer
             format!(
-                r#"Start-Process -FilePath "{}" -Verb Print -WindowStyle Hidden -Wait"#,
-                tmp_path.replace('\\', "\\\\").replace('\'', "''")
+                r#"Start-Process -FilePath '{}' -Verb Print -WindowStyle Hidden -Wait"#,
+                tmp_path.replace('\'', "''")
             )
         } else {
-            // Print to specific printer
+            // Print to specific printer - pass printer name as separate argument
             format!(
-                r#"Start-Process -FilePath "{}" -Verb PrintTo -ArgumentList "\"{}\"" -WindowStyle Hidden -Wait"#,
-                tmp_path.replace('\\', "\\\\").replace('\'', "''"),
+                r#"Start-Process -FilePath '{}' -Verb PrintTo -ArgumentList '{}' -WindowStyle Hidden -Wait"#,
+                tmp_path.replace('\'', "''"),
                 raw_printer.replace('\'', "''")
             )
         };
