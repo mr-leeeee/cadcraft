@@ -142,28 +142,34 @@ fn print_pdf_to_system_printer(pdf_bytes: &[u8], printer: Option<&str>) -> Resul
 
     #[cfg(target_os = "windows")]
     {
-        // Windows: Use cmd /c rundll32 shell32.dll,ShellExecuteW with proper quoting
+        // Windows: Use printui.dll,PrintUIEntry for reliable printing
+        // This is the standard Windows programmatic printing API
         let raw_printer = printer.map(|p| p.strip_prefix("🖨 ").unwrap_or(p)).unwrap_or("");
         
         let tmp_path = tmp.to_str().unwrap();
         
-        let mut cmd = Command::new("cmd.exe");
+        let mut cmd = Command::new("rundll32.exe");
         if !raw_printer.is_empty() {
-            // Print to specific printer using printto verb
-            let args = format!(
-                "/c rundll32.exe shell32.dll,ShellExecuteW 0 printto \"{}\" \"{}\" \"\" SW_HIDE",
-                tmp_path, raw_printer
-            );
-            cmd.args(["/c", &args]);
+            // Print to specific printer
+            // /k = print file and close, /n = printer name, /t = file to print
+            cmd.args([
+                "printui.dll,PrintUIEntry",
+                "/k",
+                "/n", raw_printer,
+                "/t", tmp_path,
+            ]);
         } else {
             // Print to default printer
-            let args = format!(
-                "/c rundll32.exe shell32.dll,ShellExecuteW 0 print \"{}\" \"\" \"\" SW_HIDE",
-                tmp_path
-            );
-            cmd.args(["/c", &args]);
+            // /y = use default printer
+            cmd.args([
+                "printui.dll,PrintUIEntry",
+                "/k",
+                "/y",
+                "/t", tmp_path,
+            ]);
         }
         
+        // Use spawn() - PrintUIEntry handles the print job asynchronously
         cmd.spawn().map_err(|e| format!("spawn print command: {e}"))?;
     }
     #[cfg(target_os = "macos")]
